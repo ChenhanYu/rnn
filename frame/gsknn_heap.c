@@ -39,7 +39,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <immintrin.h>
+//#include <immintrin.h>
 
 #include <gsknn.h>
 #include <gsknn_config.h>
@@ -112,10 +112,10 @@ inline void heapSelect_s(
 {
   int    i;
 
-  __asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( x ) );
-  __asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( alpha ) );
-  __asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( D ) );
-  __asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( I ) );
+  //__asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( x ) );
+  //__asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( alpha ) );
+  //__asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( D ) );
+  //__asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( I ) );
 
   for ( i = 0; i < m; i ++ ) {
     if ( x[ i ] > D[ 0 ] ) {
@@ -141,10 +141,10 @@ inline void heapSelect_d(
 {
   int    i;
 
-  __asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( x ) );
-  __asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( alpha ) );
-  __asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( D ) );
-  __asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( I ) );
+  //__asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( x ) );
+  //__asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( alpha ) );
+  //__asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( D ) );
+  //__asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( I ) );
 
   //For the rest n-r elements, compare with the first element in the min heap
   //if x[i] < x[0], then x[i] will not be in the largest r elements;

@@ -49,9 +49,9 @@
  * dgemm and sgemm prototypes
  *
  */ 
-void dgemm(char*, char*, int*, int*, int*, double*, double*, 
+void dgemm_(char*, char*, int*, int*, int*, double*, double*, 
     int*, double*, int*, double*, double*, int*);
-void sgemm(char*, char*, int*, int*, int*, float*, float*, 
+void sgemm_(char*, char*, int*, int*, int*, float*, float*, 
     int*, float*, int*, float*, float*, int*);
 #endif
 

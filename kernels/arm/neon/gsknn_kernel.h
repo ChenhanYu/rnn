@@ -12,6 +12,15 @@ void knn_rank_k_ref_s4x4(
     aux_t  *aux
     );
 
+void knn_rank_k_int_s4x4(
+    int    k,
+    float  *a,
+    float  *b,
+    float  *c,
+    int    ldc,
+    aux_t  *aux
+    );
+
 void knn_rank_k_abs_ref_s4x4(
     int    k,
     float  *a,
@@ -22,6 +31,18 @@ void knn_rank_k_abs_ref_s4x4(
     );
 
 void knn_r_ref_s4x4_row(
+    int    k,
+    int    r,
+    float  *aa,
+    float  *a,
+    float  *bb,
+    float  *b,
+    float  *c,
+    aux_t  *aux,
+    int    *bmap
+    );
+
+void knn_r_int_s4x4_row(
     int    k,
     int    r,
     float  *aa,
@@ -136,7 +157,8 @@ void (*micro_s[ 2 ]) (
     aux_t  *aux,
     int    *bmap
     ) = {
-  knn_r_ref_s4x4_row,
+  knn_r_int_s4x4_row,
+  //knn_r_ref_s4x4_row,
   knn_r_abs_ref_s4x4_row,
 };
 
@@ -163,7 +185,8 @@ void (*rankk_s[ 2 ]) (
     int    ldc,
     aux_t  *aux
     ) = {
-  knn_rank_k_ref_s4x4,
+  knn_rank_k_int_s4x4,
+  //knn_rank_k_ref_s4x4,
   knn_rank_k_abs_ref_s4x4
 };
 

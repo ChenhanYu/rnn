@@ -8,6 +8,7 @@ void knn_rank_k_ref_s4x4(
     float  *a,
     float  *b,
     float  *c,
+    int    ldc,
     aux_t  *aux
     )
 {
@@ -39,6 +40,7 @@ void knn_rank_k_abs_ref_s4x4(
     float  *a,
     float  *b,
     float  *c,
+    int    ldc,
     aux_t  *aux
     )
 {
@@ -70,6 +72,7 @@ void knn_rank_k_ref_d4x4(
     double *a,
     double *b,
     double *c,
+    int    ldc,
     aux_t  *aux
     )
 {
@@ -100,6 +103,7 @@ void knn_rank_k_abs_ref_d4x4(
     double *a,
     double *b,
     double *c,
+    int    ldc,
     aux_t  *aux
     )
 {

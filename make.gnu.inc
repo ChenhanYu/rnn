@@ -6,10 +6,10 @@ ARCHFLAGS = cr
 RANLIB = ranlib
 
 ifeq ($(GSKNN_USE_BLAS),true)
-CFLAGS = -O3 -fopenmp -mavx -fPIC -DUSE_BLAS
+CFLAGS = -O3 -fopenmp -fPIC -DUSE_BLAS
 LDLIBS = $(LIBGSKNN) -lpthread -lm -fopenmp -lblas
 else
-CFLAGS = -O3 -fopenmp -mavx -fPIC
+CFLAGS = -O3 -fopenmp -fPIC
 LDLIBS = $(LIBGSKNN) -lpthread -lm -fopenmp
 endif
 

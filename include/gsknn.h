@@ -41,7 +41,7 @@ extern "C" {
 #endif
 
 #include <math.h>
-#include <immintrin.h>
+//#include <immintrin.h>
 
 #define KNN_VAR_THRES 512
 #define KNN_HEAP_OFFSET 3

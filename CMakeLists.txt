@@ -32,12 +32,12 @@ set (GSKNN_ARCH ${GSKNN_ARCH_MAJOR}/${GSKNN_ARCH_MINOR})
 if ($ENV{GSKNN_USE_INTEL} MATCHES "true")
   set (CMAKE_C_COMPILER   icc )
   set (CMAKE_CXX_COMPILER icpc)
-  set (GSKNN_CFLAGS          "-O3 -openmp -mavx")
+  set (GSKNN_CFLAGS          "-O2 -openmp -mfloat-abi=hard -mfpu=neon -march=armv7-a")
   set (CMAKE_EXE_LINKER_FLAGS "-lpthread -openmp -lm")
 else ($ENV{GSKNN_USE_INTEL} MATCHES "true")
   set (CMAKE_C_COMPILER   gcc)
   set (CMAKE_CXX_COMPILER g++)
-  set (GSKNN_CFLAGS          "-O3 -fopenmp -mavx")
+  set (GSKNN_CFLAGS          "-O2 -fopenmp -mfloat-abi=hard -mfpu=neon -march=armv7-a")
   set (CMAKE_EXE_LINKER_FLAGS "-lpthread -fopenmp -lm")
 endif ($ENV{GSKNN_USE_INTEL} MATCHES "true")
 
@@ -58,7 +58,8 @@ if ($ENV{GSKNN_USE_INTEL} MATCHES "true" AND $ENV{GSKNN_USE_BLAS} MATCHES "true"
 endif ($ENV{GSKNN_USE_INTEL} MATCHES "true" AND $ENV{GSKNN_USE_BLAS} MATCHES "true")
 
 if ($ENV{GSKNN_USE_GNU} MATCHES "true" AND $ENV{GSKNN_USE_BLAS} MATCHES "true")
-  set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lblas")
+    #set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /home/ubuntu/Work/Github/OpenBLAS/libopenblas.a")
+    link_directories(/home/ubuntu/Work/Github/OpenBLAS)
 endif ($ENV{GSKNN_USE_GNU} MATCHES "true" AND $ENV{GSKNN_USE_BLAS} MATCHES "true")
   
 
@@ -83,12 +84,16 @@ add_library (gsknn ${FRAME_CC_SRC} ${FRAME_CXX_SRC} ${KERNEL_SRC})
 # Build the executable files.
 add_executable (test_sgsknn.x ${CMAKE_SOURCE_DIR}/test/test_sgsknn.c)
 target_link_libraries(test_sgsknn.x gsknn)
+target_link_libraries(test_sgsknn.x openblas)
 add_executable (test_sgsknn_stl.x ${CMAKE_SOURCE_DIR}/test/test_sgsknn_stl.cpp)
 target_link_libraries(test_sgsknn_stl.x gsknn)
+target_link_libraries(test_sgsknn_stl.x openblas)
 add_executable (test_dgsknn.x ${CMAKE_SOURCE_DIR}/test/test_dgsknn.c)
 target_link_libraries(test_dgsknn.x gsknn)
+target_link_libraries(test_dgsknn.x openblas)
 add_executable (test_dgsknn_stl.x ${CMAKE_SOURCE_DIR}/test/test_dgsknn_stl.cpp)
 target_link_libraries(test_dgsknn_stl.x gsknn)
+target_link_libraries(test_dgsknn_stl.x openblas)
 
 
 # Install shell script

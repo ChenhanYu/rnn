@@ -8,6 +8,7 @@
 
 #define SKNN_MC 336
 #define SKNN_NC 4096
+//#define SKNN_NC 1024
 #define SKNN_KC 528
 #define SKNN_MR 4
 #define SKNN_NR 4

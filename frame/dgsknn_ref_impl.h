@@ -58,7 +58,7 @@
   // Compute the inner-product term.
   beg = omp_get_wtime();
 #ifdef USE_BLAS
-  dgemm( "T", "N", &m, &n, &k, &fneg2,
+  dgemm_( "T", "N", &m, &n, &k, &fneg2,
         As, &k, Bs, &k, &fzero, Cs, &m );
 #else
   #pragma omp parallel for private( i, p )

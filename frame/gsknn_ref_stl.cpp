@@ -53,10 +53,10 @@ extern "C" {
 
 #ifdef USE_BLAS
 // dgemm prototype
-extern "C" void dgemm( char*, char*, int*, int*, int*, double*, double*, 
+extern "C" void dgemm_( char*, char*, int*, int*, int*, double*, double*, 
     int*, double*, int*, double*, double*, int* );
 // sgemm prototype
-extern "C" void sgemm( char*, char*, int*, int*, int*, float*, float*, 
+extern "C" void sgemm_( char*, char*, int*, int*, int*, float*, float*, 
     int*, float*, int*, float*, float*, int* );
 #endif
 
