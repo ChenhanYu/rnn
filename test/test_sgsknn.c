@@ -207,6 +207,8 @@ void test_sgsknn(
   }
   ref_time = omp_get_wtime() - ref_beg;
 
+
+
   // Reformat the neighbor pair for comparison.
   for ( j = 0; j < n; j ++ ) {
     for ( i = 0; i < r; i ++ ) {

@@ -84,16 +84,16 @@ add_library (gsknn ${FRAME_CC_SRC} ${FRAME_CXX_SRC} ${KERNEL_SRC})
 # Build the executable files.
 add_executable (test_sgsknn.x ${CMAKE_SOURCE_DIR}/test/test_sgsknn.c)
 target_link_libraries(test_sgsknn.x gsknn)
-target_link_libraries(test_sgsknn.x openblas)
+#target_link_libraries(test_sgsknn.x openblas)
 add_executable (test_sgsknn_stl.x ${CMAKE_SOURCE_DIR}/test/test_sgsknn_stl.cpp)
 target_link_libraries(test_sgsknn_stl.x gsknn)
-target_link_libraries(test_sgsknn_stl.x openblas)
+#target_link_libraries(test_sgsknn_stl.x openblas)
 add_executable (test_dgsknn.x ${CMAKE_SOURCE_DIR}/test/test_dgsknn.c)
 target_link_libraries(test_dgsknn.x gsknn)
-target_link_libraries(test_dgsknn.x openblas)
+#target_link_libraries(test_dgsknn.x openblas)
 add_executable (test_dgsknn_stl.x ${CMAKE_SOURCE_DIR}/test/test_dgsknn_stl.cpp)
 target_link_libraries(test_dgsknn_stl.x gsknn)
-target_link_libraries(test_dgsknn_stl.x openblas)
+#target_link_libraries(test_dgsknn_stl.x openblas)
 
 
 # Install shell script

@@ -21,7 +21,7 @@ export GSKNN_USE_GNU=true
 echo "GSKNN_USE_GNU = $GSKNN_USE_GNU"
 
 # Whether use BLAS or not?
-export GSKNN_USE_BLAS=true
+export GSKNN_USE_BLAS=false
 echo "GSKNN_USE_BLAS = $GSKNN_USE_BLAS"
 
 # Manually set the mkl path

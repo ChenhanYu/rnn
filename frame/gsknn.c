@@ -322,7 +322,9 @@ void sgsknn_macro_kernel_row(
     )
 {
   //printf( "sgsknn_macro_kernel_row(): Not implemented yet.\n");
-  float  c[ SKNN_MC * SKNN_NC ] __attribute__((aligned(32)));
+  //float  c[ SKNN_MC * SKNN_NC ] __attribute__((aligned(32)));
+  //float  c[ 2 * SKNN_MR * SKNN_NR ] __attribute__((aligned(16)));
+  float  c[ 2 * SKNN_MR * SKNN_NR ];
   float  *cbuff = c;
   int    i, ii, j;
   aux_t  aux;

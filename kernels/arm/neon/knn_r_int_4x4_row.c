@@ -29,6 +29,8 @@ void knn_r_int_s4x4_row(
   int    k_iter = k / 4;
   int    k_left = k % 4;
 
+  __builtin_prefetch( c );
+
   if ( !aux->pc ) {
     cv0 = vmovq_n_f32( 0.0 );  
     cv1 = vmovq_n_f32( 0.0 );  
@@ -110,7 +112,7 @@ void knn_r_int_s4x4_row(
   }
 
   __builtin_prefetch( aux->b_next_s );
-  //__builtin_prefetch( c );
+  __builtin_prefetch( aa );
 
   //printf( "c: %f %f %f %f\n ", c[ 0 ], c[ 1 ], c[ 2 ], c[ 3 ] );
   //printf( "c: %f %f %f %f\n ", c[ 4 ], c[ 5 ], c[ 6 ], c[ 7 ] );
@@ -141,6 +143,41 @@ void knn_r_int_s4x4_row(
   av1 = vmovq_n_f32( *( aa + 3 ) ); 
   cv3 = vaddq_f32( cv3, av1 );
 
+  //cv0 = vaddq_f32( cv0, cv1 );
+  //cv2 = vaddq_f32( cv2, cv3 );
+  //cv0 = vaddq_f32( cv0, cv2 );
+
+  //vst1q_f32( c +  0, cv0 );
+  //vst1q_f32( c +  4, cv1 );
+  //vst1q_f32( c +  8, cv2 );
+  //vst1q_f32( c + 12, cv3 );
+
+  __builtin_prefetch( D );
+  __builtin_prefetch( I );
+
+  heapSelect_s( aux->n, r, &cv0, bmap, D + 0 * ldr, I + 0 * ldr );
+
+
+  __builtin_prefetch( D + ldr );
+  __builtin_prefetch( I + ldr );
+
+  if ( aux->m > 1 ) {
+    heapSelect_s( aux->n, r, &cv1, bmap, D + 1 * ldr, I + 1 * ldr );
+  }
+
+  __builtin_prefetch( D + 2 * ldr );
+  __builtin_prefetch( I + 2 * ldr );
+
+  if ( aux->m > 2 ) {
+    heapSelect_s( aux->n, r, &cv2, bmap, D + 2 * ldr, I + 2 * ldr );
+  }
+
+  __builtin_prefetch( D + 3 * ldr );
+  __builtin_prefetch( I + 3 *ldr );
+
+  if ( aux->m > 3 ) {
+    heapSelect_s( aux->n, r, &cv3, bmap, D + 3 * ldr, I + 3 * ldr );
+  }
 
   //vst1q_f32( c +  0, cv0 );
   //heapSelect_s( aux->n, r, c + 0 * 4, bmap, D + 0 * ldr, I + 0 * ldr );
@@ -151,14 +188,14 @@ void knn_r_int_s4x4_row(
   //vst1q_f32( c + 12, cv3 );
   //heapSelect_s( aux->n, r, c + 3 * 4, bmap, D + 3 * ldr, I + 3 * ldr );
 
-  vst1q_f32( c, cv0 );
-  heapSelect_s( aux->n, r, c, bmap, D + 0 * ldr, I + 0 * ldr );
-  vst1q_f32( c, cv1 );
-  heapSelect_s( aux->n, r, c, bmap, D + 1 * ldr, I + 1 * ldr );
-  vst1q_f32( c, cv2 );
-  heapSelect_s( aux->n, r, c, bmap, D + 2 * ldr, I + 2 * ldr );
-  vst1q_f32( c, cv3 );
-  heapSelect_s( aux->n, r, c, bmap, D + 3 * ldr, I + 3 * ldr );
+  //vst1q_f32( c, cv0 );
+  //heapSelect_s( aux->n, r, c, bmap, D + 0 * ldr, I + 0 * ldr );
+  //vst1q_f32( c, cv1 );
+  //heapSelect_s( aux->n, r, c, bmap, D + 1 * ldr, I + 1 * ldr );
+  //vst1q_f32( c, cv2 );
+  //heapSelect_s( aux->n, r, c, bmap, D + 2 * ldr, I + 2 * ldr );
+  //vst1q_f32( c, cv3 );
+  //heapSelect_s( aux->n, r, c, bmap, D + 3 * ldr, I + 3 * ldr );
 
   //for ( i = 0; i < 4; i ++ ) {
   //    heapSelect_s( aux->n, r, c + i * 4, bmap, D + i * ldr, I + i * ldr );
