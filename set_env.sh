@@ -31,5 +31,5 @@ echo "GSKNN_MKL_DIR = $GSKNN_MKL_DIR"
 
 # Parallel options
 export KMP_AFFINITY=compact
-export OMP_NUM_THREADS=1
-export GSKNN_IC_NT=1
+export OMP_NUM_THREADS=8
+export GSKNN_IC_NT=8

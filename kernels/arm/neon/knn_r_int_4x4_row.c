@@ -142,15 +142,23 @@ void knn_r_int_s4x4_row(
   cv3 = vaddq_f32( cv3, av1 );
 
 
-  vst1q_f32( c +  0, cv0 );
-  heapSelect_s( aux->n, r, c + 0 * 4, bmap, D + 0 * ldr, I + 0 * ldr );
-  vst1q_f32( c +  4, cv1 );
-  heapSelect_s( aux->n, r, c + 1 * 4, bmap, D + 1 * ldr, I + 1 * ldr );
-  vst1q_f32( c +  8, cv2 );
-  heapSelect_s( aux->n, r, c + 2 * 4, bmap, D + 2 * ldr, I + 2 * ldr );
-  vst1q_f32( c + 12, cv3 );
-  heapSelect_s( aux->n, r, c + 3 * 4, bmap, D + 3 * ldr, I + 3 * ldr );
+  //vst1q_f32( c +  0, cv0 );
+  //heapSelect_s( aux->n, r, c + 0 * 4, bmap, D + 0 * ldr, I + 0 * ldr );
+  //vst1q_f32( c +  4, cv1 );
+  //heapSelect_s( aux->n, r, c + 1 * 4, bmap, D + 1 * ldr, I + 1 * ldr );
+  //vst1q_f32( c +  8, cv2 );
+  //heapSelect_s( aux->n, r, c + 2 * 4, bmap, D + 2 * ldr, I + 2 * ldr );
+  //vst1q_f32( c + 12, cv3 );
+  //heapSelect_s( aux->n, r, c + 3 * 4, bmap, D + 3 * ldr, I + 3 * ldr );
 
+  vst1q_f32( c, cv0 );
+  heapSelect_s( aux->n, r, c, bmap, D + 0 * ldr, I + 0 * ldr );
+  vst1q_f32( c, cv1 );
+  heapSelect_s( aux->n, r, c, bmap, D + 1 * ldr, I + 1 * ldr );
+  vst1q_f32( c, cv2 );
+  heapSelect_s( aux->n, r, c, bmap, D + 2 * ldr, I + 2 * ldr );
+  vst1q_f32( c, cv3 );
+  heapSelect_s( aux->n, r, c, bmap, D + 3 * ldr, I + 3 * ldr );
 
   //for ( i = 0; i < 4; i ++ ) {
   //    heapSelect_s( aux->n, r, c + i * 4, bmap, D + i * ldr, I + i * ldr );
