@@ -1,0 +1,22 @@
+
+GSRNN (General Stride R-Nearest Neighbor)
+Readme
+---
+
+Thank you for deciding to give GSRNN a try!
+
+GSRNN (General Stride R-Nearest Neighbor) is a portable framework that
+provides a high performance memory efficient nearest neighbors search 
+based on the BLIS framework.
+
+GSRNN has several features. For further details of this project, please
+check the Githup repo:
+
+
+
+Thank you again for being intersted in GSRNN!
+
+Best regards,
+
+Chenhan D. Yu
+chenhan@cs.utexas.edu
