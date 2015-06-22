@@ -7,6 +7,7 @@ FRAME_CC_SRC=  \
 							 frame/dgsrnn_ref.c \
 							 frame/rnn_heap.c \
 							 frame/rnn_mergesort.c \
+							 frame/dgsnm.c \
 
 FRAME_CPP_SRC= \
 							 frame/dgsrnn_ref_stl.cpp \

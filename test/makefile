@@ -2,6 +2,7 @@ include $(RNN_DIR)/make.inc
 
 RNN_TEST_CC_SRC=  \
                  test_dgsrnn.c \
+                 test_dgsnm.c \
 #								 test_bitonic_d8.c \
 #								 test_merge_d8.c \
 #								 test_merge_dn.c \
