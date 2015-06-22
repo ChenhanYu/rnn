@@ -2,13 +2,20 @@
 export RNN_DIR=$PWD
 echo "RNN_DIR = $RNN_DIR"
 
-export KMP_AFFINITY=compact
-#export KMP_AFFINITY=scatter
-
-export OMP_NUM_THREADS=10
-export RNN_IC_NT=10
+# Manually set the target architecture.
+export RNN_ARCH_MAJOR=x86_64
+export RNN_ARCH_MINOR=sandybridge
+echo "RNN_ARCH = $RNN_ARCH_MAJOR/$RNN_ARCH_MINOR"
 
 # For macbook pro
 export DYLD_LIBRARY_PATH=/opt/intel/lib:/opt/intel/mkl/lib
 echo "DYLD_LIBRARY_PATH = $DYLD_LIBRARY_PATH"
-#ulimit -s 65532
+
+# Manually set the mkl path
+export RNN_MKL_DIR=/opt/intel/mkl
+echo "RNN_MKL_DIR = $RNN_MKL_DIR"
+
+# Parallel options
+export KMP_AFFINITY=compact
+export OMP_NUM_THREADS=1
+export RNN_IC_NT=1

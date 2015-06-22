@@ -1,21 +1,40 @@
 
 GSRNN (General Stride R-Nearest Neighbor)
-Install
+INSTALL
 ---
 
-The simplest way (the only way) to install GSRNN is to use makefile.
 
+
+GSRNN is tested on LINUX and OSX
+REQUIRES Intel compilers and MKL. 
+
+LINUX:
+edit set_env.sh and make.inc to set the paths to the libraries. 
+
+OSX: 
+edit set_env_osx.sh and make.osx.inc to set the paths to the libraries. 
+edit the first line in makefile to change make.inc to make.osx.inc 
+
+For LINUX (and similarly for OSX), to use the standard makefil:
 >source set_env.sh
 >make
 
-GSRNN requires c and c++ compilers that support OpenMP, and the
-default micro-kernel (written AXV) requires the a Sandy-Bridge
-processor or any successor.
+For LINUX (and similarly for OSX), to use cmake:
+>source set_env.sh
+>mkdir build
+>cd build
+>cmake ..
+>make
+>make install
 
-The currnet reference function requires the support of the MKL
+GSRNN requires C and C++ compilers that support OpenMP, and the
+default micro-kernel (uses AVX) requires the a Sandy-Bridge
+processor or any successor. 
+
+The current reference function requires the support of the MKL
 library which will be changed in the future. The default 
-compilation will also compile all the testing drivers. To run
-some basic examples from the testing drivers:
+compilation will also compile all the test drivers. To run
+some basic example from the testing drivers:
 
 >cd test
 >./run_dgsrnn.sh
@@ -30,4 +49,4 @@ C/C++ example:
 ...
 
 Compilation example:
->gcc ... -I$(RNN_DIR)/include $(RNN_DIR)/lib/librnn.a
+>icc ... -I$(RNN_DIR)/include $(RNN_DIR)/lib/librnn.a

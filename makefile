@@ -21,11 +21,9 @@ KERNEL_SRC=    \
 							 kernels/x86_64/sandybridge/rnn_asm_d8x4_var3_case2.c \
 							 kernels/x86_64/sandybridge/rnn_rank_k_asm_d8x4.c \
 							 kernels/x86_64/sandybridge/rnn_rank_int_d4.c \
-							 kernels/x86_64/sandybridge/rnn_bitonic_int_d8.c \
 							 kernels/x86_64/sandybridge/rnn_merge_int_d8.c \
 							 kernels/x86_64/sandybridge/rnn_merge_int_d4plus4.c \
 							 kernels/x86_64/sandybridge/rnn_sort_int_d4x4.c \
-							 kernels/x86_64/sandybridge/rnn_r1_int_d8x4.c \
 							 kernels/x86_64/sandybridge/rnn_r_int_d8x4.c \
 							 kernels/x86_64/sandybridge/rnn_r_int_d8x4_row.c \
 							 kernels/x86_64/sandybridge/rnn_r_int_d8x4_var3.c \

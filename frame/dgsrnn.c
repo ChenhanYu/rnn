@@ -346,19 +346,19 @@ void dgsrnn_macro_kernel(
       if ( i + DRNN_MR >= m ) {
         aux.b_next += DRNN_NR * k;
       }
-      if ( r < 1 ) {
-        rnn_r1_int_d8x4(
-            k,
-            0.0,
-            &packA2[ i ],
-            &packA[ i * k ],
-            &packB2[ j ],
-            &packB[ j * k ],
-            &aux,
-            &amap[ i ],
-            &I[ j ],
-            &D[ j ]
-            );
+      if ( r < 0 ) {
+        //rnn_r1_int_d8x4(
+        //    k,
+        //    0.0,
+        //    &packA2[ i ],
+        //    &packA[ i * k ],
+        //    &packB2[ j ],
+        //    &packB[ j * k ],
+        //    &aux,
+        //    &amap[ i ],
+        //    &I[ j ],
+        //    &D[ j ]
+        //    );
       }
       else {
         // ------------------------------------------------------------------

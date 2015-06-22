@@ -2,5 +2,6 @@
 *.swp
 *.x
 *.o
+*.a
 *.log
-
+build
