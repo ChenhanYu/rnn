@@ -251,14 +251,14 @@ void test_dgsrnn(
   //}
 
   // Compute error
-  //compute_error(
-  //    r,
-  //    m,
-  //    D,
-  //    I,
-  //    D_mkl,
-  //    I_mkl
-  //    );
+  compute_error(
+      r,
+      m,
+      D,
+      I,
+      D_mkl,
+      I_mkl
+      );
 
 
 
@@ -326,7 +326,6 @@ void test_dgsrnn_var2(
 
   for ( j = 0; j < n; j ++ ) {
     bmap[ j ] = j;
-    //bmap[ j ] = j;
   }
 
 
@@ -362,16 +361,6 @@ void test_dgsrnn_var2(
       I_mkl[ j * r + i ] = -1;
     }
   }
-
-  // Other Initialization
-  //for ( j = 0; j < m; j ++ ) {
-  //  for ( i = 0; i < r; i ++ ) {
-  //    D[ j * r + i ]     =  sqrt( k ) / ( i + 1 );
-  //    D_mkl[ j * r + i ] =  sqrt( k ) / ( i + 1 );
-  //    I[ j * r + i ]     = n + i;
-  //    I_mkl[ j * r + i ] = n + i; 
-  //  }
-  //}
 
 
     dgsrnn_var2(
@@ -461,14 +450,14 @@ void test_dgsrnn_var2(
 
 
   // Compute error
-  //compute_error(
-  //    r,
-  //    m,
-  //    D,
-  //    I,
-  //    D_mkl,
-  //    I_mkl
-  //    );
+  compute_error(
+      r,
+      m,
+      D,
+      I,
+      D_mkl,
+      I_mkl
+      );
 
 
 
@@ -498,9 +487,6 @@ void test_dgsrnn_var2(
 int main( int argc, char *argv[] )
 {
   int    m, n, k, r; 
-  //printf("start the test dgsknn!\n");
-  fflush( stdout );
-
 
 
   if ( argc != 5 ) {

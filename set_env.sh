@@ -5,7 +5,8 @@ echo "RNN_DIR = $RNN_DIR"
 # Manually set the target architecture.
 export RNN_ARCH_MAJOR=x86_64
 export RNN_ARCH_MINOR=sandybridge
-echo "RNN_ARCH = $RNN_ARCH_MAJOR/$RNN_ARCH_MINOR"
+export RNN_ARCH=$RNN_ARCH_MAJOR/$RNN_ARCH_MINOR
+echo "RNN_ARCH = $RNN_ARCH"
 
 # For macbook pro
 export DYLD_LIBRARY_PATH=/opt/intel/lib:/opt/intel/mkl/lib

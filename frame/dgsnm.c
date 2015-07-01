@@ -94,7 +94,7 @@ void dgsbnm(
     )
 {
   double *C, *C2, *D;
-  double delta, q;
+  double delta, q, qnext;
   int    *cmap;
   int    i, j, p, iter;
 
@@ -111,14 +111,13 @@ void dgsbnm(
   // Allocate D.
   D = rnn_malloc_aligned( m, 1, sizeof(double) );
 
-
-  delta = 99999.99;
+  q     = quality( m, n, k, X, amap, C, pi );
+  delta = q;
   iter  = 0;
 
   // Main loop
   while ( delta > tol && iter < niter ) {
     
-    q = quality( m, n, k, X, amap, C, pi );    
     printf( "iter#%d ---> %lf\n", iter, q );
 
     // Reset D vector.
@@ -145,8 +144,14 @@ void dgsbnm(
     //printf( "Centroid\n" );
     centroid( m, n, k, X, amap, C, C2, pi ); 
 
+
+    qnext = quality( m, n, k, X, amap, C, pi );
+    delta = q - qnext;
+    q     = qnext;
+
     // Increase the counter.
     iter ++;
+    
   }
 
   free( C );

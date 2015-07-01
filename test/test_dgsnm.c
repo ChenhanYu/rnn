@@ -6,17 +6,18 @@
 
 
 void test_dgsnm(
-    int m,
-    int n,
-    int k
+    int    m,
+    int    n,
+    int    k,
+    int    niter,
+    double tol
     ) 
 {
-  int    i, j, p, nx, iter, n_iter;
+  int    i, j, p, nx, iter;
   int    *amap, *pi;
   double *XA, *XA2;
   double tmp, error, flops;
-  double ref_beg, ref_time, dgsrnn_beg, dgsrnn_time;
-
+  double ref_beg, ref_time, dgsnm_beg, dgsnm_time;
 
   nx = 4096 * 10;
 
@@ -47,7 +48,7 @@ void test_dgsnm(
   // Initialize pi in a periodic distribution.
   for ( i = 0; i < m; i ++ ) pi[ i ]  = i % n;
 
-  printf( "here1\n" );
+  dgsnm_beg = omp_get_wtime();
 
   dgsbnm(
       m,
@@ -57,15 +58,17 @@ void test_dgsnm(
       XA2,
       amap,
       pi,
-      0.0,
-      10
+      tol,
+      niter
       );
 
-  printf( "here2\n" );
+  dgsnm_time = omp_get_wtime() - dgsnm_beg;
 
+  printf( "%d, %d, %d, %5.2lf\n", m, n, k, dgsnm_time );
 
   free( XA );
   free( XA2 );
+  free( amap );
   free( pi );
 }
 
@@ -75,20 +78,30 @@ void test_dgsnm(
 
 int main( int argc, char *argv[] )
 {
-  int    m, n, k; 
-  fflush( stdout );
+  int    m, n, k, niter;
+  double tol;
 
-  if ( argc != 4 ) {
+  if ( argc < 4 ) {
     printf( "argc: %d\n", argc );
-    printf( "we need 3 arguments!\n" );
+    printf( "we need at least 3 arguments!\n" );
     exit( 0 );
   }
+
+  niter = 10;
+  tol   = 0.0001;
 
   sscanf( argv[ 1 ], "%d", &m );
   sscanf( argv[ 2 ], "%d", &n );
   sscanf( argv[ 3 ], "%d", &k );
 
-  test_dgsnm( m, n, k );
+  if ( argc > 4 ) 
+    sscanf( argv[ 4 ], "%d", &niter );
+
+  if ( argc > 5 ) 
+    sscanf( argv[ 5 ], "%lf", &tol );
+
+
+  test_dgsnm( m, n, k, niter, tol );
 
   return 0;
 }

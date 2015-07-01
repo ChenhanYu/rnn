@@ -11,111 +11,21 @@ inline void packA_kcxmc(
     double *packA
     )
 {
-  int    i;
-  double *a_i0_pntr;
-  double *a_i1_pntr;
-  double *a_i2_pntr;
-  double *a_i3_pntr;
-  double *a_i4_pntr;
-  double *a_i5_pntr;
-  double *a_i6_pntr;
-  double *a_i7_pntr;
+  int    i, p;
+  double *a_pntr[ DRNN_MR ];
 
-  double *packA_check = packA;
-
-  //printf( "packA check#0\n" );
-  if ( m > 7 ) {
-    a_i0_pntr = XA + ldXA * amap[ 0 ];
-    a_i1_pntr = XA + ldXA * amap[ 1 ];
-    a_i2_pntr = XA + ldXA * amap[ 2 ];
-    a_i3_pntr = XA + ldXA * amap[ 3 ];
-    a_i4_pntr = XA + ldXA * amap[ 4 ];
-    a_i5_pntr = XA + ldXA * amap[ 5 ];
-    a_i6_pntr = XA + ldXA * amap[ 6 ];
-    a_i7_pntr = XA + ldXA * amap[ 7 ];
-  }
-  else if ( m > 6 ) {
-    a_i0_pntr = XA + ldXA * amap[ 0 ];
-    a_i1_pntr = XA + ldXA * amap[ 1 ];
-    a_i2_pntr = XA + ldXA * amap[ 2 ];
-    a_i3_pntr = XA + ldXA * amap[ 3 ];
-    a_i4_pntr = XA + ldXA * amap[ 4 ];
-    a_i5_pntr = XA + ldXA * amap[ 5 ];
-    a_i6_pntr = XA + ldXA * amap[ 6 ];
-    a_i7_pntr = XA + ldXA * amap[ 0 ];
-  }
-  else if ( m > 5 ) {
-    a_i0_pntr = XA + ldXA * amap[ 0 ];
-    a_i1_pntr = XA + ldXA * amap[ 1 ];
-    a_i2_pntr = XA + ldXA * amap[ 2 ];
-    a_i3_pntr = XA + ldXA * amap[ 3 ];
-    a_i4_pntr = XA + ldXA * amap[ 4 ];
-    a_i5_pntr = XA + ldXA * amap[ 5 ];
-    a_i6_pntr = XA + ldXA * amap[ 0 ];
-    a_i7_pntr = XA + ldXA * amap[ 0 ];
-  }
-  else if ( m > 4 ) {
-    a_i0_pntr = XA + ldXA * amap[ 0 ];
-    a_i1_pntr = XA + ldXA * amap[ 1 ];
-    a_i2_pntr = XA + ldXA * amap[ 2 ];
-    a_i3_pntr = XA + ldXA * amap[ 3 ];
-    a_i4_pntr = XA + ldXA * amap[ 4 ];
-    a_i5_pntr = XA + ldXA * amap[ 0 ];
-    a_i6_pntr = XA + ldXA * amap[ 0 ];
-    a_i7_pntr = XA + ldXA * amap[ 0 ];
-  }
-  else if ( m > 3 ) {
-    a_i0_pntr = XA + ldXA * amap[ 0 ];
-    a_i1_pntr = XA + ldXA * amap[ 1 ];
-    a_i2_pntr = XA + ldXA * amap[ 2 ];
-    a_i3_pntr = XA + ldXA * amap[ 3 ];
-    a_i4_pntr = XA + ldXA * amap[ 0 ];
-    a_i5_pntr = XA + ldXA * amap[ 0 ];
-    a_i6_pntr = XA + ldXA * amap[ 0 ];
-    a_i7_pntr = XA + ldXA * amap[ 0 ];
-  }
-  else if ( m > 2 ) {
-    a_i0_pntr = XA + ldXA * amap[ 0 ];
-    a_i1_pntr = XA + ldXA * amap[ 1 ];
-    a_i2_pntr = XA + ldXA * amap[ 2 ];
-    a_i3_pntr = XA + ldXA * amap[ 0 ];
-    a_i4_pntr = XA + ldXA * amap[ 0 ];
-    a_i5_pntr = XA + ldXA * amap[ 0 ];
-    a_i6_pntr = XA + ldXA * amap[ 0 ];
-    a_i7_pntr = XA + ldXA * amap[ 0 ];
-  }
-  else if ( m > 1 ) {
-    a_i0_pntr = XA + ldXA * amap[ 0 ];
-    a_i1_pntr = XA + ldXA * amap[ 1 ];
-    a_i2_pntr = XA + ldXA * amap[ 0 ];
-    a_i3_pntr = XA + ldXA * amap[ 0 ];
-    a_i4_pntr = XA + ldXA * amap[ 0 ];
-    a_i5_pntr = XA + ldXA * amap[ 0 ];
-    a_i6_pntr = XA + ldXA * amap[ 0 ];
-    a_i7_pntr = XA + ldXA * amap[ 0 ];
-  }
-  else {
-    a_i0_pntr = XA + ldXA * amap[ 0 ];
-    a_i1_pntr = XA + ldXA * amap[ 0 ];
-    a_i2_pntr = XA + ldXA * amap[ 0 ];
-    a_i3_pntr = XA + ldXA * amap[ 0 ];
-    a_i4_pntr = XA + ldXA * amap[ 0 ];
-    a_i5_pntr = XA + ldXA * amap[ 0 ];
-    a_i6_pntr = XA + ldXA * amap[ 0 ];
-    a_i7_pntr = XA + ldXA * amap[ 0 ];
+  for ( i = 0; i < m; i ++ ) {
+    a_pntr[ i ] = XA + ldXA * amap[ i ];
   }
 
+  for ( i = m; i < DRNN_MR; i ++ ) {
+    a_pntr[ i ] = XA + ldXA * amap[ 0 ];
+  }
 
-  // loop over rows of XB
-  for ( i = 0; i < k; i ++ ) {
-    *packA ++ = *a_i0_pntr++;
-    *packA ++ = *a_i1_pntr++;
-    *packA ++ = *a_i2_pntr++;
-    *packA ++ = *a_i3_pntr++;
-    *packA ++ = *a_i4_pntr++;
-    *packA ++ = *a_i5_pntr++;
-    *packA ++ = *a_i6_pntr++;
-    *packA ++ = *a_i7_pntr++;
+  for ( p = 0; p < k; p ++ ) {
+    for ( i = 0; i < DRNN_MR; i ++ ) {
+      *packA ++ = *a_pntr[ i ] ++;
+    }
   }
 }
 
@@ -130,56 +40,22 @@ inline void packB_kcxnc(
     double *packB
     )
 {
-  int    i;
-  double *b_i0_pntr;
-  double *b_i1_pntr;
-  double *b_i2_pntr;
-  double *b_i3_pntr;
-  double *packB_check = packB;
+  int    j, p; 
+  double *b_pntr[ DRNN_NR ];
 
-
-  if ( n > 3 ) {
-    //printf( "packB n = 4\n" );
-    //printf( "ldXB = %d, bmap[ 0 ] = %d, bmap[ 1 ] = %d, bmap[ 2 ] = %d, bmap[ 3 ] = %d\n", 
-    //    ldXB, bmap[ 0 ], bmap[ 1 ], bmap[ 2 ], bmap[ 3 ] );
-    b_i0_pntr = XB + ldXB * bmap[ 0 ];
-    b_i1_pntr = XB + ldXB * bmap[ 1 ];
-    b_i2_pntr = XB + ldXB * bmap[ 2 ];
-    b_i3_pntr = XB + ldXB * bmap[ 3 ];
-  }
-  else if ( n > 2 ) {
-    //printf( "packB n = 3\n" );
-    b_i0_pntr = XB + ldXB * bmap[ 0 ];
-    b_i1_pntr = XB + ldXB * bmap[ 1 ];
-    b_i2_pntr = XB + ldXB * bmap[ 2 ];
-    b_i3_pntr = XB + ldXB * bmap[ 0 ];
-  }
-  else if ( n > 1 ) {
-    //printf( "packB n = 2\n" );
-    b_i0_pntr = XB + ldXB * bmap[ 0 ];
-    b_i1_pntr = XB + ldXB * bmap[ 1 ];
-    b_i2_pntr = XB + ldXB * bmap[ 0 ];
-    b_i3_pntr = XB + ldXB * bmap[ 0 ];
-  }
-  else {
-    //printf( "packB n = 1\n" );
-    b_i0_pntr = XB + ldXB * bmap[ 0 ];
-    b_i1_pntr = XB + ldXB * bmap[ 0 ];
-    b_i2_pntr = XB + ldXB * bmap[ 0 ];
-    b_i3_pntr = XB + ldXB * bmap[ 0 ];
+  for ( j = 0; j < n; j ++ ) {
+    b_pntr[ j ] = XB + ldXB * bmap[ j ];
   }
 
-  //printf( "packB loop k = %d\n", k );
-
-  // loop over rows of XB
-  for ( i = 0; i < k; i++ ) {
-    *packB ++ = *b_i0_pntr++;
-    *packB ++ = *b_i1_pntr++;
-    *packB ++ = *b_i2_pntr++;
-    *packB ++ = *b_i3_pntr++;
+  for ( j = n; j < DRNN_NR; j ++ ) {
+    b_pntr[ j ] = XB + ldXB * bmap[ 0 ];
   }
 
-  //printf( "packB end\n" );
+  for ( p = 0; p < k; p ++ ) {
+    for ( j = 0; j < DRNN_NR; j ++ ) {
+      *packB ++ = *b_pntr[ j ] ++;
+    }
+  }
 }
 
 
