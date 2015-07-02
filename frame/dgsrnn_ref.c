@@ -24,7 +24,8 @@ void dgsrnn_ref(
   int    i, j, p;
   double *As, *Bs, *Cs;
   double beg, time_collect, time_dgemm, time_square, time_heap;
-
+  double dneg2 = -2.0;
+  double dzero = 0.0;
 
   // Sanity check for early return.
   if ( m == 0 || n == 0 || k == 0 || r == 0 ) {
@@ -61,22 +62,40 @@ void dgsrnn_ref(
   beg = omp_get_wtime();
 
   // C = -2.0 * A^t * B
-  cblas_dgemm(
-      CblasColMajor,
-      CblasTrans,
-      CblasNoTrans,
-      m,
-      n,
-      k,
-      -2.0,
+  //cblas_dgemm(
+  //    CblasColMajor,
+  //    CblasTrans,
+  //    CblasNoTrans,
+  //    m,
+  //    n,
+  //    k,
+  //    -2.0,
+  //    As,
+  //    k,
+  //    Bs,
+  //    k,
+  //    0.0,
+  //    Cs,
+  //    m
+  //    );
+
+  dgemm_(
+      'T',
+      'N',
+      &m,
+      &n,
+      &k,
+      &dneg2,
       As,
-      k,
+      &k,
       Bs,
-      k,
-      0.0,
+      &k,
+      &dzero,
       Cs,
-      m
+      &m
       );
+
+
 
   time_dgemm = omp_get_wtime() - beg;
 

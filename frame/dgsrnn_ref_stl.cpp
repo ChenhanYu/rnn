@@ -1,4 +1,4 @@
-#include <mkl.h>
+//#include <mkl.h>
 #include <omp.h>
 #include <stdlib.h>
 #include <limits.h>
@@ -13,6 +13,13 @@ extern "C" {
 #include <rnn.h>
 }
 #include <dgsrnn_ref_stl.hpp>
+
+
+// dgemm prototype
+extern "C" void dgemm(char*, char*, int*, int*, int*, double*, double*, 
+                   int*, double*, int*, double*, double*, int*);
+
+
 
 // Heap operator
 struct lessthan {
@@ -41,6 +48,8 @@ void dgsrnn_ref_stl(
   int    i, j, l, p;
   double *As, *Bs, *Cs;
   double beg, time_collect, time_dgemm, time_square, time_heap;
+  double dneg2 = -2.0;
+  double dzero = 0.0;
 
 
   // Sanity check for early return.
@@ -75,22 +84,39 @@ void dgsrnn_ref_stl(
 
   beg = omp_get_wtime();
   // C = -2.0 * A^t * B
-  cblas_dgemm(
-      CblasColMajor,
-      CblasTrans,
-      CblasNoTrans,
-      m,
-      n,
-      k,
-      -2.0,
+  //cblas_dgemm(
+  //    CblasColMajor,
+  //    CblasTrans,
+  //    CblasNoTrans,
+  //    m,
+  //    n,
+  //    k,
+  //    -2.0,
+  //    As,
+  //    k,
+  //    Bs,
+  //    k,
+  //    0.0,
+  //    Cs,
+  //    m
+  //    );
+
+  dgemm(
+      "T",
+      "N",
+      &m,
+      &n,
+      &k,
+      &dneg2,
       As,
-      k,
+      &k,
       Bs,
-      k,
-      0.0,
+      &k,
+      &dzero,
       Cs,
-      m
+      &m
       );
+
   time_dgemm = omp_get_wtime() - beg;
 
 
