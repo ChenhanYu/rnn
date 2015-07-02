@@ -14,5 +14,4 @@ LIBRNN = $(RNN_DIR)/lib/librnn.a
 LDFLAGS = -I$(RNN_DIR)/include -I/opt/intel/mkl/include
 
 #LDLIBS = $(LIBRNN) -lpthread -lm -openmp -mkl=sequential -Werror -Wall -pedantic
-#LDLIBS = $(LIBRNN) -lpthread -lm -openmp -mkl=parallel -Werror -Wall -pedantic
-LDLIBS = $(LIBRNN) -lpthread -lm -openmp -lblas
+LDLIBS = $(LIBRNN) -lpthread -lm -openmp -mkl=parallel -Werror -Wall -pedantic

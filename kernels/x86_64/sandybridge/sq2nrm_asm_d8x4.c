@@ -20,6 +20,7 @@ void sq2nrm_asm_d8x4(
   unsigned long long pc     = aux->pc;
   
   double neg2 = -2.0;
+  double *pneg2 = &neg2;
 
   //printf( "%ld\n", last );
 
@@ -441,7 +442,7 @@ void sq2nrm_asm_d8x4(
     "m" (pc),          // 6
     "m" (aa),          // 7
     "m" (bb),          // 8
-    "m" (&neg2),       // 9
+    "m" (pneg2),       // 9
     "m" (ldc),         // 10
     "m" (last)         // 11
 	: // register clobber list

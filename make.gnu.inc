@@ -11,4 +11,5 @@ LIBRNN = $(RNN_DIR)/lib/librnn.a
 
 LDFLAGS = -I$(RNN_DIR)/include
 
-LDLIBS = $(LIBRNN) -lpthread -lm -fopenmp -lblas
+#LDLIBS = $(LIBRNN) -lpthread -lm -fopenmp -lblas
+LDLIBS = $(LIBRNN) -lpthread -lm -openmp -mkl=parallel -Werror -Wall -pedantic

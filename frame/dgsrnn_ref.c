@@ -1,4 +1,4 @@
-#include <mkl.h>
+//#include <mkl.h>
 #include <rnn.h>
 #include <omp.h>
 #include <stdlib.h>

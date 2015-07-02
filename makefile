@@ -1,4 +1,4 @@
-include $(RNN_DIR)/make.inc
+include $(RNN_DIR)/make.gnu.inc
 
 
 FRAME_CC_SRC=  \

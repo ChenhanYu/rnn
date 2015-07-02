@@ -62,7 +62,7 @@ void compute_error(
 
   for ( j = 0; j < n; j ++ ) {
     for ( i = 0; i < r; i ++ ) {
-      if ( fabs( D1[ j * r + i ] - D2[ j * r + i ] ) > 0.0000000001 ) {
+      if ( fabs( D1[ j * r + i ] - D2[ j * r + i ] ) > 0.000000000001 ) {
         printf( "D[ %d ][ %d ] != D_gold, %E, %E\n", i, j, D1[ j * r + i ], D2[ j * r + i ] );
         break;
       }

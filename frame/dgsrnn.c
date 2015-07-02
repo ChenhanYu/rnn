@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <omp.h>
 #include <rnn.h>
 #define min( i, j ) ( (i)<(j) ? (i): (j) )

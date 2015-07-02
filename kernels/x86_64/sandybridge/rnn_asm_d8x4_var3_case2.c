@@ -23,6 +23,7 @@ void rnn_asm_d8x4_var3_case2(
   
 
   double neg2 = -2.0;
+  double *pneg2 = &neg2;
 
 	__asm__ volatile
 	(
@@ -442,7 +443,7 @@ void rnn_asm_d8x4_var3_case2(
     "m" (pc),          // 6
     "m" (aa),          // 7
     "m" (bb),          // 8
-    "m" (&neg2),       // 9
+    "m" (pneg2),       // 9
     "m" (ctmp),        // 10
     "m" (ldc)          // 11
 	: // register clobber list

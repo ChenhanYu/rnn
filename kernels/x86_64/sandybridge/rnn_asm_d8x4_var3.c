@@ -19,7 +19,7 @@ void rnn_asm_d8x4_var3(
   unsigned long long ldc    = ldctmp;
   
   double neg2 = -2.0;
-
+  double *pneg2 = &neg2;
 
 	__asm__ volatile
 	(
@@ -425,7 +425,7 @@ void rnn_asm_d8x4_var3(
     "m" (pc),          // 6
     "m" (aa),          // 7
     "m" (bb),          // 8
-    "m" (&neg2),       // 9
+    "m" (pneg2),       // 9
     "m" (ldc)          // 10
 	: // register clobber list
 	  "rax", "rbx", "rcx", "rsi", "rdi",
