@@ -4,7 +4,6 @@
 #define RNN_NUM_THD_MC 1
 
 #define DRNN_SIMD_ALIGN_SIZE 32
-//#define DRNN_MC 96
 #define DRNN_MC 104
 #define DRNN_NC 2048
 #define DRNN_KC 256
@@ -149,17 +148,4 @@ void heap_sort(
     int    *alpha, 
     double *D,
     int    *I
-    );
-
-void rnn_r1_int_d8x4(
-    int    k,
-    double alpha,
-    double *aa,
-    double *a,
-    double *bb,
-    double *b,
-    aux_t  *aux,
-    int *amap,
-    int *I,
-    double *D
     );
