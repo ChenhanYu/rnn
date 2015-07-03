@@ -140,7 +140,7 @@ void dgsrnn_macro_kernel_case2(
   int    i, j, jj;
   aux_t  aux;
 
-  aux.pc = pc;
+  aux.pc     = pc;
   aux.b_next = packB;
 
   for ( j = 0; j < n; j += DRNN_NR ) {
@@ -223,199 +223,26 @@ void dgsrnn_macro_kernel(
       if ( i + DRNN_MR >= m ) {
         aux.b_next += DRNN_NR * k;
       }
-      if ( r < 0 ) {
-        //rnn_r1_int_d8x4(
-        //    k,
-        //    0.0,
-        //    &packA2[ i ],
-        //    &packA[ i * k ],
-        //    &packB2[ j ],
-        //    &packB[ j * k ],
-        //    &aux,
-        //    &amap[ i ],
-        //    &I[ j ],
-        //    &D[ j ]
-        //    );
-      }
-      else {
-        // ------------------------------------------------------------------
-        // Compute the square distance
-        // ------------------------------------------------------------------
-        //rnn_int_d8x4(
-        //    k,
-        //    &packA2[ i ],
-        //    &packA[ i * k ],
-        //    &packB2[ j ],
-        //    &packB[ j * k ],
-        //    c,
-        //    &aux
-        //    );
-        // ------------------------------------------------------------------
-
-
-        // ------------------------------------------------------------------
-        // Heap insertion
-        // ------------------------------------------------------------------
-        //for ( jj = 0; jj < aux.n; jj ++ ) {
-        //  heap_sort( 
-        //      aux.m, 
-        //      r, 
-        //      c + 8 * jj, 
-        //      amap + i, 
-        //      D + r * ( j + jj ), 
-        //      I + r * ( j + jj ) 
-        //      ); 
-        //}
-        // ------------------------------------------------------------------
-
-
-        // ------------------------------------------------------------------
-        // Combine selective square distance and the heap adjustment.
-        // ------------------------------------------------------------------
-        rnn_r_int_d8x4(
-            k,
-            r,
-            packA2 + i,
-            &packA[ i * k ],
-            packB2 + j,
-            &packB[ j * k ],
-            c,
-            &aux,
-            amap + i,
-            I + r * j,
-            D + r * j
-            );
-        // ------------------------------------------------------------------
-      }
-    }
-  }
-}
-
-
-void dgsrnn_macro_kernel_var3(
-    int    m,
-    int    n,
-    int    k,
-    int    r,
-    double *packA,
-    double *packA2,
-    double *packB,
-    double *packB2,
-    int    *bmap,
-    double *D,
-    int    *I,
-    int    ldr
-    )
-{
-  double c[ DRNN_MC * DRNN_NC ] __attribute__((aligned(32)));
-  char   flag[ DRNN_MC * ( DRNN_NC / DRNN_NR ) ] = { 0 };
-  int    i, j, ii, jj, mr, nr, ldc;
-  aux_t  aux;
-
-  aux.pc  = 0;
-  aux.ldr = ldr;
-
-  ldc = ( ( n - 1 ) / DRNN_NR + 1 ) * DRNN_NR;
-  //ldr = I[ 2 ];
-
-  //printf( "macro_kernel_var3(): ldr = %d\n", ldr );
-
-  /*
-   * For example:
-   *
-   * c = [   c0,  c1,  c2,  c3,    x,   x,   x,   x;
-   *          x,   x,   x,   x,   c4,  c5,  c6,  c7;
-   *          x,   x,   x,   x,    x,   x,   x,   x;
-   *         c8,  c9, c10, c11,  c12, c13, c14, c15;  ]
-   *
-   * flag = [ 1, 0;
-   *          0, 1;
-   *          0, 0; 
-   *          1, 1; ]
-   * */
-  // ------------------------------------------------------------------------
-  // Flag initialization
-  // ------------------------------------------------------------------------
-  //for ( i = 0; i < DRNN_MC * ( DRNN_NC / DRNN_NR ); i ++ ) {
-  //  flag[ i ] = 0;
-  //}
-  // ------------------------------------------------------------------------
-
-
-  for ( j = 0; j < n; j += DRNN_NR ) {
-    aux.n = min( n - j, DRNN_NR );
-    for ( i = 0; i < m; i += DRNN_MR ) {
-      aux.m = min( m - i, DRNN_MR );
-      aux.I = I + i * ldr;
-      aux.D = D + i * ldr;
-      if ( i + DRNN_MR >= m ) {
-        aux.b_next += DRNN_NR * k;
-      }
-
-      // --------------------------------------------------------------------
-      // Compute the square distance. Store c selectively.
-      // --------------------------------------------------------------------
-      //rnn_r_int_d8x4_var3(
-      //    k,
-      //    r,
-      //    packA2 + i,
-      //    &packA[ i * k ],
-      //    packB2 + j,
-      //    &packB[ j * k ],
-      //    &c[ i * DRNN_NC + j ],
-      //    &flag[ i * ( DRNN_NC / DRNN_NR ) + ( j / DRNN_NR ) ],
-      //    &aux
-      //    );
-      // ------------------------------------------------------------------------
-      rnn_asm_d8x4_var3(
+      // ------------------------------------------------------------------
+      // Combine selective square distance and the heap adjustment.
+      // ------------------------------------------------------------------
+      rnn_r_int_d8x4(
           k,
-          &packA[ i * k ],
+          r,
           packA2 + i,
-          &packB[ j * k ],
+          &packA[ i * k ],
           packB2 + j,
-          &c[ i * ldc + j ],
-          ldc,
-          &aux
+          &packB[ j * k ],
+          c,
+          &aux,
+          amap + i,
+          I + r * j,
+          D + r * j
           );
+      // ------------------------------------------------------------------
     }
   }
-
-  //printf( "here\n" );
-
-  // ------------------------------------------------------------------------
-  // Heap Adjustment
-  // ------------------------------------------------------------------------
-  //for ( i = 0; i < m; i ++ ) {
-  //  for ( j = 0; j < n; j += DRNN_NR ) {
-  //    aux.n = min( n - j, DRNN_NR );
-  //    if ( flag[ i * ( DRNN_NC / DRNN_NR ) + ( j / DRNN_NR ) ] ) {
-  //      heap_sort( 
-  //          aux.n,
-  //          r,
-  //          c + i * DRNN_NC + j,
-  //          bmap + j,
-  //          D + i * ldr, 
-  //          I + i * ldr 
-  //          );
-  //    }
-  //  }
-  //}
-  // ------------------------------------------------------------------------
-  // ------------------------------------------------------------------------
-  for ( i = 0; i < m; i ++ ) {
-    //heap_sort(
-    heapSelect_dheap_var2(
-    //heapSelect_int_d4(
-        n, 
-        r, 
-        c + ldc * i, 
-        bmap, 
-        D + ldr * i, 
-        I + ldr * i  
-        );
-  }
 }
-
 
 
 
@@ -478,77 +305,6 @@ void dgsrnn_macro_kernel_row(
     }
   }
 }
-
-
-void dgsrnn_macro_kernel_var3_case2(
-    int    m,
-    int    n,
-    int    k,
-    int    r,
-    double *packA,
-    double *packA2,
-    double *packB,
-    double *packB2,
-    int    *bmap,
-    double *packC,
-    int    ldc,
-    int    pc,
-    double *D,
-    int    *I
-    )
-{
-  double c[ DRNN_MC * DRNN_NC ] __attribute__((aligned(32)));
-
-  int    i, ii, j, ldctmp, ldr;
-  aux_t  aux;
-
-  aux.pc = pc;
-  aux.b_next = packB;
-
-
-  ldctmp = ( ( n - 1 ) / DRNN_NR + 1 ) * DRNN_NR;
-  ldr = I[ 2 ];
-
-  for ( j = 0; j < n; j += DRNN_NR ) {
-    aux.n  = min( n - j, DRNN_NR );
-    for ( i = 0; i < m; i += DRNN_MR ) {
-      aux.m = min( m - i, DRNN_MR );
-      if ( i + DRNN_MR >= m ) {
-        aux.b_next += DRNN_NR * k;
-      }
-      rnn_asm_d8x4_var3_case2(
-          k,
-          &packA[ i * k ],
-          packA2 + i,
-          &packB[ j * k ],
-          packB2 + j,
-          &packC[ j * ldc + i * DRNN_NR ], // packed
-          &c[ i * ldctmp + j ],
-          ldctmp,
-          &aux
-          );
-    }
-  }
-
-  // ------------------------------------------------------------------------
-  // Heap Adjustment
-  // ------------------------------------------------------------------------
-  //printf( "heapSelect_d16()\n" );
-  for ( i = 0; i < m; i ++ ) {
-    heap_sort( 
-    //heapSelect_dheap_var2( 
-    //heapSelect_int_d4(
-        n, 
-        r, 
-        c + ldctmp * i, 
-        bmap, 
-        D + ldr * i, 
-        I + ldr * i  
-        );
-  }
-}
-
-
 
 
 void dsq2nrm_macro_kernel(
@@ -1118,43 +874,23 @@ void dgsrnn_var2(
                 );
           }
           else {
-            if ( r <= 2048 ) {
-              dgsrnn_macro_kernel_row(                      // 1~3 loops
-                  ib,
-                  jb,
-                  pb,
-                  r,
-                  packA  + tid * DRNN_MC * pb,
-                  packA2 + tid * DRNN_MC,
-                  packB,
-                  packB2,
-                  bmap   + jc,
-                  &packC[ ic * padn ], // packed
-                  ( ( ib - 1 ) / DRNN_MR + 1 ) * DRNN_MR, // packed
-                  pc,
-                  D      + ic * ldr, // D is m x ldr (d-array heap) 
-                  I      + ic * ldr, // I is m x ldr (d-array heap)
-                  ldr
-                  );
-            }
-            else {
-              dgsrnn_macro_kernel_var3_case2(                      // 1~3 loops
-                  ib,
-                  jb,
-                  pb,
-                  r,
-                  packA  + tid * DRNN_MC * pb,
-                  packA2 + tid * DRNN_MC,
-                  packB,
-                  packB2,
-                  bmap + jc,
-                  &packC[ ic * padn ], // packed
-                  ( ( ib - 1 ) / DRNN_MR + 1 ) * DRNN_MR, // packed
-                  pc,
-                  D      + ic * ldr, // D is m x ldr (d-array heap) 
-                  I      + ic * ldr  // I is m x ldr (d-array heap)
-                  );
-            }
+            dgsrnn_macro_kernel_row(                      // 1~3 loops
+                ib,
+                jb,
+                pb,
+                r,
+                packA  + tid * DRNN_MC * pb,
+                packA2 + tid * DRNN_MC,
+                packB,
+                packB2,
+                bmap   + jc,
+                &packC[ ic * padn ], // packed
+                ( ( ib - 1 ) / DRNN_MR + 1 ) * DRNN_MR, // packed
+                pc,
+                D      + ic * ldr, // D is m x ldr (d-array heap) 
+                I      + ic * ldr, // I is m x ldr (d-array heap)
+                ldr
+                );
           }
         }
       }
@@ -1203,41 +939,23 @@ void dgsrnn_var2(
                 );
           }
 
-          if ( r <= 2048 ) {
-            dgsrnn_macro_kernel_row(                      // 1~3 loops
-                ib,
-                jb,
-                pb,
-                r,
-                packA  + tid * DRNN_MC * pb,
-                packA2 + tid * DRNN_MC,
-                packB,
-                packB2,
-                bmap   + jc,
-                NULL,
-                0,
-                pc,
-                D      + ic * ldr, // D is m x ldr (d-array heap) 
-                I      + ic * ldr, // I is m x ldr (d-array heap)
-                ldr
-                );
-          }
-          else {
-            dgsrnn_macro_kernel_var3(                      // 1~3 loops
-                ib,
-                jb,
-                pb,
-                r,
-                packA  + tid * DRNN_MC * pb,
-                packA2 + tid * DRNN_MC,
-                packB,
-                packB2,
-                bmap   + jc,
-                D      + ic * ldr, // D is m x ldr (d-array heap) 
-                I      + ic * ldr, // I is m x ldr (d-array heap)
-                ldr
-                );
-          }
+          dgsrnn_macro_kernel_row(                      // 1~3 loops
+              ib,
+              jb,
+              pb,
+              r,
+              packA  + tid * DRNN_MC * pb,
+              packA2 + tid * DRNN_MC,
+              packB,
+              packB2,
+              bmap   + jc,
+              NULL,
+              0,
+              pc,
+              D      + ic * ldr, // D is m x ldr (d-array heap) 
+              I      + ic * ldr, // I is m x ldr (d-array heap)
+              ldr
+              );
         }                                                  // End 4-th loop
       }                                                    // End 5-th loop
     }                                                      // end 6-th loop
