@@ -5,6 +5,12 @@
 #include <limits.h>
 #include <float.h>
 
+
+// dgemm prototype
+void dgemm(char*, char*, int*, int*, int*, double*, double*, 
+    int*, double*, int*, double*, double*, int*);
+
+
 // This reference function will call MKL
 void dgsrnn_ref(
     int    m,
@@ -79,9 +85,9 @@ void dgsrnn_ref(
   //    m
   //    );
 
-  dgemm_(
-      'T',
-      'N',
+  dgemm(
+      "T",
+      "N",
       &m,
       &n,
       &k,

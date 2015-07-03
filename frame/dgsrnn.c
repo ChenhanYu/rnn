@@ -113,139 +113,6 @@ void rank_k_macro_kernel(
 }
 
 
-// This macro kernel is called in the last iteration while k > KC. 
-// packC is required, and it will be discarded after this micro kernel call.
-// 
-// ldC is max( MC, ( ( m - 1 ) / MR + 1 ) * MR )
-//
-// We need to deal with the edge case here. Before every micro-kernel call,
-// compute the valid aux.m and aux.n.
-void dgsrnn_macro_kernel_case2(
-    int    m,
-    int    n,
-    int    k,
-    int    r,
-    double *packA,
-    double *packA2,
-    int    *amap,
-    double *packB,
-    double *packB2,
-    double *packC,
-    int    ldc,
-    int    pc,
-    double *D,
-    int    *I
-    )
-{
-  int    i, j, jj;
-  aux_t  aux;
-
-  aux.pc     = pc;
-  aux.b_next = packB;
-
-  for ( j = 0; j < n; j += DRNN_NR ) {
-    aux.n  = min( n - j, DRNN_NR );
-    for ( i = 0; i < m; i += DRNN_MR ) {
-      aux.m = min( m - i, DRNN_MR );
-      if ( i + DRNN_MR >= m ) {
-        aux.b_next += DRNN_NR * k;
-      }
-
-      rnn_asm_d8x4(
-          k,
-          &packA[ i * k ],
-          packA2 + i,
-          &packB[ j * k ],
-          packB2 + j,
-          &packC[ j * ldc + i * DRNN_NR ], // packed
-          &aux
-          );
-
-      for ( jj = 0; jj < aux.n; jj ++ ) {
-        heap_sort( 
-            aux.m, 
-            r, 
-            packC + j * ldc + i * DRNN_NR + 8 * jj, 
-            amap + i, 
-            D + r * ( j + jj ), 
-            I + r * ( j + jj ) 
-            ); 
-      }
-    }
-  }
-}
-
-// This macro kernel is called if k <= KC.
-/*
- * --------------------------------------------------------------------------
- * @brief  This macro-kernel contains the 3.rd and the 2.nd loop of the
- *         rank-k update, computing the square distance in the micro-kernel.
- *
- * @param  m        Number of target points
- * @param  n        Number of source points
- * @param  k        Data point dimension
- * @param  r        The desired size of the nearest neighbor
- * @param  *packA   Packed target points coordinates
- * @param  *packA2  Packed target points square distance
- * @param  *amap    Target point index map, used as a tracing id
- * @param  *packB   Packed source points coordinates
- * @param  *packB2  Packed source points square distance
- * @param  *D       Square distance of the current r-nn, arranged as several
- *                  length-r heaps or sorted lists. [ Key value ] 
- * @param  *I       Corresponing point index of D
- */ 
-void dgsrnn_macro_kernel(
-    int    m,
-    int    n,
-    int    k,
-    int    r,
-    double *packA,
-    double *packA2,
-    int    *amap,
-    double *packB,
-    double *packB2,
-    double *D,
-    int    *I
-    )
-{
-  double c[ DRNN_MR * DRNN_NR ] __attribute__((aligned(32)));
-  int    i, j, jj;
-  aux_t  aux;
-
-  aux.b_next = packB;
-
-  for ( j = 0; j < n; j += DRNN_NR ) {
-    aux.n  = min( n - j, DRNN_NR );
-    aux.I  = I + j * r;
-    aux.D  = D + j * r;
-    for ( i = 0; i < m; i += DRNN_MR ) {
-      aux.m = min( m - i, DRNN_MR );
-      if ( i + DRNN_MR >= m ) {
-        aux.b_next += DRNN_NR * k;
-      }
-      // ------------------------------------------------------------------
-      // Combine selective square distance and the heap adjustment.
-      // ------------------------------------------------------------------
-      rnn_r_int_d8x4(
-          k,
-          r,
-          packA2 + i,
-          &packA[ i * k ],
-          packB2 + j,
-          &packB[ j * k ],
-          c,
-          &aux,
-          amap + i,
-          I + r * j,
-          D + r * j
-          );
-      // ------------------------------------------------------------------
-    }
-  }
-}
-
-
-
 void dgsrnn_macro_kernel_row(
     int    m,
     int    n,
@@ -324,7 +191,7 @@ void dsq2nrm_macro_kernel(
   int    i, ii, j;
   aux_t  aux;
 
-  aux.pc = pc;
+  aux.pc     = pc;
   aux.b_next = packB;
 
   //printf( "here, pc = %d, last = %d, ldc = %d, m = %d, n = %d, k %d\n", 
@@ -495,12 +362,6 @@ void dgsrnn_var3(
 
   double *C = rnn_malloc_aligned( ldc, n + 4, sizeof(double) );
 
-  //if ( posix_memalign( (void**)&C, (size_t)DRNN_SIMD_ALIGN_SIZE, 
-  //      sizeof(double) * ldc * ( n + 4 ) ) ) {
-  //  printf( "test_dgsrnn_var2(): posix_memalign() failures" );
-  //  exit( 1 );    
-  //}
-
   beg = omp_get_wtime();
   dgssq2nrm(
       m,
@@ -531,222 +392,6 @@ void dgsrnn_var3(
   //printf( "gsrnn sq2nrm: %5.3lf, heap: %5.3lf\n", time_sq2nrm, time_heap );
 
   free( C );
-}
-
-
-
-
-
-void dgsrnn(
-    int    m,
-    int    n,
-    int    k,
-    int    r,
-    double *XA,
-    double *XA2,
-    int    *amap,
-    double *XB,
-    double *XB2,
-    int    *bmap,
-    double *D,
-    int    *I
-    )
-{
-  int    i, j, p;
-  int    ic, ib, jc, jb, pc, pb;
-  int    ir, jr;
-  int    rnn_ic_nt;
-  int    ldc, padn;
-  double *packA, *packB, *packC, *packA2, *packB2;
-
-
-  // Early return if possible
-  if ( m == 0 || n == 0 || k == 0 || r == 0 ) {
-    printf( "dgsrnn(): early return\n" );
-    return;
-  }
-
-
-  // sequential is the default situation
-  rnn_ic_nt = 1;
-
-
-  // Allocate packing buffers
-  packA  = rnn_malloc_aligned( DRNN_KC, ( DRNN_MC + 1 ) * rnn_ic_nt, sizeof(double) );
-  packB  = rnn_malloc_aligned( DRNN_KC, ( DRNN_NC + 1 )            , sizeof(double) );
-  packA2 = rnn_malloc_aligned(       1, ( DRNN_MC + 1 ) * rnn_ic_nt, sizeof(double) );
-  packB2 = rnn_malloc_aligned(       1, ( DRNN_NC + 1 )            , sizeof(double) );
-
-
-  if ( k > DRNN_KC ) {
-
-    ldc  = ( ( m - 1 ) / DRNN_MR + 1 ) * DRNN_MR;
-    padn = DRNN_NC;
-    if ( n < DRNN_NC ) {
-      padn = ( ( n - 1 ) / DRNN_NR + 1 ) * DRNN_NR;
-    }
-
-    packC  = rnn_malloc_aligned( ldc, padn, sizeof(double) );
-
-
-    for ( jc = 0; jc < n; jc += DRNN_NC ) {           // 6-th loop
-      jb = min( n - jc, DRNN_NC );
-      for ( pc = 0; pc < k; pc += DRNN_KC ) {         // 5-th loop
-        pb = min( k - pc, DRNN_KC );
-        for ( j = 0; j < jb; j += DRNN_NR ) {
-          if ( pc + DRNN_KC >= k ) {
-            for ( jr = 0; jr < min( jb - j, DRNN_NR ); jr ++ ) {
-                packB2[ j + jr ] = XB2[ bmap[ jc + j + jr ] ];
-            }
-          }
-          packB_kcxnc(
-              min( jb - j, DRNN_NR ),
-              pb,
-              &XB[ pc ],
-              k, // should be ldXB instead
-              &bmap[ jc + j ],
-              &packB[ j * pb ]
-              );
-        }
-
-
-        for ( ic = 0; ic < m; ic += DRNN_MC ) {       // 4-th loop
-          int     tid = 0;
-
-          ib = min( m - ic, DRNN_MC );
-          for ( i = 0; i < ib; i += DRNN_MR ) {
-            if ( pc + DRNN_KC >= k ) {
-              for ( ir = 0; ir < min( ib - i, DRNN_MR ); ir ++ ) {
-                packA2[ tid * DRNN_MC + i + ir ] = XA2[ amap[ ic + i + ir ] ];
-              }
-            }
-            packA_kcxmc(
-                min( ib - i, DRNN_MR ),
-                pb,
-                &XA[ pc ],
-                k,
-                &amap[ ic + i ],
-                &packA[ tid * DRNN_MC * pb + i * pb ]
-                );
-          }
-
-          // Check if this is the last kc interation
-          if ( pc + DRNN_KC < k ) {
-            //if ( r > 64 ) {
-            //  rank_k_macro_kernel_col(
-            //      ib,
-            //      jb,
-            //      pb,
-            //      packA + tid * DRNN_MC * pb,
-            //      packB,
-            //      &packC[ ic * padn ], // packed
-            //      ldc, // non-packed
-            //      pc
-            //      );
-            //}
-            //else {
-              rank_k_macro_kernel(
-                  ib,
-                  jb,
-                  pb,
-                  packA + tid * DRNN_MC * pb,
-                  packB,
-                  &packC[ ic * padn ], // packed
-                  ( ( ib - 1 ) / DRNN_MR + 1 ) * DRNN_MR, // packed
-                  pc
-                  );
-            //}
-          }
-          else {
-            //printf( "dgsrnn(): k > KC macro kerenel hasn't been implemented yet.\n" );
-              dgsrnn_macro_kernel_case2(                      // 1~3 loops
-                  ib,
-                  jb,
-                  pb,
-                  r,
-                  packA  + tid * DRNN_MC * pb,
-                  packA2 + tid * DRNN_MC,
-                  amap + ic,
-                  packB,
-                  packB2,
-                  &packC[ ic * padn ],                    // packed
-                  ( ( ib - 1 ) / DRNN_MR + 1 ) * DRNN_MR, // packed
-                  pc,
-                  D + jc * r,
-                  I + jc * r
-                  );
-          }
-        }
-      }
-    }
-
-
-    free( packC );
-  }
-  else {
-
-    for ( jc = 0; jc < n; jc += DRNN_NC ) {           // 6-th loop
-      jb = min( n - jc, DRNN_NC );
-      for ( pc = 0; pc < k; pc += DRNN_KC ) {         // 5-th loop
-        pb = min( k - pc, DRNN_KC );
-        // packB, packw, packbb
-        for ( j = 0; j < jb; j += DRNN_NR ) {
-          // packw and packB2
-          for ( jr = 0; jr < min( jb - j, DRNN_NR ); jr ++ ) {
-            packB2[ j + jr ] = XB2[ bmap[ jc + j + jr ] ];
-          }
-          // packB
-          packB_kcxnc(
-              min( jb - j, DRNN_NR ),
-              pb,
-              XB,
-              k, // should be ldXB instead
-              &bmap[ jc + j ],
-              &packB[ j * pb ]
-              );
-        }
-
-        for ( ic = 0; ic < m; ic += DRNN_MC ) {       // 4-th loop
-          int     tid = 0;
-
-          ib = min( m - ic, DRNN_MC );
-          for ( i = 0; i < ib; i += DRNN_MR ) {
-            for ( ir = 0; ir < min( ib - i, DRNN_MR ); ir ++ ) {
-              packA2[ tid * DRNN_MC + i + ir ] = XA2[ amap[ ic + i + ir ] ];
-            }
-            packA_kcxmc(
-                min( ib - i, DRNN_MR ),
-                pb,
-                XA,
-                k,
-                &amap[ ic + i ],
-                &packA[ tid * DRNN_MC * pb + i * pb ]
-                );
-          }
-
-          dgsrnn_macro_kernel(                      // 1~3 loops
-              ib,
-              jb,
-              pb,
-              r,
-              packA  + tid * DRNN_MC * pb,
-              packA2 + tid * DRNN_MC,
-              amap + ic,
-              packB,
-              packB2,
-              D + jc * r,
-              I + jc * r
-              );
-        }
-      }
-    }
-  }
-
-
-  free( packA );
-  free( packB );
-  free( packA2 );
-  free( packB2 );
 }
 
 
@@ -966,4 +611,21 @@ void dgsrnn_var2(
   free( packB );
   free( packA2 );
   free( packB2 );
+}
+
+void dgsrnn(
+    int    m,
+    int    n,
+    int    k,
+    int    r,
+    double *XA,
+    double *XA2,
+    int    *amap,
+    double *XB,
+    double *XB2,
+    int    *bmap,
+    double *D,
+    int    *I
+    )
+{
 }

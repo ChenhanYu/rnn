@@ -98,8 +98,8 @@ void test_dgsrnn(
 
   heap_t *heap = rnn_heapCreate( m, r, 1.79E+308 );
 
-  nx = 4096 * 30;
-  n_iter = 4;
+  nx = 4096 * 5;
+  n_iter = 2;
 
 
   amap  = (int*)malloc( sizeof(int) * m );
@@ -234,24 +234,23 @@ void test_dgsrnn(
   ref_time = omp_get_wtime() - ref_beg;
 
 
+  for ( j = 0; j < n; j ++ ) {
+    for ( i = 0; i < r; i ++ ) {
+      D[ j * r + i ] = heap->D[ j * heap->ldk + i + 3 ];
+      I[ j * r + i ] = heap->I[ j * heap->ldk + i + 3 ];
+    }
+  }
 
-  //for ( j = 0; j < n; j ++ ) {
-  //  for ( i = 0; i < r; i ++ ) {
-  //    D[ j * r + i ] = heap->D[ j * heap->ldk + i + 3 ];
-  //    I[ j * r + i ] = heap->I[ j * heap->ldk + i + 3 ];
-  //  }
-  //}
 
-
-  //// Compute error
-  //compute_error(
-  //    r,
-  //    n,
-  //    D,
-  //    I,
-  //    D_mkl,
-  //    I_mkl
-  //    );
+  // Compute error
+  compute_error(
+      r,
+      n,
+      D,
+      I,
+      D_mkl,
+      I_mkl
+      );
 
 
 
