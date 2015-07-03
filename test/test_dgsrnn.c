@@ -511,8 +511,8 @@ int main( int argc, char *argv[] )
 
 
   //printf("before call the function!\n");
-  test_dgsrnn( m, n, k, r );
-  //test_dgsrnn_var2( m, n, k, r );
+  //test_dgsrnn( m, n, k, r );
+  test_dgsrnn_var2( m, n, k, r );
 
 
   return 0;

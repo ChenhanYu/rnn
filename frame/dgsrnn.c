@@ -292,93 +292,6 @@ void dgsrnn_macro_kernel(
 }
 
 
-void dgsrnn_macro_kernel_row(
-    int    m,
-    int    n,
-    int    k,
-    int    r,
-    double *packA,
-    double *packA2,
-    double *packB,
-    double *packB2,
-    int    *bmap,
-    double *D,
-    int    *I,
-    int    ldr
-    )
-{
-  double c[ DRNN_MR * DRNN_NR ] __attribute__((aligned(32)));
-  int    i, j, ii, jj, mr, nr;
-  aux_t  aux;
-
-  double beg;
-
-  aux.pc  = 0;
-  aux.ldr = ldr;
-
-  for ( j = 0; j < n; j += DRNN_NR ) {
-    aux.n = min( n - j, DRNN_NR );
-    for ( i = 0; i < m; i += DRNN_MR ) {
-      aux.m = min( m - i, DRNN_MR );
-      aux.I = I + i * ldr;
-      aux.D = D + i * ldr;
-      if ( i + DRNN_MR >= m ) {
-        aux.b_next += DRNN_NR * k;
-      }
-
-      // --------------------------------------------------------------------
-      // Compute the square distance
-      // --------------------------------------------------------------------
-      //rnn_int_d8x4_var2(
-      //    k,
-      //    packA2 + i,
-      //    &packA[ i * k ],
-      //    packB2 + j,
-      //    &packB[ j * k ],
-      //    c,
-      //    &aux
-      //    );
-      // --------------------------------------------------------------------
-
-      
-      // --------------------------------------------------------------------
-      // Heap insertion
-      // --------------------------------------------------------------------
-      //for ( ii = 0; ii < aux.m; ii ++ ) {
-      //  heap_sort( 
-      //  //heapSelect_dheap_var2(
-      //      aux.n, 
-      //      r, 
-      //      c + 4 * ii, 
-      //      bmap + j, 
-      //      D + ldr * ( i + ii ), 
-      //      I + ldr * ( i + ii ) 
-      //      );
-      //}
-      // --------------------------------------------------------------------
-
-
-      // --------------------------------------------------------------------
-      // Combine selective square distance and the heap adjustment.
-      // --------------------------------------------------------------------
-      rnn_r_int_d8x4_row(
-          k,
-          r,
-          &packA2[ i ],
-          &packA[ i * k ],
-          &packB2[ j ],
-          &packB[ j * k ],
-          c,
-          &aux,
-          bmap + j
-          );
-      // --------------------------------------------------------------------
-    }
-  }
-}
-
-
-
 void dgsrnn_macro_kernel_var3(
     int    m,
     int    n,
@@ -506,7 +419,7 @@ void dgsrnn_macro_kernel_var3(
 
 
 
-void dgsrnn_macro_kernel_row_large_k(
+void dgsrnn_macro_kernel_row(
     int    m,
     int    n,
     int    k,
@@ -524,11 +437,10 @@ void dgsrnn_macro_kernel_row_large_k(
     int    ldr
     )
 {
-  double c[ DRNN_MR * DRNN_NR ] __attribute__((aligned(32)));
+  double c[ DRNN_MC * DRNN_NC ] __attribute__((aligned(32)));
+  double *cbuff = c;
   int    i, ii, j;
   aux_t  aux;
-  double beg;
-
 
   aux.pc     = pc;
   aux.b_next = packB;
@@ -544,56 +456,27 @@ void dgsrnn_macro_kernel_row_large_k(
       if ( i + DRNN_MR >= m ) {
         aux.b_next += DRNN_NR * k;
       }
+      if ( pc ) {
+        cbuff = packC  + j * ldc + i * DRNN_NR;
+      }
 
-      // Notice that packC is packed column major, yet we need a row major
-      // to perform the heap adjustment.
-      //rnn_asm_d8x4_case2(
-      //    k,
-      //    &packA[ i * k ],
-      //    packA2 + i,
-      //    &packB[ j * k ],
-      //    packB2 + j,
-      //    &packC[ j * ldc + i * DRNN_NR ], // packed
-      //    c,
-      //    &aux
-      //    );
-
-      // --------------------------------------------------------------------
-      // Heap insertion
-      // --------------------------------------------------------------------
-      //for ( ii = 0; ii < aux.m; ii ++ ) {
-      //  heap_sort( 
-      //  //heapSelect_d16( 
-      //  //heapSelect_dheap_var2( 
-      //      aux.n, 
-      //      r, 
-      //      c + 4 * ii, 
-      //      bmap + j, 
-      //      D + ldr * ( i + ii ), 
-      //      I + ldr * ( i + ii ) 
-      //      );
-      //}
-      // --------------------------------------------------------------------
-      
       // --------------------------------------------------------------------
       // Combine selective square distance and the heap adjustment.
       // --------------------------------------------------------------------
       rnn_r_int_d8x4_row(
           k,
           r,
-          &packA2[ i ],
-          &packA[ i * k ],
-          &packB2[ j ],
-          &packB[ j * k ],
-          &packC[ j * ldc + i * DRNN_NR ], // packed
+          packA2 + i,
+          packA  + i * k,
+          packB2 + j,
+          packB  + j * k,
+          cbuff,
           &aux,
-          bmap + j
+          bmap   + j
           );
       // --------------------------------------------------------------------
     }
   }
-
-
 }
 
 
@@ -1236,7 +1119,7 @@ void dgsrnn_var2(
           }
           else {
             if ( r <= 2048 ) {
-              dgsrnn_macro_kernel_row_large_k(                      // 1~3 loops
+              dgsrnn_macro_kernel_row(                      // 1~3 loops
                   ib,
                   jb,
                   pb,
@@ -1331,6 +1214,9 @@ void dgsrnn_var2(
                 packB,
                 packB2,
                 bmap   + jc,
+                NULL,
+                0,
+                pc,
                 D      + ic * ldr, // D is m x ldr (d-array heap) 
                 I      + ic * ldr, // I is m x ldr (d-array heap)
                 ldr
