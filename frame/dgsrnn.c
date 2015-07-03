@@ -395,7 +395,7 @@ void dgsrnn_var3(
 }
 
 
-void dgsrnn_var2(
+void dgsrnn_var1(
     int    m,
     int    n,
     int    k,
@@ -624,8 +624,41 @@ void dgsrnn(
     double *XB,
     double *XB2,
     int    *bmap,
-    double *D,
-    int    *I
+    heap_t *heap
     )
 {
+  int    i, j;
+
+  if ( r > RNN_VAR_THRES ) {
+    dgsrnn_var3(
+        m,
+        n,
+        k,
+        r,
+        XA,
+        XA2,
+        amap,
+        XB,
+        XB2,
+        bmap,
+        heap->D,
+        heap->I
+        );
+  }
+  else {
+    dgsrnn_var1(
+        n,
+        m,
+        k,
+        r,
+        XB,
+        XB2,
+        bmap,
+        XA,
+        XA2,
+        amap,
+        heap->D,
+        heap->I
+        );
+  }
 }

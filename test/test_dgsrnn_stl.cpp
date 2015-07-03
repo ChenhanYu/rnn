@@ -5,9 +5,8 @@
 
 extern "C" {
 #include <rnn.h>
-}
-
 #include <dgsrnn_ref_stl.hpp>
+}
 
 
 void bubble_sort(
@@ -85,209 +84,7 @@ void compute_error(
 }
 
 
-
-
-
 void test_dgsrnn(
-    int m,
-    int n,
-    int k,
-    int r
-    ) 
-{
-  int    i, j, p, nx, iter, n_iter;
-  int    *amap, *bmap, *I, *I_mkl;
-  double *XA, *XB, *XA2, *XB2, *D, *D_mkl;
-  double tmp, error, flops;
-  double ref_beg, ref_time, dgsrnn_beg, dgsrnn_time;
-
-  heap_t *heap = rnn_heapCreate( n, r, 1.79E+308 );
-
-  nx = 4096 * 30;
-  n_iter = 4;
-
-
-  amap  = (int*)malloc( sizeof(int) * m );
-  bmap  = (int*)malloc( sizeof(int) * n );
-  I     = (int*)malloc( sizeof(int) * r * n );
-  I_mkl = (int*)malloc( sizeof(int) * r * n );
-  XA    = (double*)malloc( sizeof(double) * k * nx );
-  XA2   = (double*)malloc( sizeof(double) * nx ); 
-  D     = (double*)malloc( sizeof(double) * r * n );
-  D_mkl = (double*)malloc( sizeof(double) * r * n );
-
-  //printf( "After Malloc\n" );
-
-  for ( i = 0; i < m; i ++ ) {
-    amap[ i ] = 2 * i;
-    //amap[ i ] = i;
-  }
-
-  for ( j = 0; j < n; j ++ ) {
-    bmap[ j ] = 2 * j + 1;
-    //bmap[ j ] = j;
-  }
-
-  // random[ 0, 0.1 ]
-  for ( i = 0; i < nx; i ++ ) {
-    for ( p = 0; p < k; p ++ ) {
-      XA[ i * k + p ] = (double)( rand() % 1000 ) / 1000.0;	
-    }
-  }
-
-  // Compute XA2
-  for ( i = 0; i < nx; i ++ ) {
-    tmp = 0.0;
-    for ( p = 0; p < k; p ++ ) {
-      tmp += XA[ i * k + p ] * XA[ i * k + p ];
-    }
-    XA2[ i ] = tmp;
-  }
-
-  // Use the same coordinate table
-  XB  = XA;
-  XB2 = XA2;
-
-  // Initialize D to the maximum double and I to -1.
-  for ( j = 0; j < n; j ++ ) {
-    for ( i = 0; i < r; i ++ ) {
-      D[ j * r + i ] = 1.79E+308;
-      D_mkl[ j * r + i ] = 1.79E+308;
-      I[ j * r + i ] = -1;
-      I_mkl[ j * r + i ] = -1;
-    }
-  }
-
-
-  // Discard the first run
-    dgsrnn_var3(
-    //dgsrnn(
-        m,
-        n,
-        k,
-        r,
-        XA,
-        XA2,
-        amap,
-        XB,
-        XB2,
-        bmap,
-        heap->D,
-        heap->I
-        //D,
-        //I
-        );
-
-  dgsrnn_beg = omp_get_wtime();
-  // Call my implementation
-  for ( iter = 1; iter < n_iter; iter ++ ) {
-    dgsrnn_var3(
-    //dgsrnn(
-        m,
-        n,
-        k,
-        r,
-        XA  + iter * m * k,
-        XA2 + iter * m,
-        amap,
-        XB,
-        XB2,
-        bmap,
-        heap->D,
-        heap->I
-        //D,
-        //I
-        );
-  } 
-  dgsrnn_time = omp_get_wtime() - dgsrnn_beg;
-
-  
-
-
-    dgsrnn_ref_stl(
-        m,
-        n,
-        k,
-        r,
-        XA,
-        XA2,
-        amap,
-        XB,
-        XB2,
-        bmap,
-        D_mkl,
-        I_mkl
-        );
-
-
-
-
-  ref_beg = omp_get_wtime();
-  // Call the reference function 
-  for ( iter = 1; iter < n_iter; iter ++ ) {
-    dgsrnn_ref_stl(
-        m,
-        n,
-        k,
-        r,
-        XA  + iter * m * k,
-        XA2 + iter * m,
-        amap,
-        XB,
-        XB2,
-        bmap,
-        D_mkl,
-        I_mkl
-        );
-  }
-  ref_time = omp_get_wtime() - ref_beg;
-
-
-  //for ( j = 0; j < n; j ++ ) {
-  //  for ( i = 0; i < r; i ++ ) {
-  //    D[ j * r + i ] = heap->D[ j * heap->ldk + i + 3 ];
-  //    I[ j * r + i ] = heap->I[ j * heap->ldk + i + 3 ];
-  //  }
-  //}
-
-  // Compute error
-  compute_error(
-      r,
-      m,
-      D,
-      I,
-      D_mkl,
-      I_mkl
-      );
-
-
-
-  ref_time /=    ( n_iter - 1 );
-  dgsrnn_time /= ( n_iter - 1 );
-  flops = ( m * n / ( 1024.0 * 1024.0 * 1024.0 ) )* ( 2 * k + 3 );
-
-
-  //printf( "%d, %d, %d, %d, %5.2lf Gflops, %5.2lf Gflops;\n", 
-  //    m, n, k, r, flops / dgsrnn_time, flops / ref_time );
-  printf( "%d, %d, %d, %d, %5.2lf, %5.2lf;\n", 
-      m, n, k, r, flops / dgsrnn_time, flops / ref_time );
-  //printf( "%d, %d, %d, %d, %5.2lf, %5.2lf;\n", 
-  //    m, n, k, r, dgsrnn_time, ref_time );
-
-
-  free( XA );
-  free( XA2 );
-  free( D );
-  free( I );
-  free( D_mkl );
-  free( I_mkl );
-}
-
-
-
-
-// This this test case, D and I are m x r.
-void test_dgsrnn_var2(
     int m,
     int n,
     int k,
@@ -362,8 +159,8 @@ void test_dgsrnn_var2(
     }
   }
 
-
-    dgsrnn_var2(
+  {
+    dgsrnn(
         m,
         n,
         k,
@@ -374,78 +171,85 @@ void test_dgsrnn_var2(
         XB,
         XB2,
         bmap,
-        //heap->D,
-        //heap->I
-        D,
-        I
+        heap
         );
-
+  }
 
   dgsrnn_beg = omp_get_wtime();
   // Call my implementation 
   for ( iter = 1; iter < n_iter; iter ++ ) {
-    dgsrnn_var2(
+    dgsrnn(
         m,
         n,
         k,
         r,
-        XA,
-        XA2,
+        XA  + iter * k * m,
+        XA2 + iter * m,
         amap,
-        XB  + iter * k * n,
-        XB2 + iter * n,
+        XB,
+        XB2,
         bmap,
-        //heap->D,
-        //heap->I
-        D,
-        I
+        heap
         );
   }
   dgsrnn_time = omp_get_wtime() - dgsrnn_beg;
 
 
-
+  {
     dgsrnn_ref_stl(
-        n,
         m,
+        n,
         k,
         r,
-        XB,
-        XB2,
-        bmap,
         XA,
         XA2,
         amap,
+        XB,
+        XB2,
+        bmap,
         D_mkl,
         I_mkl
         );
+  }
 
   ref_beg = omp_get_wtime();
   // Call the reference function ( we use the transpose to solve the problem. )
   for ( iter = 1; iter < n_iter; iter ++ ) {
     dgsrnn_ref_stl(
-        n,
         m,
+        n,
         k,
         r,
-        XB  + iter * k * n,
-        XB2 + iter * n,
-        bmap,
-        XA,
-        XA2,
+        XA  + iter * k * m,
+        XA2 + iter * m,
         amap,
+        XB,
+        XB2,
+        bmap,
         D_mkl,
         I_mkl
         );
   }
   ref_time = omp_get_wtime() - ref_beg;
 
-  //for ( j = 0; j < m; j ++ ) {
-  //  for ( i = 0; i < r; i ++ ) {
-  //    D[ j * r + i ] = heap->D[ j * heap->ldk + i + 3 ];
-  //    I[ j * r + i ] = heap->I[ j * heap->ldk + i + 3 ];
-  //  }
-  //}
+
+  if ( r > RNN_VAR_THRES ) { 
+    for ( j = 0; j < m; j ++ ) {
+      for ( i = 0; i < r; i ++ ) {
+        D[ j * r + i ] = heap->D[ j * heap->ldk + i + 3 ];
+        I[ j * r + i ] = heap->I[ j * heap->ldk + i + 3 ];
+      }
+    }
+  }
+  else {
+    for ( j = 0; j < m; j ++ ) {
+      for ( i = 0; i < r; i ++ ) {
+        D[ j * r + i ] = heap->D[ j * heap->ldk + i ];
+        I[ j * r + i ] = heap->I[ j * heap->ldk + i ];
+      }
+    }
+  }
+
 
 
 
@@ -500,10 +304,7 @@ int main( int argc, char *argv[] )
   sscanf( argv[ 3 ], "%d", &k );
   sscanf( argv[ 4 ], "%d", &r );
 
-
-  //printf("before call the function!\n");
-  //test_dgsrnn( m, n, k, r );
-  test_dgsrnn_var2( m, n, k, r );
+  test_dgsrnn( m, n, k, r );
 
   return 0;
 }

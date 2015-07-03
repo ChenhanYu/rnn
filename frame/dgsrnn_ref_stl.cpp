@@ -11,9 +11,9 @@
 
 extern "C" {
 #include <rnn.h>
-}
-#include <dgsrnn_ref_stl.hpp>
 
+#include <dgsrnn_ref_stl.hpp>
+}
 
 // dgemm prototype
 extern "C" void dgemm(char*, char*, int*, int*, int*, double*, double*, 
@@ -30,6 +30,7 @@ struct lessthan {
 
 
 // This reference function will call MKL
+extern "C"
 void dgsrnn_ref_stl(
     int    m,
     int    n,

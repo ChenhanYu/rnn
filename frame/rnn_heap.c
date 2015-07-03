@@ -87,6 +87,23 @@ inline void heap_sort(
 }
 
 
+heap_t *rnn_heapAttach(
+    int    m,
+    int    k,
+    double *D,
+    int    *I
+    )
+{
+  heap_t *heap = malloc( sizeof(heap_t) );
+  heap->m   = m;
+  heap->k   = k;
+  heap->d   = 2;
+  heap->ro  = 0.0;
+  heap->ldk = k;
+  heap->D   = D;
+  heap->I   = I;
+}
+
 heap_t *rnn_heapCreate(
     int    m,
     int    k,
@@ -94,14 +111,21 @@ heap_t *rnn_heapCreate(
     )
 {
   int    ldk, i, j;
-  
-  ldk = ( ( k + RNN_HEAP_OFFSET - 1 ) / 4 + 1 ) * 4;
-
+ 
   heap_t *heap = malloc( sizeof(heap_t) );
-  
+
+  if ( k > RNN_VAR_THRES ) {
+    ldk = ( ( k + RNN_HEAP_OFFSET - 1 ) / 4 + 1 ) * 4;
+    heap->d = 4;
+  }
+  else {
+    ldk = k;
+    heap->d = 2;
+  }
+
+
   heap->m   = m;
   heap->k   = k;
-  heap->d   = 4;
   heap->ro  = ro;
   heap->ldk = ldk;
 
@@ -122,17 +146,27 @@ heap_t *rnn_heapCreate(
 
   //printf( "Create finish\n" );
 
-  for ( i = 0; i < m; i ++ ) {
-    heap->D[ i * ldk     ] = ro;   // filter radius
-    heap->D[ i * ldk + 1 ] = 0.0;  // Currently useless
-    heap->D[ i * ldk + 2 ] = 0.0;  // ..
-    heap->I[ i * ldk     ] = k;
-    heap->I[ i * ldk + 1 ] = 0;
-    heap->I[ i * ldk + 2 ] = ldk;  //
+  if ( k > RNN_VAR_THRES ) {
+    for ( i = 0; i < m; i ++ ) {
+      heap->D[ i * ldk     ] = ro;   // filter radius
+      heap->D[ i * ldk + 1 ] = 0.0;  // Currently useless
+      heap->D[ i * ldk + 2 ] = 0.0;  // ..
+      heap->I[ i * ldk     ] = k;
+      heap->I[ i * ldk + 1 ] = 0;
+      heap->I[ i * ldk + 2 ] = ldk;  //
 
-    for ( j = 0; j < k; j ++ ) {
-      heap->D[ i * ldk + 3 + j ] = ro;
-      heap->I[ i * ldk + 3 + j ] = -1;
+      for ( j = 0; j < k; j ++ ) {
+        heap->D[ i * ldk + 3 + j ] = ro;
+        heap->I[ i * ldk + 3 + j ] = -1;
+      }
+    }
+  }
+  else {
+    for ( i = 0; i < m; i ++ ) {
+      for ( j = 0; j < k; j ++ ) {
+        heap->D[ i * ldk + j ] = ro;
+        heap->I[ i * ldk + j ] = -1;
+      }
     }
   }
 

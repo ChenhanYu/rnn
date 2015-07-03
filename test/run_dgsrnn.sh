@@ -52,13 +52,13 @@ n=1029
 
 
 #k=16
-r=16
+r=513
 echo "var1_k16=["
 for (( k=4; k<1024; k+=32 ))
 #for (( r=4; r<2060; r+=32 ))
 do
   ./test_dgsrnn.x $m $n $k $r
-#  ./test_dgsrnn_stl.x $m $n $k $r
+  ./test_dgsrnn_stl.x $m $n $k $r
 done
 echo "];"
 #

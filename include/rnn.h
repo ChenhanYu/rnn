@@ -2,6 +2,7 @@
 #include <immintrin.h> // AVX
 
 #define RNN_NUM_THD_MC 1
+#define RNN_VAR_THRES 512
 
 #define DRNN_SIMD_ALIGN_SIZE 32
 #define DRNN_MC 104
@@ -59,8 +60,7 @@ void dgsrnn(
     double *XB,
     double *XB2,
     int    *beta,
-    double *D,
-    int    *I
+    heap_t *heap
     );
 
 void dgsrnn_var2(
@@ -108,6 +108,7 @@ void dgsrnn_ref(
     int    *I
     );
 
+
 void dgssq2nrm(
     int    m,
     int    n,
@@ -132,6 +133,13 @@ heap_t *rnn_heapCreate(
     int    m,
     int    k,
     double ro
+    );
+
+heap_t *rnn_heapAttach(
+    int    m,
+    int    k,
+    double *D,
+    int    *I
     );
 
 void HeapAdjust(

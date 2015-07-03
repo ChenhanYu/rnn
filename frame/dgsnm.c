@@ -125,7 +125,7 @@ void dgsbnm(
 
     // Recompute the distance and reassign the group.
     //printf( "gsrnn\n" );
-    dgsrnn_var2(
+    dgsrnn_var1(
         m,
         n,
         k,
