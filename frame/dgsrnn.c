@@ -158,6 +158,7 @@ void dgsrnn_macro_kernel_row(
       // Combine selective square distance and the heap adjustment.
       // --------------------------------------------------------------------
       rnn_r_int_d8x4_row(
+      //rnn_r_1norm_int_d8x4_row(
           k,
           r,
           packA2 + i,

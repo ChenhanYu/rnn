@@ -16,6 +16,7 @@ KERNEL_SRC=    \
 							 kernels/$(RNN_ARCH)/rnn_rank_k_asm_d8x4.c \
 							 kernels/$(RNN_ARCH)/rnn_r_int_d8x4_row.c \
 							 kernels/$(RNN_ARCH)/sq2nrm_asm_d8x4.c \
+							 kernels/$(RNN_ARCH)/rnn_r_1norm_int_d8x4_row.c \
 
 RNN_OBJ=$(FRAME_CC_SRC:.c=.o) $(FRAME_CPP_SRC:.cpp=.o) $(KERNEL_SRC:.c=.o)
 

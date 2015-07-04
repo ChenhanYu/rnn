@@ -196,7 +196,7 @@ void test_dgsrnn(
 
 
   {
-    dgsrnn_ref_stl(
+    dgsrnn_ref(
         n,
         m,
         k,
@@ -216,7 +216,7 @@ void test_dgsrnn(
   ref_beg = omp_get_wtime();
   // Call the reference function ( we use the transpose to solve the problem. )
   for ( iter = 1; iter < n_iter; iter ++ ) {
-    dgsrnn_ref_stl(
+    dgsrnn_ref(
         m,
         n,
         k,
