@@ -3,6 +3,8 @@
 #include <rnn.h>
 #define min( i, j ) ( (i)<(j) ? (i): (j) )
 
+#include <rnn_kernel.h>
+
 inline void packA_kcxmc(
     int    m,
     int    k,
@@ -100,7 +102,7 @@ void rank_k_macro_kernel(
       if ( i + DRNN_MR >= m ) {
         aux.b_next += DRNN_NR * k;
       }
-      rnn_rank_k_asm_d8x4(
+      ( *rankk ) (
           k,
           &packA[ i * k ],
           &packB[ j * k ],
@@ -157,8 +159,7 @@ void dgsrnn_macro_kernel_row(
       // --------------------------------------------------------------------
       // Combine selective square distance and the heap adjustment.
       // --------------------------------------------------------------------
-      rnn_r_int_d8x4_row(
-      //rnn_r_1norm_int_d8x4_row(
+      ( *micro[ 1 ] ) (
           k,
           r,
           packA2 + i,
@@ -206,7 +207,8 @@ void dsq2nrm_macro_kernel(
         aux.b_next += DRNN_NR * k;
       }
 
-      sq2nrm_asm_d8x4(
+      //sq2nrm_asm_d8x4(
+      ( *sq2nrm ) (
           k,
           &packA[ i * k ],
           packA2 + i,

@@ -9,7 +9,7 @@ CFLAGS = -O3 -fopenmp -mavx
 
 LIBRNN = $(RNN_DIR)/lib/librnn.a
 
-LDFLAGS = -I$(RNN_DIR)/include
+LDFLAGS = -I$(RNN_DIR)/include -I$(RNN_DIR)/kernels/$(RNN_ARCH)
 
 #LDLIBS = $(LIBRNN) -lpthread -lm -fopenmp -lblas
 LDLIBS = $(LIBRNN) -lpthread -lm -openmp -mkl=parallel -Werror -Wall -pedantic
