@@ -7,6 +7,15 @@ void rnn_rank_k_asm_d8x4(
     aux_t  *aux
     );
 
+void rnn_rank_k_abs_int_d8x4(
+    int    k,
+    double *a,
+    double *b,
+    double *c,
+    int    ldc,
+    aux_t  *aux
+    );
+
 void rnn_r_int_d8x4_row(
     int    k,
     int    r,
@@ -58,7 +67,7 @@ void (*micro[ 2 ]) (
   rnn_r_1norm_int_d8x4_row
 };
 
-void (*rankk) (
+void (*rankk[ 2 ]) (
     int    k,
     double *a,
     double *b,
@@ -66,7 +75,8 @@ void (*rankk) (
     int    ldc,
     aux_t  *aux
     ) = {
-  rnn_rank_k_asm_d8x4
+  rnn_rank_k_asm_d8x4,
+  rnn_rank_k_abs_int_d8x4
 };
 
 void (*sq2nrm) (

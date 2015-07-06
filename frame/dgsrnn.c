@@ -102,7 +102,7 @@ void rank_k_macro_kernel(
       if ( i + DRNN_MR >= m ) {
         aux.b_next += DRNN_NR * k;
       }
-      ( *rankk ) (
+      ( *rankk[ 1 ] ) (
           k,
           &packA[ i * k ],
           &packB[ j * k ],
