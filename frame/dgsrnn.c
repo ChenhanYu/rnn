@@ -354,15 +354,16 @@ void dgsrnn_var3(
     double *XB,
     double *XB2,
     int    *bmap,
-    double *D,
-    int    *I
+    heap_t *heap
+    //double *D,
+    //int    *I
     )
 {
   int    i, j, ldr;
   int    ldc = ( ( m - 1 ) / DRNN_MR + 1 ) * DRNN_MR;
   double beg, time_heap, time_sq2nrm;
-
-
+  double *D = heap->D;
+  int    *I = heap->I;
   double *C = rnn_malloc_aligned( ldc, n + 4, sizeof(double) );
 
   beg = omp_get_wtime();
@@ -382,7 +383,8 @@ void dgsrnn_var3(
   time_sq2nrm = omp_get_wtime() - beg;
 
 
-  ldr = I[ 2 ];
+  //ldr = I[ 2 ];
+  ldr = heap->ldk;
 
   beg = omp_get_wtime();
   #pragma omp parallel for
@@ -409,8 +411,9 @@ void dgsrnn_var1(
     double *XB,
     double *XB2,
     int    *bmap,
-    double *D,
-    int    *I
+    heap_t *heap
+    //double *D,
+    //int    *I
     )
 {
   int    i, j, p, rnn_ic_nt;
@@ -419,6 +422,8 @@ void dgsrnn_var1(
   int    ldc, padn, ldr;
   double *packA, *packB, *packC, *packw, *packu, *packA2, *packB2;
   char   *str;
+  double *D = heap->D;
+  int    *I = heap->I;
 
 
   // Early return if possible
@@ -441,7 +446,8 @@ void dgsrnn_var1(
 
   // D-array heap leading dimenstion.
   //ldr = I[ 2 ];
-  ldr = r;
+  //ldr = r;
+  ldr = heap->ldk;
 
 
   // Allocate packing buffers
@@ -644,8 +650,9 @@ void dgsrnn(
         XB,
         XB2,
         bmap,
-        heap->D,
-        heap->I
+        heap
+        //heap->D,
+        //heap->I
         );
   }
   else {
@@ -660,8 +667,9 @@ void dgsrnn(
         XA,
         XA2,
         amap,
-        heap->D,
-        heap->I
+        heap
+        //heap->D,
+        //heap->I
         );
   }
 }

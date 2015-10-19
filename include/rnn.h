@@ -25,6 +25,11 @@ typedef union {
   int d[ 4 ];
 } v4li_t;
 
+typedef enum {
+  RNN_2NORM,
+  RNN_1NORM
+} rnn_type;
+
 struct aux_s {
   double *b_next;
   int    *I;
@@ -46,6 +51,7 @@ struct heap_s {
   double ro;
   double *D;
   int    *I;
+  rnn_type type;
 };
 
 typedef struct heap_s heap_t;
@@ -64,7 +70,7 @@ void dgsrnn(
     heap_t *heap
     );
 
-void dgsrnn_var2(
+void dgsrnn_var1(
     int    m,
     int    n,
     int    k,
@@ -75,8 +81,9 @@ void dgsrnn_var2(
     double *XB,
     double *XB2,
     int    *beta,
-    double *D,
-    int    *I
+    heap_t *heap
+    //double *D,
+    //int    *I
     );
 
 void dgsrnn_var3(
@@ -90,8 +97,9 @@ void dgsrnn_var3(
     double *XB,
     double *XB2,
     int    *bmap,
-    double *D,
-    int    *I
+    heap_t *heap
+    //double *D,
+    //int    *I
     );
 
 void dgsrnn_ref(
