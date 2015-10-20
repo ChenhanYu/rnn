@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <omp.h>
 #include <limits.h>
-#include <rnn.h>
 
-#include <dgsrnn_ref_stl.hpp>
+#include <rnn.h>
+#include <gsknn_ref.h>
 
 void bubble_sort(
     int    r,

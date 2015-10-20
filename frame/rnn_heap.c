@@ -6,6 +6,12 @@
 #define RNN_HEAP_OFFSET 3
 #define DARRAY 4
 
+inline void swap_float( float *x, int i, int j ) {
+  float  tmp = x[i];
+  x[ i ] = x[ j ];
+  x[ j ] = tmp;
+}
+
 
 inline void swap_double( double *x, int i, int j ) {
   double tmp = x[i];

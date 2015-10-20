@@ -13,3 +13,17 @@ void dgsrnn_ref_stl(
     int    *I
     );
 
+void sgsrnn_ref_stl(
+    int    m,
+    int    n,
+    int    k,
+    int    r,
+    float  *XA,
+    float  *XA2,
+    int    *alpha,
+    float  *XB,
+    float  *XB2,
+    int    *beta,
+    float  *D,
+    int    *I
+    );

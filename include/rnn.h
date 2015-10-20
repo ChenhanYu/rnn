@@ -108,22 +108,6 @@ void dgsrnn_var3(
     //int    *I
     );
 
-void dgsrnn_ref(
-    int    m,
-    int    n,
-    int    k,
-    int    r,
-    prec_t *XA,
-    prec_t *XA2,
-    int    *alpha,
-    prec_t *XB,
-    prec_t *XB2,
-    int    *beta,
-    prec_t *D,
-    int    *I
-    );
-
-
 void dgssq2nrm(
     int    m,
     int    n,

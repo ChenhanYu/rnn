@@ -1,9 +1,9 @@
-//#include <mkl.h>
-#include <rnn.h>
 #include <omp.h>
 #include <stdlib.h>
 #include <limits.h>
 #include <float.h>
+#include <rnn.h>
+#include <gsknn_ref.h>
 
 #define USE_BLAS 0
 

@@ -11,7 +11,7 @@
 
 extern "C" {
 #include <rnn.h>
-#include <dgsrnn_ref_stl.hpp>
+#include <gsknn_ref_stl.hpp>
 }
 
 #define USE_BLAS 0
