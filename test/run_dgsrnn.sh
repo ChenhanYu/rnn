@@ -1,4 +1,5 @@
 #!/bin/bash
+export DYLD_LIBRARY_PATH=/opt/intel/lib:/opt/intel/mkl/lib
 
 #m=2048
 #n=2048
@@ -47,9 +48,8 @@
 
 
 
-m=8192
-n=8192
-
+m=4096
+n=4096
 
 #k=16
 r=10
@@ -73,14 +73,14 @@ echo "];"
 #echo "];"
 #
 #
-k=64
-echo "var1_k64=["
-for (( r=4; r<2060; r+=32 ))
-do
+#k=64
+#echo "var1_k64=["
+#for (( r=4; r<2060; r+=32 ))
+#do
 #  ./test_dgsrnn.x $m $n $k $r
   ./test_dgsrnn_stl.x $m $n $k $r
-done
-echo "];"
+#done
+#echo "];"
 #
 #
 #k=256

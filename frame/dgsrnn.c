@@ -102,7 +102,7 @@ void rank_k_macro_kernel(
       if ( i + DRNN_MR >= m ) {
         aux.b_next += DRNN_NR * k;
       }
-      ( *rankk[ 1 ] ) (
+      ( *rankk[ 0 ] ) (
           k,
           &packA[ i * k ],
           &packB[ j * k ],
@@ -159,7 +159,7 @@ void dgsrnn_macro_kernel_row(
       // --------------------------------------------------------------------
       // Combine selective square distance and the heap adjustment.
       // --------------------------------------------------------------------
-      ( *micro[ 1 ] ) (
+      ( *micro[ 0 ] ) (
           k,
           r,
           packA2 + i,

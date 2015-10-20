@@ -6,11 +6,11 @@ FRAME_CC_SRC=  \
 							 frame/rnn_util.c \
 							 frame/dgsrnn_ref.c \
 							 frame/rnn_heap.c \
-							 frame/dgsnm.c \
+							 #frame/dgsnm.c \
 
 FRAME_CPP_SRC= \
 							 frame/dgsrnn_ref_stl.cpp \
-							 frame/dgsrnn_directKQuery.cpp \
+							 #frame/dgsrnn_directKQuery.cpp \
 
 KERNEL_SRC=    \
 							 kernels/$(RNN_ARCH)/rnn_rank_k_asm_d8x4.c \

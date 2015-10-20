@@ -86,7 +86,6 @@ void dgsrnn_ref(
   //    );
 
 
-  /*
   dgemm(
       "T",
       "N",
@@ -102,8 +101,8 @@ void dgsrnn_ref(
       Cs,
       &m
       );
-  */
 
+  /*
   // 1-norm
   #pragma omp parallel for
   for ( j = 0; j < n; j ++ ) {
@@ -114,11 +113,10 @@ void dgsrnn_ref(
       }
     }
   }
-
+  */
 
   time_dgemm = omp_get_wtime() - beg;
 
-  /* 
   beg = omp_get_wtime();
   #pragma omp parallel for
   for ( j = 0; j < n; j ++ ) {
@@ -128,7 +126,6 @@ void dgsrnn_ref(
     }
   }
   time_square = omp_get_wtime() - beg;
-  */
 
 
   beg = omp_get_wtime();

@@ -2,7 +2,6 @@ include $(RNN_DIR)/make.inc
 
 RNN_TEST_CC_SRC=  \
                  test_dgsrnn.c \
-                 test_dgsnm.c \
 
 RNN_TEST_CPP_SRC= \
 									test_dgsrnn_stl.cpp \
