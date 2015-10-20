@@ -23,57 +23,59 @@ void dgsrnn_ref(
     int    n,
     int    k,
     int    r,
-    double *XA,
-    double *XA2,
+    prec_t *XA,
+    prec_t *XA2,
     int    *alpha,
-    double *XB,
-    double *XB2,
+    prec_t *XB,
+    prec_t *XB2,
     int    *beta,
-    double *D,
+    prec_t *D,
     int    *I
     )
 {
   // Local variables.
   int    i, j, p;
-  double *As, *Bs, *Cs;
   double beg, time_collect, time_dgemm, time_square, time_heap;
-  double dneg2 = -2.0;
-  double dzero = 0.0;
+  prec_t *As, *Bs, *Cs;
+  prec_t fneg2 = -2.0, fzero = 0.0;
+
 
   // Sanity check for early return.
   if ( m == 0 || n == 0 || k == 0 || r == 0 ) return;
 
-  As = (double*)malloc( sizeof(double) * m * k );
-  Bs = (double*)malloc( sizeof(double) * n * k );
-  Cs = (double*)malloc( sizeof(double) * m * n );
+
+  As = (prec_t*)malloc( sizeof(prec_t) * m * k );
+  Bs = (prec_t*)malloc( sizeof(prec_t) * n * k );
+  Cs = (prec_t*)malloc( sizeof(prec_t) * m * n );
 
 
+  // Collect As from XA and XB.
   beg = omp_get_wtime();
-
-  // Collect As from XA
   #pragma omp parallel for private( p )
   for ( i = 0; i < m; i ++ ) {
     for ( p = 0; p < k; p ++ ) {
       As[ i * k + p ] = XA[ alpha[ i ] * k + p ];
     }
   }
-
-  // Collect Bs from XB
   #pragma omp parallel for private( p )
   for ( j = 0; j < n; j ++ ) {
     for ( p = 0; p < k; p ++ ) {
       Bs[ j * k + p ] = XB[ beta[ j ] * k + p ];
     }
   }
-
   time_collect = omp_get_wtime() - beg;
 
 
   // Compute the inner-product term.
   beg = omp_get_wtime();
   if ( USE_BLAS ) {
-    dgemm( "T", "N", &m, &n, &k, &dneg2,
-        As, &k, Bs, &k, &dzero, Cs, &m );
+#ifdef KNN_PREC_SINGLE
+    sgemm( "T", "N", &m, &n, &k, &fneg2,
+        As, &k, Bs, &k, &fzero, Cs, &m );
+#else
+    dgemm( "T", "N", &m, &n, &k, &fneg2,
+        As, &k, Bs, &k, &fzero, Cs, &m );
+#endif
   }
   else {
     #pragma omp parallel for private( i, p )
@@ -128,97 +130,6 @@ void dgsrnn_ref(
   */
 
   // Free the temporary buffers
-  free( As );
-  free( Bs );
-  free( Cs );
-}
-
-void sgsrnn_ref(
-    int    m,
-    int    n,
-    int    k,
-    int    r,
-    float  *XA,
-    float  *XA2,
-    int    *alpha,
-    float  *XB,
-    float  *XB2,
-    int    *beta,
-    float  *D,
-    int    *I
-    )
-{
-  int    i, j, p;
-  float  *As, *Bs, *Cs;
-  double beg, time_collect, time_dgemm, time_square, time_heap;
-  float  fneg2 = -2.0;
-  float  fzero = 0.0;
-
-  // Sanity check for early return.
-  if ( m == 0 || n == 0 || k == 0 || r == 0 ) {
-    return;
-  }
-
-  As = (float*)malloc( sizeof(float) * m * k );
-  Bs = (float*)malloc( sizeof(float) * n * k );
-  Cs = (float*)malloc( sizeof(float) * m * n );
-
-  beg = omp_get_wtime();
-
-  // Collect As from XA
-  #pragma omp parallel for private( p )
-  for ( i = 0; i < m; i ++ ) {
-    for ( p = 0; p < k; p ++ ) {
-      As[ i * k + p ] = XA[ alpha[ i ] * k + p ];
-    }
-  }
-
-  // Collect Bs from XB
-  #pragma omp parallel for private( p )
-  for ( j = 0; j < n; j ++ ) {
-    for ( p = 0; p < k; p ++ ) {
-      Bs[ j * k + p ] = XB[ beta[ j ] * k + p ];
-    }
-  }
-
-  time_collect = omp_get_wtime() - beg;
-
-  // Compute the inner-product term.
-  beg = omp_get_wtime();
-  sgemm( "T", "N", &m, &n, &k, &fneg2,
-      As, &k, Bs, &k, &fzero, Cs, &m );
-  time_dgemm = omp_get_wtime() - beg;
-
-  /*
-  // 1-norm
-  #pragma omp parallel for private( i, p )
-  for ( j = 0; j < n; j ++ ) {
-    for ( i = 0; i < m; i ++ ) {
-      Cs[ j * m + i ] = 0.0;
-      for ( p = 0; p < k; p ++ ) {
-        Cs[ j * m + i ] += fabs( As[ i * k + p ] - Bs[ j * k + p ] );
-      }
-    }
-  }
-  */
-
-  beg = omp_get_wtime();
-  #pragma omp parallel for private( i )
-  for ( j = 0; j < n; j ++ ) {
-    for ( i = 0; i < m; i ++ ) {
-      Cs[ j * m + i ] += XA2[ alpha[ i ] ];
-      Cs[ j * m + i ] += XB2[ beta[ j ] ];
-    }
-  }
-  time_square = omp_get_wtime() - beg;
-
-  beg = omp_get_wtime();
-  #pragma omp parallel for schedule( dynamic )
-  for ( j = 0; j < n; j ++ ) {
-    //heap_sort( m, r, &Cs[ j * m ], alpha, &D[ j * r ], &I[ j * r ] );
-  }
-  time_heap = omp_get_wtime() - beg;
-
   free( As );
   free( Bs );
   free( Cs );

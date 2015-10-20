@@ -1,6 +1,12 @@
 #include <math.h>
 #include <immintrin.h> // AVX
 
+#ifdef KNN_PREC_SINGLE
+#define prec_t float
+#else
+#define prec_t double
+#endif
+
 #define RNN_NUM_THD_MC 1
 #define RNN_VAR_THRES 512
 
@@ -107,13 +113,13 @@ void dgsrnn_ref(
     int    n,
     int    k,
     int    r,
-    double *XA,
-    double *XA2,
+    prec_t *XA,
+    prec_t *XA2,
     int    *alpha,
-    double *XB,
-    double *XB2,
+    prec_t *XB,
+    prec_t *XB2,
     int    *beta,
-    double *D,
+    prec_t *D,
     int    *I
     );
 

@@ -13,8 +13,8 @@ export DYLD_LIBRARY_PATH=/opt/intel/lib:/opt/intel/mkl/lib
 echo "DYLD_LIBRARY_PATH = $DYLD_LIBRARY_PATH"
 
 # Manually set the mkl path
-export RNN_MKL_DIR=/opt/intel/mkl
-#export RNN_MKL_DIR=$TACC_MKL_DIR
+#export RNN_MKL_DIR=/opt/intel/mkl
+export RNN_MKL_DIR=$TACC_MKL_DIR
 echo "RNN_MKL_DIR = $RNN_MKL_DIR"
 
 # Parallel options
