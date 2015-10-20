@@ -108,6 +108,7 @@ heap_t *rnn_heapAttach(
   heap->ldk = k;
   heap->D   = D;
   heap->I   = I;
+  return heap;
 }
 
 heap_t *rnn_heapCreate(
