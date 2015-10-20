@@ -2,19 +2,18 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <float.h>
-#include <rnn.h>
+
+#include <gsknn.h>
 #include <gsknn_ref.h>
 
-#define USE_BLAS 0
-
-
+#ifdef USE_BLAS
 // dgemm prototype
 void dgemm(char*, char*, int*, int*, int*, double*, double*, 
     int*, double*, int*, double*, double*, int*);
-
 // sgemm prototype
 void sgemm(char*, char*, int*, int*, int*, float*, float*, 
     int*, float*, int*, float*, float*, int*);
+#endif
 
 
 // This reference function will call BLAS.

@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <rnn.h>
 #include <immintrin.h>
+
+#include <gsknn.h>
 
 #define RNN_HEAP_OFFSET 3
 #define DARRAY 4

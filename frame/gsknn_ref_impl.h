@@ -17,26 +17,25 @@
 
   // Compute the inner-product term.
   beg = omp_get_wtime();
-  if ( USE_BLAS ) {
+#ifdef USE_BLAS 
 #ifdef KNN_PREC_SINGLE
-    sgemm( "T", "N", &m, &n, &k, &fneg2,
+  sgemm( "T", "N", &m, &n, &k, &fneg2,
         As, &k, Bs, &k, &fzero, Cs, &m );
 #else
-    dgemm( "T", "N", &m, &n, &k, &fneg2,
+  dgemm( "T", "N", &m, &n, &k, &fneg2,
         As, &k, Bs, &k, &fzero, Cs, &m );
 #endif
-  }
-  else {
-    #pragma omp parallel for private( i, p )
-    for ( j = 0; j < n; j ++ ) {
-      for ( i = 0; i < m; i ++ ) {
-        Cs[ j * m + i ] = 0.0;
-        for ( p = 0; p < k; p ++ ) {
-          Cs[ j * m + i ] -= 2.0 * As[ i * k + p ] * Bs[ j * k + p ];
-        }
+#else
+  #pragma omp parallel for private( i, p )
+  for ( j = 0; j < n; j ++ ) {
+    for ( i = 0; i < m; i ++ ) {
+      Cs[ j * m + i ] = 0.0;
+      for ( p = 0; p < k; p ++ ) {
+        Cs[ j * m + i ] -= 2.0 * As[ i * k + p ] * Bs[ j * k + p ];
       }
     }
   }
+#endif
   time_dgemm = omp_get_wtime() - beg;
 
   /*

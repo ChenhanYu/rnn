@@ -1,5 +1,6 @@
 #include <immintrin.h> // AVX
-#include <rnn.h>
+
+#include <gsknn.h>
 
 void rnn_r_1norm_int_d8x4_row(
     int    k,

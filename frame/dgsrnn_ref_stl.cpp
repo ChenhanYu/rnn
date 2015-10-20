@@ -10,19 +10,19 @@
 #include<iostream>
 
 extern "C" {
-#include <rnn.h>
+#include <gsknn.h>
 #include <gsknn_ref_stl.hpp>
 }
 
-#define USE_BLAS 0
-
-
+#ifdef USE_BLAS
 // dgemm prototype
 extern "C" void dgemm( char*, char*, int*, int*, int*, double*, double*, 
     int*, double*, int*, double*, double*, int* );
 // sgemm prototype
 extern "C" void sgemm( char*, char*, int*, int*, int*, float*, float*, 
     int*, float*, int*, float*, float*, int* );
+#endif
+
 
 // Heap operator
 struct lessthan {

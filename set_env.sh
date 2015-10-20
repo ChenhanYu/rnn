@@ -16,6 +16,10 @@ echo "DYLD_LIBRARY_PATH = $DYLD_LIBRARY_PATH"
 export GSKNN_USE_INTEL=true
 echo "GSKNN_USE_INTEL = $GSKNN_USE_INTEL"
 
+# Whether use BLAS or not?
+export GSKNN_USE_BLAS=true
+echo "GSKNN_USE_BLAS = $GSKNN_USE_BLAS"
+
 # Manually set the mkl path
 export GSKNN_MKL_DIR=/opt/intel/mkl
 #export GSKNN_MKL_DIR=$TACC_MKL_DIR

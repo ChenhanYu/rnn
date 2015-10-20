@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <omp.h>
-#include <rnn.h>
+#include <gsknn.h>
 #define min( i, j ) ( (i)<(j) ? (i): (j) )
 
 #include <rnn_kernel.h>

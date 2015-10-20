@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <immintrin.h> // AVX
-#include <rnn.h>
+
+#include <gsknn.h>
 
 
 void sq2nrm_asm_d8x4(

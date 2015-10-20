@@ -1,15 +1,20 @@
-include $(RNN_DIR)/make.inc
-
-RNN_TEST_CC_SRC=  \
-                 test_dgsrnn.c \
-
-RNN_TEST_CPP_SRC= \
-									test_dgsrnn_stl.cpp \
+ifeq ($(GSKNN_USE_INTEL),true)
+include $(GSKNN_DIR)/make.intel.inc
+else
+include $(GSKNN_DIR)/make.gnu.inc
+endif
 
 
-RNN_TEST_EXE= $(RNN_TEST_CC_SRC:.c=.x) $(RNN_TEST_CPP_SRC:.cpp=.x)
+GSKNN_TEST_CC_SRC= \
+									 test_dgsrnn.c \
 
-all: $(RNN_TEST_EXE)
+GSKNN_TEST_CPP_SRC=\
+									 test_dgsrnn_stl.cpp \
+
+
+GSKNN_TEST_EXE= $(GSKNN_TEST_CC_SRC:.c=.x) $(GSKNN_TEST_CPP_SRC:.cpp=.x)
+
+all: $(GSKNN_TEST_EXE)
 
 
 # ---------------------------------------------------------------------------
@@ -23,4 +28,4 @@ all: $(RNN_TEST_EXE)
 # ---------------------------------------------------------------------------
 
 clean:
-	rm -f $(RNN_TEST_EXE)
+	rm -f $(GSKNN_TEST_EXE)

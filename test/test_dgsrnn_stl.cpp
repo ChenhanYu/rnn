@@ -4,7 +4,7 @@
 #include <limits.h>
 
 extern "C" {
-#include <rnn.h>
+#include <gsknn.h>
 #include <gsknn_ref_stl.hpp>
 }
 

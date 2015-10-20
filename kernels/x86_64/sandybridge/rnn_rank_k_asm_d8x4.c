@@ -1,5 +1,6 @@
 #include <immintrin.h> // AVX
-#include <rnn.h>
+
+#include <gsknn.h>
 
 
 void rnn_rank_k_asm_d8x4(

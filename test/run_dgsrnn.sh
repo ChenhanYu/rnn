@@ -1,8 +1,8 @@
 #!/bin/bash
 export DYLD_LIBRARY_PATH=/opt/intel/lib:/opt/intel/mkl/lib
 
-m=1027
-n=1027
+m=4096
+n=4096
 
 r=10
 echo "var1_k16=["

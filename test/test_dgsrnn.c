@@ -3,7 +3,7 @@
 #include <omp.h>
 #include <limits.h>
 
-#include <rnn.h>
+#include <gsknn.h>
 #include <gsknn_ref.h>
 
 void bubble_sort(

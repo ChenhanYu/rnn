@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <omp.h>
-#include <rnn.h>
+
+#include <gsknn.h>
 
 double *rnn_malloc_aligned(
     int    m,
