@@ -28,10 +28,20 @@ set (GSKNN_ARCH_MINOR $ENV{GSKNN_ARCH_MINOR})
 set (GSKNN_ARCH ${GSKNN_ARCH_MAJOR}/${GSKNN_ARCH_MINOR})
 
 
-# Compiler Options (GSKNN must use Intel compiler.)
-set (CMAKE_C_COMPILER   icc )
-set (CMAKE_CXX_COMPILER icpc)
-set (GSKNN_CFLAGS          "-O3 -openmp -mavx -Werror -Wall -pedantic")
+# Compiler Options.
+if ($ENV{GSKNN_USE_INTEL} MATCHES "true")
+  set (CMAKE_C_COMPILER   icc )
+  set (CMAKE_CXX_COMPILER icpc)
+else ($ENV{GSKNN_USE_INTEL} MATCHES "true")
+  set (CMAKE_C_COMPILER   gcc)
+  set (CMAKE_CXX_COMPILER g++)
+endif ($ENV{GSKNN_USE_INTEL} MATCHES "true")
+
+if ($ENV{GSKNN_USE_BLAS} MATCHES "true")
+  set (GSKNN_CFLAGS          "-O3 -openmp -mavx -Werror -Wall -pedantic -DUSE_BLAS")
+else ($ENV{GSKNN_USE_BLAS} MATCHES "true")
+  set (GSKNN_CFLAGS          "-O3 -openmp -mavx -Werror -Wall -pedantic")
+endif ($ENV{GSKNN_USE_BLAS} MATCHES "true")
 set (CMAKE_C_FLAGS      "${CMAKE_C_FLAGS} ${GSKNN_CFLAGS}")
 set (CMAKE_CXX_FLAGS    "${CMAKE_CXX_FLAGS} ${GSKNN_CFLAGS}")
 
@@ -41,7 +51,17 @@ set (MKL_DIR $ENV{GSKNN_MKL_DIR})
 
 
 # Linking infos.
-set (CMAKE_EXE_LINKER_FLAGS "-lpthread -lm -mkl=parallel")
+set (CMAKE_EXE_LINKER_FLAGS "-lpthread -lm")
+
+if ($ENV{GSKNN_USE_INTEL} MATCHES "true" AND $ENV{GSKNN_USE_BLAS} MATCHES "true")
+  set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mkl=parallel")
+endif ($ENV{GSKNN_USE_INTEL} MATCHES "true" AND $ENV{GSKNN_USE_BLAS} MATCHES "true")
+
+if ($ENV{GSKNN_USE_GNU} MATCHES "true" AND $ENV{GSKNN_USE_BLAS} MATCHES "true")
+  set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lblas")
+endif ($ENV{GSKNN_USE_GNU} MATCHES "true" AND $ENV{GSKNN_USE_BLAS} MATCHES "true")
+  
+
 
 
 # Headers.
