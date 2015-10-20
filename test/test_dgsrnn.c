@@ -18,7 +18,7 @@ void bubble_sort(
     for ( j = 0; j < r - 1 - i; j ++ ) {
        if ( D[ j ] > D[ j + 1 ] ) {
          double dtmp;
-         double itmp;
+         int    itmp;
          dtmp = D[ j ];
          D[ j ] = D[ j + 1 ];
          D[ j + 1 ] = dtmp;
