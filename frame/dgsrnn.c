@@ -260,7 +260,7 @@ void dgssq2nrm(
 
 
   // check the environment variable
-  str = getenv( "RNN_IC_NT" );
+  str = getenv( "GSKNN_IC_NT" );
   if ( str != NULL ) {
     rnn_ic_nt = (int)strtol( str, NULL, 10 );
   }
@@ -438,7 +438,7 @@ void dgsrnn_var1(
 
 
   // check the environment variable
-  str = getenv( "RNN_IC_NT" );
+  str = getenv( "GSKNN_IC_NT" );
   if ( str != NULL ) {
     rnn_ic_nt = (int)strtol( str, NULL, 10 );
   }
