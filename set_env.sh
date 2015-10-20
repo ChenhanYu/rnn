@@ -1,23 +1,27 @@
 #!/bin/bash
-export RNN_DIR=$PWD
-echo "RNN_DIR = $RNN_DIR"
+export GSKNN_DIR=$PWD
+echo "GSKNN_DIR = $GSKNN_DIR"
 
 # Manually set the target architecture.
-export RNN_ARCH_MAJOR=x86_64
-export RNN_ARCH_MINOR=sandybridge
-export RNN_ARCH=$RNN_ARCH_MAJOR/$RNN_ARCH_MINOR
-echo "RNN_ARCH = $RNN_ARCH"
+export GSKNN_ARCH_MAJOR=x86_64
+export GSKNN_ARCH_MINOR=sandybridge
+export GSKNN_ARCH=$GSKNN_ARCH_MAJOR/$GSKNN_ARCH_MINOR
+echo "GSKNN_ARCH = $GSKNN_ARCH"
 
 # For macbook pro
-export DYLD_LIBRARY_PATH=/opt/intel/lib:/opt/intel/mkl/lib
+export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/opt/intel/lib:/opt/intel/mkl/lib
 echo "DYLD_LIBRARY_PATH = $DYLD_LIBRARY_PATH"
 
+# Compiler options (if false, then use GNU compilers)
+export GSKNN_USE_INTEL=true
+echo "GSKNN_USE_INTEL = $GSKNN_USE_INTEL"
+
 # Manually set the mkl path
-#export RNN_MKL_DIR=/opt/intel/mkl
-export RNN_MKL_DIR=$TACC_MKL_DIR
-echo "RNN_MKL_DIR = $RNN_MKL_DIR"
+export GSKNN_MKL_DIR=/opt/intel/mkl
+#export GSKNN_MKL_DIR=$TACC_MKL_DIR
+echo "GSKNN_MKL_DIR = $GSKNN_MKL_DIR"
 
 # Parallel options
 export KMP_AFFINITY=compact
 export OMP_NUM_THREADS=10
-export RNN_IC_NT=10
+export GSKNN_IC_NT=10

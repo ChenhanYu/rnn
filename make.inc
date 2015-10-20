@@ -7,11 +7,8 @@ RANLIB = ranlib
 
 CFLAGS = -O3 -openmp -mavx
 
-LIBRNN = $(RNN_DIR)/lib/librnn.a
+LIBGSKNN = $(GSKNN_DIR)/lib/librnn.a
 
+LDFLAGS = -I$(GSKNN_DIR)/include -I$(GSKNN_DIR)/kernels/$(GSKNN_ARCH) -I/$(GSKNN_MKL_DIR)/include
 
-#LDFLAGS = -I$(RNN_DIR)/include -I$(TACC_MKL_DIR)/include
-LDFLAGS = -I$(RNN_DIR)/include -I$(RNN_DIR)/kernels/$(RNN_ARCH) -I/opt/intel/mkl/include
-
-#LDLIBS = $(LIBRNN) -lpthread -lm -openmp -mkl=sequential -Werror -Wall -pedantic
-LDLIBS = $(LIBRNN) -lpthread -lm -openmp -mkl=parallel -Werror -Wall -pedantic
+LDLIBS = $(LIBGSKNN) -lpthread -lm -openmp -mkl=parallel -Werror -Wall -pedantic
