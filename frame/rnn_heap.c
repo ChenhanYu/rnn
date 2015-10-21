@@ -28,29 +28,32 @@ inline void swap_int( int *I, int i, int j ) {
 }
 
 
-//Maintain a max heap
-inline void HeapAdjust(
-    double *D, 
+// Maintain a max heap
+#ifdef KNN_PREC_SINGLE 
+inline void HeapAdjust_s
+#else
+inline void HeapAdjust_d
+#endif
+    (
+    prec_t *D, 
     int    s, 
     int    n, 
     int    *I
     ) 
 {
-  int j;
+  int    j;
 
   while ( 2 * s + 1 < n ) {
     j = 2 * s + 1;
-
     if ( ( j + 1 ) < n ) {
       if ( D[ j ] < D[ j + 1 ] ) j ++;
     }
-
-    //__asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( D + j * 2 + 1 ) );
-    //__asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( I + j * 2 + 1 ) );
-    
-
     if ( D[ s ] < D[ j ] ) {
+#ifdef KNN_PREC_SINGLE 
+      swap_float( D, s, j );
+#else
       swap_double( D, s, j );
+#endif
       swap_int( I, s, j );
       s = j;
     } 
@@ -61,13 +64,18 @@ inline void HeapAdjust(
 }
 
 
-//Heap Sort the first largest r elements in an double array of length len)
-inline void heap_sort(
+// Heap Sort the first largest r elements in an double array of length len)
+#ifdef KNN_PREC_SINGLE 
+inline void heap_sort_s
+#else
+inline void heap_sort_d
+#endif
+    (
     int    m,
     int    r,
-    double *x, 
+    prec_t *x, 
     int    *alpha, 
-    double *D,
+    prec_t *D,
     int    *I
     ) 
 {
@@ -88,7 +96,11 @@ inline void heap_sort(
     else {
       D[ 0 ] = x[ i ];  
       I[ 0 ] = alpha[ i ];
-      HeapAdjust( D, 0, r, I );
+#ifdef KNN_PREC_SINGLE 
+      HeapAdjust_s( D, 0, r, I );
+#else
+      HeapAdjust_d( D, 0, r, I );
+#endif
     }
   }
 }

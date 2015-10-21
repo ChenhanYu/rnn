@@ -1,6 +1,5 @@
 TODO:
 
-BUGS:
+Change vectorized heap to suport prec_t.
 
-1. The problem will crash if we set NC to 2048.
-2. Var3 will lead to seg fault, but I can't reproduce without MPI.
+BUGS:

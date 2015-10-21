@@ -61,7 +61,11 @@ void dgsrnn_ref
   beg = omp_get_wtime();
   #pragma omp parallel for schedule( dynamic )
   for ( j = 0; j < n; j ++ ) {
-    heap_sort( m, r, &Cs[ j * m ], alpha, &D[ j * r ], &I[ j * r ] );
+#ifdef KNN_PREC_SINGLE
+    heap_sort_s( m, r, &Cs[ j * m ], alpha, &D[ j * r ], &I[ j * r ] );
+#else
+    heap_sort_d( m, r, &Cs[ j * m ], alpha, &D[ j * r ], &I[ j * r ] );
+#endif
   }
   time_heap = omp_get_wtime() - beg;
 

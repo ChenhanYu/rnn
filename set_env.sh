@@ -21,7 +21,7 @@ export GSKNN_USE_BLAS=true
 echo "GSKNN_USE_BLAS = $GSKNN_USE_BLAS"
 
 # Manually set the mkl path
-#export GSKNN_MKL_DIR=/opt/intel/mkl
+export GSKNN_MKL_DIR=/opt/intel/mkl
 #export GSKNN_MKL_DIR=$TACC_MKL_DIR
 echo "GSKNN_MKL_DIR = $GSKNN_MKL_DIR"
 
