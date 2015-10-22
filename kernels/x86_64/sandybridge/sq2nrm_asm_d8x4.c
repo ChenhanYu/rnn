@@ -2,6 +2,7 @@
 #include <immintrin.h> // AVX
 
 #include <gsknn.h>
+#include <avx_types.h>
 
 
 void sq2nrm_asm_d8x4(

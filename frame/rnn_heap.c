@@ -7,6 +7,20 @@
 #define RNN_HEAP_OFFSET 3
 #define DARRAY 4
 
+
+typedef union {
+  __m256d v;
+  __m256i u;
+  double d[ 4 ];
+} v4df_t;
+
+
+typedef union {
+  __m128i v;
+  int d[ 4 ];
+} v4li_t;
+
+
 inline void swap_float( float *x, int i, int j ) {
   float  tmp = x[i];
   x[ i ] = x[ j ];
