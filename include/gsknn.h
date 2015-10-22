@@ -19,18 +19,6 @@
 
 typedef unsigned long long dim_t;
 
-//typedef union {
-//  __m256d v;
-//  __m256i u;
-//  double d[ 4 ];
-//} v4df_t;
-//
-//
-//typedef union {
-//  __m128i v;
-//  int d[ 4 ];
-//} v4li_t;
-
 typedef enum {
   RNN_2NORM,
   RNN_1NORM
@@ -137,38 +125,6 @@ heap_t *rnn_heapCreate(
 heap_t *rnn_heapAttach(
     int    m,
     int    k,
-    double *D,
-    int    *I
-    );
-
-void HeapAdjust_s(
-    float  *D, 
-    int    s, 
-    int    n, 
-    int    *I
-    );
-
-void HeapAdjust_d(
-    double *D, 
-    int    s, 
-    int    n, 
-    int    *I
-    );
-
-void heap_sort_s(
-    int    m,
-    int    r,
-    double *x, 
-    int    *alpha, 
-    double *D,
-    int    *I
-    );
-
-void heap_sort_d(
-    int    m,
-    int    r,
-    double *x, 
-    int    *alpha, 
     double *D,
     int    *I
     );

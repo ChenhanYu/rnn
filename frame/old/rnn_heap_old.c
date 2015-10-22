@@ -138,6 +138,7 @@ heap_t *rnn_heapAttach(
   return heap;
 }
 
+
 heap_t *rnn_heapCreate(
     int    m,
     int    k,
@@ -208,7 +209,6 @@ heap_t *rnn_heapCreate(
 }
 
 
-
 void heapSelect_int_d4(
     int    m,
     int    k,
@@ -219,37 +219,30 @@ void heapSelect_int_d4(
     )
 {
   int    i, j, s, p, l, l_left;
-
   v4df_t d0, p0, p1, p2, p3;
 
-  for ( i = 0; i < m; i++ ) {
-    if ( key[ i ] < D[ RNN_HEAP_OFFSET ] ) {
-      D[ RNN_HEAP_OFFSET ] = key[ i ];
-      I[ RNN_HEAP_OFFSET ] = val[ i ];
-      
+  for ( i = 0; i < m; i ++ ) {
+    if ( key[ i ] < D[ 3 ] ) {
+      D[ 3 ] = key[ i ];
+      I[ 3 ] = val[ i ];
       s = 0;
 
       while ( 4 * s + 1 < k ) {
-
         j = 4 * s + 1;
         l = k - j;
-
         l_left = l % 4;
         l = l - l_left;
-
-        d0.v    = _mm256_load_pd( D + RNN_HEAP_OFFSET + j );
+        d0.v    = _mm256_load_pd( D + 3 + j );
         p0.v    = _mm256_permute_pd( d0.v, 0x5 );      // 1 0 3 2
         p1.v    = _mm256_max_pd( p0.v, d0.v );
         p2.v    = _mm256_permute2f128_pd( p1.v, p1.v, 0x1 ); // 3 2 1 0
         p3.v    = _mm256_max_pd( p2.v, p1.v );
-
         d0.v    = _mm256_cmp_pd( d0.v, p3.v, 0 );
-
         j +=  __builtin_ctz( _mm256_movemask_pd( d0.v ) );
 
-        if ( D[ s + RNN_HEAP_OFFSET ] < D[ j + RNN_HEAP_OFFSET ] ) {
-          swap_double( D, s + RNN_HEAP_OFFSET, j + RNN_HEAP_OFFSET );
-          swap_int( I, s + RNN_HEAP_OFFSET, j + RNN_HEAP_OFFSET );
+        if ( D[ s + 3 ] < D[ j + 3 ] ) {
+          swap_double( D, s + 3, j + 3 );
+          swap_int( I, s + 3, j + 3 );
           s = j;
         } 
         else {
@@ -261,7 +254,7 @@ void heapSelect_int_d4(
 }
 
 
-
+/*
 void heapSelect_int_d16(
     int    m,
     int    k,
@@ -337,6 +330,8 @@ void heapSelect_int_d16(
     }
   }
 }
+*/
+
 
 void heapSelect_dheap(
     int    m,
@@ -491,55 +486,32 @@ void heapSelect_dheap_var2(
 {
   int    i, j, s, p, l, l_left;
 
-
   // prefetch the head of key
   __asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( key ) );
   __asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( val ) );
   __asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( D + RNN_HEAP_OFFSET ) );
   __asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( I + RNN_HEAP_OFFSET ) );
 
-
   for ( i = 0; i < m; i++ ) {
     if ( I[ 1 ] < I[ 0 ] ) {
-
       int p = I[ 0 ] - 1 - I[ 1 ];
-
-
-
-      //if ( p * DARRAY >= k - 1 ) {
-      //  D[ p + RNN_HEAP_OFFSET ] = key[ i ];
-      //  I[ p + RNN_HEAP_OFFSET ] = val[ i ];
-      //} else {
-      //  D[ p + RNN_HEAP_OFFSET ] = key[ i ];
-      //  I[ p + RNN_HEAP_OFFSET ] = val[ i ];
-      //  //HeapAdjust_dheap( D, p, k, I );
-      //  HeapAdjust_int_d4( D, p, k, I );
-      //}
-
-
       D[ p + RNN_HEAP_OFFSET ] = key[ i ];
       I[ p + RNN_HEAP_OFFSET ] = val[ i ];
-
       if ( p * DARRAY < k - 1 ) {
-        //HeapAdjust_dheap( D, p, k, I );
         HeapAdjust_int_d4( D, p, k, I );
       }
-
       I [ 1 ] = I[ 1 ] + 1;
     } 
     else {
-
       if ( key[ i ] < D[ RNN_HEAP_OFFSET ] ) {
         D[ RNN_HEAP_OFFSET ] = key[ i ];
         I[ RNN_HEAP_OFFSET ] = val[ i ];
-
-
-        //HeapAdjust_dheap( D, 0, k, I );
         HeapAdjust_int_d4( D, 0, k, I );
       }
     }
   }
 }
+
 
 void heapSelect_d16(
     int    m,
@@ -551,10 +523,6 @@ void heapSelect_d16(
     )
 {
   int    i, j, s, p, l, l_left;
-  //double max_key;
-  
-  //printf("come inside select_d16\n");
-
 
   for ( i = 0; i < m; i++ ) {
     if ( key[ i ] < D[ 0 ] ) {
