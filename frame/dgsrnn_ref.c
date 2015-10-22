@@ -5,7 +5,6 @@
 
 #include <gsknn.h>
 #include <gsknn_ref.h>
-#include <rnn_kernel.h>
 
 #ifdef USE_BLAS
 // dgemm prototype

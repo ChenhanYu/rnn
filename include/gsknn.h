@@ -128,3 +128,44 @@ heap_t *rnn_heapAttach(
     double *D,
     int    *I
     );
+
+void HeapAdjust_s(
+    float  *D, 
+    int    s, 
+    int    n, 
+    int    *I
+    );
+
+void HeapAdjust_d(
+    double *D, 
+    int    s, 
+    int    n, 
+    int    *I
+    );
+
+void heap_sort_s(
+    int    m,
+    int    r,
+    double *x, 
+    int    *alpha, 
+    double *D,
+    int    *I
+    );
+
+void heap_sort_d(
+    int    m,
+    int    r,
+    double *x, 
+    int    *alpha, 
+    double *D,
+    int    *I
+    );
+
+void heapSelect_dheap(
+    int    m,
+    int    k,
+    double *key,
+    int    *val,
+    double *D,
+    int    *I
+    );

@@ -622,16 +622,22 @@ void dgsrnn_var1(
   free( packB2 );
 }
 
-void dgsrnn(
+
+#ifdef KNN_PREC_SINGLE 
+void sgsrnn
+#else
+void dgsrnn
+#endif
+    (
     int    m,
     int    n,
     int    k,
     int    r,
-    double *XA,
-    double *XA2,
+    prec_t *XA,
+    prec_t *XA2,
     int    *amap,
-    double *XB,
-    double *XB2,
+    prec_t *XB,
+    prec_t *XB2,
     int    *bmap,
     heap_t *heap
     )
@@ -639,7 +645,12 @@ void dgsrnn(
   int    i, j;
 
   if ( r > RNN_VAR_THRES ) {
-    dgsrnn_var3(
+#ifdef KNN_PREC_SINGLE
+    sgsrnn_var3
+#else
+    dgsrnn_var3
+#endif      
+      (
         m,
         n,
         k,
@@ -651,12 +662,15 @@ void dgsrnn(
         XB2,
         bmap,
         heap
-        //heap->D,
-        //heap->I
         );
   }
   else {
-    dgsrnn_var1(
+#ifdef KNN_PREC_SINGLE
+    sgsrnn_var1
+#else
+    dgsrnn_var1
+#endif
+      (
         n,
         m,
         k,
@@ -668,8 +682,6 @@ void dgsrnn(
         XA2,
         amap,
         heap
-        //heap->D,
-        //heap->I
         );
   }
 }
