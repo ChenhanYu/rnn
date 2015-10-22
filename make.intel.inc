@@ -14,6 +14,8 @@ LDLIBS = $(LIBGSKNN) -lpthread -lm -openmp -Werror -Wall -pedantic
 endif
 
 LIBGSKNN = $(GSKNN_DIR)/lib/librnn.a
+SHAREDLIBGSKNN = $(GSKNN_DIR)/lib/librnn.so
+
 
 LDFLAGS = -I$(GSKNN_DIR)/include -I$(GSKNN_DIR)/kernels/$(GSKNN_ARCH) -I$(GSKNN_MKL_DIR)/include
 

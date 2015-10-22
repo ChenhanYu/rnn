@@ -21,7 +21,7 @@ all: $(GSKNN_TEST_EXE)
 # Executable files compiling rules
 # ---------------------------------------------------------------------------
 %.x: %.c 
-	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS) $(LDLIBS)
+	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS) -L$(GSKNN_DIR)/lib -lrnn
 
 %.x: %.cpp 
 	$(CXX) $(CXXFLAGS) $< -o $@ $(LDFLAGS) $(LDLIBS)

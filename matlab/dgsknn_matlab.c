@@ -33,10 +33,11 @@ void mexFunction(
   for ( i = 0; i < m; i ++ ) qint[ i ] = (int)q[ i ];
   for ( j = 0; j < n; j ++ ) sint[ j ] = (int)s[ j ];
 
-  heap_t *heap = rnn_heapCreate( m, k, 1.79E+308 );
-
   printf( "%d, %d, %d\n", m, n, d );
 
+  heap_t *heap = rnn_heapCreate( m, k, 1.79E+308 );
+
+  /*
   {
     dgsrnn(
         m,
@@ -52,6 +53,7 @@ void mexFunction(
         heap
         );
   }
+  */
 
 
 

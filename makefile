@@ -23,15 +23,17 @@ KERNEL_SRC=    \
 
 GSKNN_OBJ=$(FRAME_CC_SRC:.c=.o) $(FRAME_CPP_SRC:.cpp=.o) $(KERNEL_SRC:.c=.o)
 
-all: $(LIBGSKNN) TESTGSKNN
+all: $(LIBGSKNN) $(SHAREDLIBGSKNN) TESTGSKNN
 
 TESTGSKNN: $(LIBGSKNN)
-	cd $(GSKNN_DIR)/test && $(MAKE) && cd $(GSKNN_DIR)
+	cd $(GSKNN_DIR)/test && $(MAKE) && cd $(GSKNN_DIR) $(LDFLAGS)
 
 $(LIBGSKNN): $(GSKNN_OBJ)
 	$(ARCH) $(ARCHFLAGS) $@ $(GSKNN_OBJ)
 	$(RANLIB) $@
 
+$(SHAREDLIBGSKNN): $(GSKNN_OBJ)
+	$(CC) $(CFLAGS) -shared -fPIC -o $@ $(GSKNN_OBJ) $(LDLIBS)
 
 # ---------------------------------------------------------------------------
 # Object files compiling rules

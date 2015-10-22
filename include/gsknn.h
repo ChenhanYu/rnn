@@ -1,5 +1,5 @@
 #include <math.h>
-#include <immintrin.h> // AVX
+#include <immintrin.h>
 
 #ifdef KNN_PREC_SINGLE
 #define prec_t float
@@ -76,8 +76,6 @@ void dgsrnn_var1(
     double *XB2,
     int    *beta,
     heap_t *heap
-    //double *D,
-    //int    *I
     );
 
 void dgsrnn_var3(
@@ -92,8 +90,6 @@ void dgsrnn_var3(
     double *XB2,
     int    *bmap,
     heap_t *heap
-    //double *D,
-    //int    *I
     );
 
 void dgssq2nrm(

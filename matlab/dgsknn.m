@@ -24,5 +24,7 @@ function [ I, D ] = dgsknn( X, k, q, s, options )
     X2( 1, i ) = X( i, : ) * X( i, : )';
   end
 
+  display( 'dgsknn calling dgsknn_matlab.' );
+
   % Call the mex wrapper.
   [ I, D ] =  dgsknn_matlab( m, n, d, k, q, s, X, X2 );
