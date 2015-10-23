@@ -1,4 +1,4 @@
-.. image:: https://github.com/ChenhanYu/rnn/blob/master/logo/gsknn_logo.001.png
+.. image:: https://github.com/ChenhanYu/rnn/blob/master/logo/gsknn_logo.png
   :alt: knn logo
   :align: center
 
