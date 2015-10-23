@@ -111,8 +111,8 @@ void test_dgsknn(
   D_mkl = (double*)malloc( sizeof(double) * r * m );
 
 
-  heap_t *heap = rnn_heapCreate( m, r, 1.79E+308 );
-  //printf( "rnn_heapCreate(): %d, %d, %d\n", 
+  heap_t *heap = gsknn_heapCreate( m, r, 1.79E+308 );
+  //printf( "gsknn_heapCreate(): %d, %d, %d\n", 
   //    heap->I[ 0 ], heap->I[ 1 ], heap->I[ 2 ] );
 
 

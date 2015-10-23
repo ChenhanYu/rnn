@@ -5,7 +5,7 @@
 #include <gsknn.h>
 #include <gsknn_config.h>
 
-double *rnn_malloc_aligned(
+double *gsknn_malloc_aligned(
     int    m,
     int    n,
     int    size
@@ -17,7 +17,7 @@ double *rnn_malloc_aligned(
   err = posix_memalign( (void**)&ptr, (size_t)DKNN_SIMD_ALIGN_SIZE, size * m * n );
 
   if ( err ) {
-    printf( "rnn_malloc_aligned(): posix_memalign() failures" );
+    printf( "gsknn_malloc_aligned(): posix_memalign() failures" );
     exit( 1 );    
   }
 

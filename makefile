@@ -8,7 +8,7 @@ endif
 FRAME_CC_SRC=  \
 							 frame/gsknn.c \
 							 frame/gsknn_heap.c \
-							 frame/rnn_util.c \
+							 frame/gsknn_util.c \
 							 frame/gsknn_ref.c \
 
 FRAME_CPP_SRC= \

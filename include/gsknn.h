@@ -99,19 +99,19 @@ void dgssq2nrm(
     int    ldc
 );
 
-double *rnn_malloc_aligned(
+double *gsknn_malloc_aligned(
     int    m,
     int    n,
     int    size
     );
 
-heap_t *rnn_heapCreate(
+heap_t *gsknn_heapCreate(
     int    m,
     int    k,
     double ro
     );
 
-heap_t *rnn_heapAttach(
+heap_t *gsknn_heapAttach(
     int    m,
     int    k,
     double *D,

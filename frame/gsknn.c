@@ -4,7 +4,7 @@
 #define min( i, j ) ( (i)<(j) ? (i): (j) )
 
 #include <gsknn_config.h>
-#include <rnn_kernel.h>
+#include <gsknn_kernel.h>
 
 inline void packA_kcxmc(
     int    m,
@@ -242,7 +242,7 @@ void dgssq2nrm(
     int    ldc        // ldc must also be aligned
 )
 {
-  int    i, j, p, rnn_ic_nt;
+  int    i, j, p, gsknn_ic_nt;
   int    ic, ib, jc, jb, pc, pb;
   int    ir, jr;
   double *packA, *packB, *packA2, *packB2;
@@ -257,21 +257,21 @@ void dgssq2nrm(
 
 
   // sequential is the default situation
-  rnn_ic_nt = 1;
+  gsknn_ic_nt = 1;
 
 
   // check the environment variable
   str = getenv( "GSKNN_IC_NT" );
   if ( str != NULL ) {
-    rnn_ic_nt = (int)strtol( str, NULL, 10 );
+    gsknn_ic_nt = (int)strtol( str, NULL, 10 );
   }
 
 
   // Allocate packing buffers
-  packA  = rnn_malloc_aligned( DKNN_KC, ( DKNN_MC + 1 ) * rnn_ic_nt, sizeof(double) );
-  packB  = rnn_malloc_aligned( DKNN_KC, ( DKNN_NC + 1 )            , sizeof(double) );
-  packA2 = rnn_malloc_aligned(       1, ( DKNN_MC + 1 ) * rnn_ic_nt, sizeof(double) );
-  packB2 = rnn_malloc_aligned(       1, ( DKNN_NC + 1 )            , sizeof(double) );
+  packA  = gsknn_malloc_aligned( DKNN_KC, ( DKNN_MC + 1 ) * gsknn_ic_nt, sizeof(double) );
+  packB  = gsknn_malloc_aligned( DKNN_KC, ( DKNN_NC + 1 )            , sizeof(double) );
+  packA2 = gsknn_malloc_aligned(       1, ( DKNN_MC + 1 ) * gsknn_ic_nt, sizeof(double) );
+  packB2 = gsknn_malloc_aligned(       1, ( DKNN_NC + 1 )            , sizeof(double) );
 
 
   for ( jc = 0; jc < n; jc += DKNN_NC ) {                  // 6-th loop
@@ -280,7 +280,7 @@ void dgssq2nrm(
       pb = min( k - pc, DKNN_KC );
 
 
-      #pragma omp parallel for num_threads( rnn_ic_nt ) private( jr )
+      #pragma omp parallel for num_threads( gsknn_ic_nt ) private( jr )
       for ( j = 0; j < jb; j += DKNN_NR ) {
         if ( pc + DKNN_KC >= k ) {
           for ( jr = 0; jr < min( jb - j, DKNN_NR ); jr ++ ) {
@@ -297,7 +297,7 @@ void dgssq2nrm(
             );
       }
 
-      #pragma omp parallel for num_threads( rnn_ic_nt ) private( ic, ib, i, ir )
+      #pragma omp parallel for num_threads( gsknn_ic_nt ) private( ic, ib, i, ir )
       for ( ic = 0; ic < m; ic += DKNN_MC ) {              // 4-th loop
         int     tid = omp_get_thread_num();
 
@@ -365,7 +365,7 @@ void dgsknn_var3(
   double beg, time_heap, time_sq2nrm;
   double *D = heap->D;
   int    *I = heap->I;
-  double *C = rnn_malloc_aligned( ldc, n + 4, sizeof(double) );
+  double *C = gsknn_malloc_aligned( ldc, n + 4, sizeof(double) );
 
   beg = omp_get_wtime();
   dgssq2nrm(
@@ -425,7 +425,7 @@ void dgsknn_var1(
     //int    *I
     )
 {
-  int    i, j, p, rnn_ic_nt;
+  int    i, j, p, gsknn_ic_nt;
   int    ic, ib, jc, jb, pc, pb;
   int    ir, jr;
   int    ldc, padn, ldr;
@@ -443,13 +443,13 @@ void dgsknn_var1(
 
 
   // sequential is the default situation
-  rnn_ic_nt = 1;
+  gsknn_ic_nt = 1;
 
 
   // check the environment variable
   str = getenv( "GSKNN_IC_NT" );
   if ( str != NULL ) {
-    rnn_ic_nt = (int)strtol( str, NULL, 10 );
+    gsknn_ic_nt = (int)strtol( str, NULL, 10 );
   }
 
 
@@ -460,10 +460,10 @@ void dgsknn_var1(
 
 
   // Allocate packing buffers
-  packA  = rnn_malloc_aligned( DKNN_KC, ( DKNN_MC + 1 ) * rnn_ic_nt, sizeof(double) );
-  packB  = rnn_malloc_aligned( DKNN_KC, ( DKNN_NC + 1 )            , sizeof(double) );
-  packA2 = rnn_malloc_aligned(       1, ( DKNN_MC + 1 ) * rnn_ic_nt, sizeof(double) );
-  packB2 = rnn_malloc_aligned(       1, ( DKNN_NC + 1 )            , sizeof(double) );
+  packA  = gsknn_malloc_aligned( DKNN_KC, ( DKNN_MC + 1 ) * gsknn_ic_nt, sizeof(double) );
+  packB  = gsknn_malloc_aligned( DKNN_KC, ( DKNN_NC + 1 )            , sizeof(double) );
+  packA2 = gsknn_malloc_aligned(       1, ( DKNN_MC + 1 ) * gsknn_ic_nt, sizeof(double) );
+  packB2 = gsknn_malloc_aligned(       1, ( DKNN_NC + 1 )            , sizeof(double) );
 
 
   if ( k > DKNN_KC ) {
@@ -474,7 +474,7 @@ void dgsknn_var1(
     }
 
 
-    packC  = rnn_malloc_aligned( ldc, padn, sizeof(double) );
+    packC  = gsknn_malloc_aligned( ldc, padn, sizeof(double) );
 
 
     for ( jc = 0; jc < n; jc += DKNN_NC ) {           // 6-th loop
@@ -483,7 +483,7 @@ void dgsknn_var1(
         pb = min( k - pc, DKNN_KC );
 
         // packB, packw, packbb
-        #pragma omp parallel for num_threads( rnn_ic_nt ) private( jr )
+        #pragma omp parallel for num_threads( gsknn_ic_nt ) private( jr )
         for ( j = 0; j < jb; j += DKNN_NR ) {
           if ( pc + DKNN_KC >= k ) {
             // packw and packB2
@@ -501,7 +501,7 @@ void dgsknn_var1(
               );
         }
 
-        #pragma omp parallel for num_threads( rnn_ic_nt ) private( ic, ib, i, ir )
+        #pragma omp parallel for num_threads( gsknn_ic_nt ) private( ic, ib, i, ir )
         for ( ic = 0; ic < m; ic += DKNN_MC ) {       // 4-th loop
           //int     tid = 0;
           int     tid = omp_get_thread_num();
@@ -568,7 +568,7 @@ void dgsknn_var1(
       for ( pc = 0; pc < k; pc += DKNN_KC ) {              // 5-th loop
         pb = min( k - pc, DKNN_KC );
 
-        #pragma omp parallel for num_threads( rnn_ic_nt ) private( jr )
+        #pragma omp parallel for num_threads( gsknn_ic_nt ) private( jr )
         for ( j = 0; j < jb; j += DKNN_NR ) {
           for ( jr = 0; jr < min( jb - j, DKNN_NR ); jr ++ ) {
             packB2[ j + jr ] = XB2[ bmap[ jc + j + jr ] ];
@@ -583,7 +583,7 @@ void dgsknn_var1(
               );
         }
 
-        #pragma omp parallel for num_threads( rnn_ic_nt ) private( ic, ib, i, ir )
+        #pragma omp parallel for num_threads( gsknn_ic_nt ) private( ic, ib, i, ir )
         for ( ic = 0; ic < m; ic += DKNN_MC ) {            // 4-th loop
           int     tid = omp_get_thread_num();
 

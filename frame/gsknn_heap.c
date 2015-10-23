@@ -105,7 +105,7 @@ inline void heap_sort_d
 }
 
 
-heap_t *rnn_heapAttach(
+heap_t *gsknn_heapAttach(
     int    m,
     int    k,
     double *D,
@@ -124,7 +124,7 @@ heap_t *rnn_heapAttach(
 }
 
 
-heap_t *rnn_heapCreate(
+heap_t *gsknn_heapCreate(
     int    m,
     int    k,
     double ro
@@ -153,13 +153,13 @@ heap_t *rnn_heapCreate(
 
   if ( posix_memalign( (void**)&(heap->D), (size_t)DKNN_SIMD_ALIGN_SIZE, 
         sizeof(double) * ldk * m ) ) {
-    printf( "rnn_heapCreate(): posix_memalign() failures" );
+    printf( "gsknn_heapCreate(): posix_memalign() failures" );
     exit( 1 );    
   }
 
   if ( posix_memalign( (void**)&(heap->I), (size_t)DKNN_SIMD_ALIGN_SIZE, 
         sizeof(int) * ldk * m ) ) {
-    printf( "rnn_heapCreate(): posix_memalign() failures" );
+    printf( "gsknn_heapCreate(): posix_memalign() failures" );
     exit( 1 );    
   }
   
