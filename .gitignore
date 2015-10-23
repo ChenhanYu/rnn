@@ -3,5 +3,6 @@
 *.x
 *.o
 *.a
+*.so
 *.log
 build
