@@ -3,11 +3,8 @@
 #include <omp.h>
 #include <limits.h>
 
-extern "C" {
 #include <gsknn.h>
-#include <gsknn_ref_stl.hpp>
-}
-
+#include <gsknn_ref.h>
 
 void bubble_sort(
     int    r,
@@ -21,7 +18,7 @@ void bubble_sort(
     for ( j = 0; j < r - 1 - i; j ++ ) {
        if ( D[ j ] > D[ j + 1 ] ) {
          double dtmp;
-         double itmp;
+         int    itmp;
          dtmp = D[ j ];
          D[ j ] = D[ j + 1 ];
          D[ j + 1 ] = dtmp;
@@ -51,6 +48,7 @@ void compute_error(
   I1 = (int*)malloc( sizeof(int) * r * n );
   I2 = (int*)malloc( sizeof(int) * r * n );
 
+
   // bubble sort
   for ( j = 0; j < n; j ++ ) {
     for ( i = 0; i < r; i ++ ) {
@@ -65,7 +63,7 @@ void compute_error(
 
   for ( j = 0; j < n; j ++ ) {
     for ( i = 0; i < r; i ++ ) {
-      if ( fabs( D1[ j * r + i ] - D2[ j * r + i ] ) > 0.0000000001 ) {
+      if ( fabs( D1[ j * r + i ] - D2[ j * r + i ] ) > 0.000000000001 ) {
         printf( "D[ %d ][ %d ] != D_gold, %E, %E\n", i, j, D1[ j * r + i ], D2[ j * r + i ] );
         break;
       }
@@ -77,6 +75,7 @@ void compute_error(
     }
   }
 
+
   free( D1 );
   free( D2 );
   free( I1 );
@@ -84,7 +83,8 @@ void compute_error(
 }
 
 
-void test_dgsrnn(
+
+void test_dgsknn(
     int m,
     int n,
     int k,
@@ -95,11 +95,10 @@ void test_dgsrnn(
   int    *amap, *bmap, *I, *I_mkl;
   double *XA, *XB, *XA2, *XB2, *D, *D_mkl;
   double tmp, error, flops;
-  double ref_beg, ref_time, dgsrnn_beg, dgsrnn_time;
+  double ref_beg, ref_time, dgsknn_beg, dgsknn_time;
 
-
-  nx     = 4096 * 30;
-  n_iter = 4;
+  nx     = 4096 * 5;
+  n_iter = 2;
 
 
   amap  = (int*)malloc( sizeof(int) * m );
@@ -111,8 +110,8 @@ void test_dgsrnn(
   D     = (double*)malloc( sizeof(double) * r * m );
   D_mkl = (double*)malloc( sizeof(double) * r * m );
 
-  heap_t *heap = rnn_heapCreate( m, r, 1.79E+308 );
 
+  heap_t *heap = rnn_heapCreate( m, r, 1.79E+308 );
   //printf( "rnn_heapCreate(): %d, %d, %d\n", 
   //    heap->I[ 0 ], heap->I[ 1 ], heap->I[ 2 ] );
 
@@ -133,7 +132,6 @@ void test_dgsrnn(
     }
   }
 
-
   // Compute XA2
   for ( i = 0; i < nx; i ++ ) {
     tmp = 0.0;
@@ -142,7 +140,6 @@ void test_dgsrnn(
     }
     XA2[ i ] = tmp;
   }
-
 
   // Use the same coordinate table
   XB  = XA;
@@ -159,8 +156,9 @@ void test_dgsrnn(
     }
   }
 
+
   {
-    dgsrnn(
+    dgsknn(
         m,
         n,
         k,
@@ -175,10 +173,11 @@ void test_dgsrnn(
         );
   }
 
-  dgsrnn_beg = omp_get_wtime();
+
+  dgsknn_beg = omp_get_wtime();
   // Call my implementation 
   for ( iter = 1; iter < n_iter; iter ++ ) {
-    dgsrnn(
+    dgsknn(
         m,
         n,
         k,
@@ -192,13 +191,14 @@ void test_dgsrnn(
         heap
         );
   }
-  dgsrnn_time = omp_get_wtime() - dgsrnn_beg;
+  dgsknn_time = omp_get_wtime() - dgsknn_beg;
+
 
 
   {
-    dgsrnn_ref_stl(
-        m,
+    dgsknn_ref(
         n,
+        m,
         k,
         r,
         XA,
@@ -212,10 +212,11 @@ void test_dgsrnn(
         );
   }
 
+
   ref_beg = omp_get_wtime();
   // Call the reference function ( we use the transpose to solve the problem. )
   for ( iter = 1; iter < n_iter; iter ++ ) {
-    dgsrnn_ref_stl(
+    dgsknn_ref(
         m,
         n,
         k,
@@ -233,7 +234,7 @@ void test_dgsrnn(
   ref_time = omp_get_wtime() - ref_beg;
 
 
-  if ( r > RNN_VAR_THRES ) { 
+  if ( r > KNN_VAR_THRES ) { 
     for ( j = 0; j < m; j ++ ) {
       for ( i = 0; i < r; i ++ ) {
         D[ j * r + i ] = heap->D[ j * heap->ldk + i + 3 ];
@@ -251,12 +252,10 @@ void test_dgsrnn(
   }
 
 
-
-
   // Compute error
   compute_error(
       r,
-      m,
+      n,
       D,
       I,
       D_mkl,
@@ -265,13 +264,15 @@ void test_dgsrnn(
 
 
 
-  ref_time /=    ( n_iter - 1 );
-  dgsrnn_time /= ( n_iter - 1 );
+  ref_time    /= ( n_iter - 1 );
+  dgsknn_time /= ( n_iter - 1 );
   flops = ( m * n / ( 1024.0 * 1024.0 * 1024.0 ) )* ( 2 * k + 3 );
+
+
   printf( "%d, %d, %d, %d, %5.2lf, %5.2lf;\n", 
-      m, n, k, r, flops / dgsrnn_time, flops / ref_time );
-  //printf( "%d, %d, %d, %d, %5.3lf, %5.3lf;\n", 
-  //    m, n, k, r, dgsrnn_time, ref_time );
+      m, n, k, r, flops / dgsknn_time, flops / ref_time );
+  //printf( "%d, %d, %d, %d, %5.2lf, %5.2lf;\n", 
+  //    m, n, k, r, dgsknn_time, ref_time );
 
 
   free( XA );
@@ -291,6 +292,9 @@ void test_dgsrnn(
 int main( int argc, char *argv[] )
 {
   int    m, n, k, r; 
+  //printf("start the test dgsknn!\n");
+  fflush( stdout );
+
 
 
   if ( argc != 5 ) {
@@ -304,7 +308,9 @@ int main( int argc, char *argv[] )
   sscanf( argv[ 3 ], "%d", &k );
   sscanf( argv[ 4 ], "%d", &r );
 
-  test_dgsrnn( m, n, k, r );
+
+  test_dgsknn( m, n, k, r );
+
 
   return 0;
 }

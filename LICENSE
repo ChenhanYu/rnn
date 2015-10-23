@@ -1,9 +1,9 @@
 
-GSRNN (General Stride R-Nearest Neighbor)
+GSKNN (General Stride K-Nearest Neighbor)
 License
 ---
 
-The GSRNN library is licensed under the following license, typically
+The GSKNN library is licensed under the following license, typically
 known as the GPL-3.0 license.
 
 Copyright (C) 2015, The University of Texas at Austin

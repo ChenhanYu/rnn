@@ -3,9 +3,10 @@
 #include <immintrin.h>
 
 #include <gsknn.h>
+#include <gsknn_config.h>
 #include <avx_types.h>
 
-#define RNN_HEAP_OFFSET 3
+#define KNN_HEAP_OFFSET 3
 #define DARRAY 4
 
 
@@ -137,8 +138,8 @@ heap_t *rnn_heapCreate(
  
   heap_t *heap = malloc( sizeof(heap_t) );
 
-  if ( k > RNN_VAR_THRES ) {
-    ldk = ( ( k + RNN_HEAP_OFFSET - 1 ) / 4 + 1 ) * 4;
+  if ( k > KNN_VAR_THRES ) {
+    ldk = ( ( k + KNN_HEAP_OFFSET - 1 ) / 4 + 1 ) * 4;
     heap->d = 4;
   }
   else {
@@ -154,13 +155,13 @@ heap_t *rnn_heapCreate(
 
   //printf( "ldk = %d\n", ldk );
 
-  if ( posix_memalign( (void**)&(heap->D), (size_t)DRNN_SIMD_ALIGN_SIZE, 
+  if ( posix_memalign( (void**)&(heap->D), (size_t)DKNN_SIMD_ALIGN_SIZE, 
         sizeof(double) * ldk * m ) ) {
     printf( "rnn_heapCreate(): posix_memalign() failures" );
     exit( 1 );    
   }
 
-  if ( posix_memalign( (void**)&(heap->I), (size_t)DRNN_SIMD_ALIGN_SIZE, 
+  if ( posix_memalign( (void**)&(heap->I), (size_t)DKNN_SIMD_ALIGN_SIZE, 
         sizeof(int) * ldk * m ) ) {
     printf( "rnn_heapCreate(): posix_memalign() failures" );
     exit( 1 );    
@@ -169,7 +170,7 @@ heap_t *rnn_heapCreate(
 
   //printf( "Create finish\n" );
 
-  if ( k > RNN_VAR_THRES ) {
+  if ( k > KNN_VAR_THRES ) {
     for ( i = 0; i < m; i ++ ) {
       heap->D[ i * ldk     ] = ro;   // filter radius
       heap->D[ i * ldk + 1 ] = 0.0;  // Currently useless
@@ -215,7 +216,7 @@ inline void HeapAdjust_int_d4(
     l = k - j;
 
     if ( l > 4 ) {
-      d0.v    = _mm256_load_pd( D + RNN_HEAP_OFFSET + j );
+      d0.v    = _mm256_load_pd( D + KNN_HEAP_OFFSET + j );
       p0.v    = _mm256_permute_pd( d0.v, 0x5 );      // 1 0 3 2
       p1.v    = _mm256_max_pd( p0.v, d0.v );
       p2.v    = _mm256_permute2f128_pd( p1.v, p1.v, 0x1 ); // 3 2 1 0
@@ -224,20 +225,20 @@ inline void HeapAdjust_int_d4(
       j +=  __builtin_ctz( _mm256_movemask_pd( d0.v ) );
 
 
-      __asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( D + RNN_HEAP_OFFSET + j * 4 + 1 ) );
-      __asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( I + RNN_HEAP_OFFSET + j * 4 + 1 ) );
+      __asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( D + KNN_HEAP_OFFSET + j * 4 + 1 ) );
+      __asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( I + KNN_HEAP_OFFSET + j * 4 + 1 ) );
     }
     else {
       for ( p = 4 * s + 2; p < 4 * s + 1 + l; p ++ ) {
-        if ( D[ p + RNN_HEAP_OFFSET ] > D[ j + RNN_HEAP_OFFSET ] ) {
+        if ( D[ p + KNN_HEAP_OFFSET ] > D[ j + KNN_HEAP_OFFSET ] ) {
           j = p;
         }
       }
     }
 
-    if ( D[ s + RNN_HEAP_OFFSET ] < D[ j + RNN_HEAP_OFFSET ] ) {
-      swap_double( D, s + RNN_HEAP_OFFSET, j + RNN_HEAP_OFFSET );
-      swap_int( I, s + RNN_HEAP_OFFSET, j + RNN_HEAP_OFFSET );
+    if ( D[ s + KNN_HEAP_OFFSET ] < D[ j + KNN_HEAP_OFFSET ] ) {
+      swap_double( D, s + KNN_HEAP_OFFSET, j + KNN_HEAP_OFFSET );
+      swap_int( I, s + KNN_HEAP_OFFSET, j + KNN_HEAP_OFFSET );
       s = j;
     } 
     else {
@@ -262,23 +263,23 @@ void heapSelect_dheap(
   // prefetch the head of key
   __asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( key ) );
   __asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( val ) );
-  __asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( D + RNN_HEAP_OFFSET ) );
-  __asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( I + RNN_HEAP_OFFSET ) );
+  __asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( D + KNN_HEAP_OFFSET ) );
+  __asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( I + KNN_HEAP_OFFSET ) );
 
   for ( i = 0; i < m; i++ ) {
     if ( I[ 1 ] < I[ 0 ] ) {
       int p = I[ 0 ] - 1 - I[ 1 ];
-      D[ p + RNN_HEAP_OFFSET ] = key[ i ];
-      I[ p + RNN_HEAP_OFFSET ] = val[ i ];
+      D[ p + KNN_HEAP_OFFSET ] = key[ i ];
+      I[ p + KNN_HEAP_OFFSET ] = val[ i ];
       if ( p * DARRAY < k - 1 ) {
         HeapAdjust_int_d4( D, p, k, I );
       }
       I [ 1 ] = I[ 1 ] + 1;
     } 
     else {
-      if ( key[ i ] < D[ RNN_HEAP_OFFSET ] ) {
-        D[ RNN_HEAP_OFFSET ] = key[ i ];
-        I[ RNN_HEAP_OFFSET ] = val[ i ];
+      if ( key[ i ] < D[ KNN_HEAP_OFFSET ] ) {
+        D[ KNN_HEAP_OFFSET ] = key[ i ];
+        I[ KNN_HEAP_OFFSET ] = val[ i ];
         HeapAdjust_int_d4( D, 0, k, I );
       }
     }

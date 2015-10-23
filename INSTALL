@@ -1,11 +1,11 @@
 
-GSRNN (General Stride R-Nearest Neighbor)
+GSKNN (General Stride K-Nearest Neighbor)
 INSTALL
 ---
 
 
 
-GSRNN is tested on LINUX and OSX
+GSKNN is tested on LINUX and OSX
 REQUIRES Intel compilers and MKL. 
 
 LINUX:
@@ -27,7 +27,7 @@ For LINUX (and similarly for OSX), to use cmake:
 >make
 >make install
 
-GSRNN requires C and C++ compilers that support OpenMP, and the
+GSKNN requires C and C++ compilers that support OpenMP, and the
 default micro-kernel (uses AVX) requires the a Sandy-Bridge
 processor or any successor. 
 
@@ -37,16 +37,16 @@ compilation will also compile all the test drivers. To run
 some basic example from the testing drivers:
 
 >cd test
->./run_dgsrnn.sh
+>./run_dgsknn.sh
 
-To embed GSRNN in a specific application, you need to include the
-header files <rnn.h> and make the right function calls. 
-GSRNN can be linked statically with lib/librnn.a.
+To embed GSKNN in a specific application, you need to include the
+header files <gsknn.h> and make the right function calls. 
+GSKNN can be linked statically with lib/libgsknn.a.
 
 C/C++ example:
 ...
-#include <rnn.h>
+#include <gsknn.h>
 ...
 
 Compilation example:
->icc ... -I$(RNN_DIR)/include $(RNN_DIR)/lib/librnn.a
+>icc ... -I$(GSKNN_DIR)/include $(GSKNN_DIR)/lib/libgsknn.a

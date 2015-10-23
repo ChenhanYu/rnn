@@ -3,6 +3,7 @@
 #include <gsknn.h>
 #define min( i, j ) ( (i)<(j) ? (i): (j) )
 
+#include <gsknn_config.h>
 #include <rnn_kernel.h>
 
 inline void packA_kcxmc(
@@ -15,18 +16,18 @@ inline void packA_kcxmc(
     )
 {
   int    i, p;
-  double *a_pntr[ DRNN_MR ];
+  double *a_pntr[ DKNN_MR ];
 
   for ( i = 0; i < m; i ++ ) {
     a_pntr[ i ] = XA + ldXA * amap[ i ];
   }
 
-  for ( i = m; i < DRNN_MR; i ++ ) {
+  for ( i = m; i < DKNN_MR; i ++ ) {
     a_pntr[ i ] = XA + ldXA * amap[ 0 ];
   }
 
   for ( p = 0; p < k; p ++ ) {
-    for ( i = 0; i < DRNN_MR; i ++ ) {
+    for ( i = 0; i < DKNN_MR; i ++ ) {
       *packA ++ = *a_pntr[ i ] ++;
     }
   }
@@ -44,18 +45,18 @@ inline void packB_kcxnc(
     )
 {
   int    j, p; 
-  double *b_pntr[ DRNN_NR ];
+  double *b_pntr[ DKNN_NR ];
 
   for ( j = 0; j < n; j ++ ) {
     b_pntr[ j ] = XB + ldXB * bmap[ j ];
   }
 
-  for ( j = n; j < DRNN_NR; j ++ ) {
+  for ( j = n; j < DKNN_NR; j ++ ) {
     b_pntr[ j ] = XB + ldXB * bmap[ 0 ];
   }
 
   for ( p = 0; p < k; p ++ ) {
-    for ( j = 0; j < DRNN_NR; j ++ ) {
+    for ( j = 0; j < DKNN_NR; j ++ ) {
       *packB ++ = *b_pntr[ j ] ++;
     }
   }
@@ -97,16 +98,16 @@ void rank_k_macro_kernel(
   aux.pc     = pc;
   aux.b_next = packB;
 
-  for ( j = 0; j < n; j += DRNN_NR ) {
-    for ( i = 0; i < m; i += DRNN_MR ) {
-      if ( i + DRNN_MR >= m ) {
-        aux.b_next += DRNN_NR * k;
+  for ( j = 0; j < n; j += DKNN_NR ) {
+    for ( i = 0; i < m; i += DKNN_MR ) {
+      if ( i + DKNN_MR >= m ) {
+        aux.b_next += DKNN_NR * k;
       }
       ( *rankk[ 0 ] ) (
           k,
           &packA[ i * k ],
           &packB[ j * k ],
-          &packC[ j * ldc + i * DRNN_NR ], // packed
+          &packC[ j * ldc + i * DKNN_NR ], // packed
           ldc,
           &aux
           );
@@ -115,7 +116,7 @@ void rank_k_macro_kernel(
 }
 
 
-void dgsrnn_macro_kernel_row(
+void dgsknn_macro_kernel_row(
     int    m,
     int    n,
     int    k,
@@ -133,7 +134,7 @@ void dgsrnn_macro_kernel_row(
     int    ldr
     )
 {
-  double c[ DRNN_MC * DRNN_NC ] __attribute__((aligned(32)));
+  double c[ DKNN_MC * DKNN_NC ] __attribute__((aligned(32)));
   double *cbuff = c;
   int    i, ii, j;
   aux_t  aux;
@@ -143,17 +144,17 @@ void dgsrnn_macro_kernel_row(
   aux.ldr    = ldr;
 
 
-  for ( j = 0; j < n; j += DRNN_NR ) {
-    aux.n  = min( n - j, DRNN_NR );
-    for ( i = 0; i < m; i += DRNN_MR ) {
-      aux.m = min( m - i, DRNN_MR );
+  for ( j = 0; j < n; j += DKNN_NR ) {
+    aux.n  = min( n - j, DKNN_NR );
+    for ( i = 0; i < m; i += DKNN_MR ) {
+      aux.m = min( m - i, DKNN_MR );
       aux.I = I + i * ldr;
       aux.D = D + i * ldr;
-      if ( i + DRNN_MR >= m ) {
-        aux.b_next += DRNN_NR * k;
+      if ( i + DKNN_MR >= m ) {
+        aux.b_next += DKNN_NR * k;
       }
       if ( pc ) {
-        cbuff = packC  + j * ldc + i * DRNN_NR;
+        cbuff = packC  + j * ldc + i * DKNN_NR;
       }
 
       // --------------------------------------------------------------------
@@ -199,12 +200,12 @@ void dsq2nrm_macro_kernel(
   //printf( "here, pc = %d, last = %d, ldc = %d, m = %d, n = %d, k %d\n", 
   //    pc, lastiter, ldc, m, n , k );
 
-  for ( j = 0; j < n; j += DRNN_NR ) {
-    aux.n  = min( n - j, DRNN_NR );
-    for ( i = 0; i < m; i += DRNN_MR ) {
-      aux.m = min( m - i, DRNN_MR );
-      if ( i + DRNN_MR >= m ) {
-        aux.b_next += DRNN_NR * k;
+  for ( j = 0; j < n; j += DKNN_NR ) {
+    aux.n  = min( n - j, DKNN_NR );
+    for ( i = 0; i < m; i += DKNN_MR ) {
+      aux.m = min( m - i, DKNN_MR );
+      if ( i + DKNN_MR >= m ) {
+        aux.b_next += DKNN_NR * k;
       }
 
       //sq2nrm_asm_d8x4(
@@ -250,7 +251,7 @@ void dgssq2nrm(
 
   // Early return if possible
   if ( m == 0 || n == 0 || k == 0 ) {
-    printf( "dgsrnn(): early return\n" );
+    printf( "dgsknn(): early return\n" );
     return;
   }
 
@@ -267,27 +268,27 @@ void dgssq2nrm(
 
 
   // Allocate packing buffers
-  packA  = rnn_malloc_aligned( DRNN_KC, ( DRNN_MC + 1 ) * rnn_ic_nt, sizeof(double) );
-  packB  = rnn_malloc_aligned( DRNN_KC, ( DRNN_NC + 1 )            , sizeof(double) );
-  packA2 = rnn_malloc_aligned(       1, ( DRNN_MC + 1 ) * rnn_ic_nt, sizeof(double) );
-  packB2 = rnn_malloc_aligned(       1, ( DRNN_NC + 1 )            , sizeof(double) );
+  packA  = rnn_malloc_aligned( DKNN_KC, ( DKNN_MC + 1 ) * rnn_ic_nt, sizeof(double) );
+  packB  = rnn_malloc_aligned( DKNN_KC, ( DKNN_NC + 1 )            , sizeof(double) );
+  packA2 = rnn_malloc_aligned(       1, ( DKNN_MC + 1 ) * rnn_ic_nt, sizeof(double) );
+  packB2 = rnn_malloc_aligned(       1, ( DKNN_NC + 1 )            , sizeof(double) );
 
 
-  for ( jc = 0; jc < n; jc += DRNN_NC ) {                  // 6-th loop
-    jb = min( n - jc, DRNN_NC );
-    for ( pc = 0; pc < k; pc += DRNN_KC ) {                // 5-th loop
-      pb = min( k - pc, DRNN_KC );
+  for ( jc = 0; jc < n; jc += DKNN_NC ) {                  // 6-th loop
+    jb = min( n - jc, DKNN_NC );
+    for ( pc = 0; pc < k; pc += DKNN_KC ) {                // 5-th loop
+      pb = min( k - pc, DKNN_KC );
 
 
       #pragma omp parallel for num_threads( rnn_ic_nt ) private( jr )
-      for ( j = 0; j < jb; j += DRNN_NR ) {
-        if ( pc + DRNN_KC >= k ) {
-          for ( jr = 0; jr < min( jb - j, DRNN_NR ); jr ++ ) {
+      for ( j = 0; j < jb; j += DKNN_NR ) {
+        if ( pc + DKNN_KC >= k ) {
+          for ( jr = 0; jr < min( jb - j, DKNN_NR ); jr ++ ) {
             packB2[ j + jr ] = XB2[ bmap[ jc + j + jr ] ];
           }
         }
         packB_kcxnc(
-            min( jb - j, DRNN_NR ),
+            min( jb - j, DKNN_NR ),
             pb,
             &XB[ pc ],
             k, // should be ldXB instead
@@ -297,23 +298,23 @@ void dgssq2nrm(
       }
 
       #pragma omp parallel for num_threads( rnn_ic_nt ) private( ic, ib, i, ir )
-      for ( ic = 0; ic < m; ic += DRNN_MC ) {              // 4-th loop
+      for ( ic = 0; ic < m; ic += DKNN_MC ) {              // 4-th loop
         int     tid = omp_get_thread_num();
 
-        ib = min( m - ic, DRNN_MC );
-        for ( i = 0; i < ib; i += DRNN_MR ) {
-          if ( pc + DRNN_KC >= k ) {
-            for ( ir = 0; ir < min( ib - i, DRNN_MR ); ir ++ ) {
-              packA2[ tid * DRNN_MC + i + ir ] = XA2[ amap[ ic + i + ir ] ];
+        ib = min( m - ic, DKNN_MC );
+        for ( i = 0; i < ib; i += DKNN_MR ) {
+          if ( pc + DKNN_KC >= k ) {
+            for ( ir = 0; ir < min( ib - i, DKNN_MR ); ir ++ ) {
+              packA2[ tid * DKNN_MC + i + ir ] = XA2[ amap[ ic + i + ir ] ];
             }
           }
           packA_kcxmc(
-              min( ib - i, DRNN_MR ),
+              min( ib - i, DKNN_MR ),
               pb,
               &XA[ pc ],
               k,
               &amap[ ic + i ],
-              &packA[ tid * DRNN_MC * pb + i * pb ]
+              &packA[ tid * DKNN_MC * pb + i * pb ]
               );
         }
 
@@ -322,14 +323,14 @@ void dgssq2nrm(
             ib,
             jb,
             pb,
-            packA  + tid * DRNN_MC * pb,
-            packA2 + tid * DRNN_MC,
+            packA  + tid * DKNN_MC * pb,
+            packA2 + tid * DKNN_MC,
             packB,
             packB2,
             &C[ jc * ldc + ic ], 
             ldc,
             pc,
-            ( pc + DRNN_KC >= k )
+            ( pc + DKNN_KC >= k )
             );
 
       }                                                    // End 4.th loop
@@ -343,7 +344,7 @@ void dgssq2nrm(
 }
 
 
-void dgsrnn_var3(
+void dgsknn_var3(
     int    m,
     int    n,
     int    k,
@@ -360,7 +361,7 @@ void dgsrnn_var3(
     )
 {
   int    i, j, ldr;
-  int    ldc = ( ( m - 1 ) / DRNN_MR + 1 ) * DRNN_MR;
+  int    ldc = ( ( m - 1 ) / DKNN_MR + 1 ) * DKNN_MR;
   double beg, time_heap, time_sq2nrm;
   double *D = heap->D;
   int    *I = heap->I;
@@ -394,13 +395,13 @@ void dgsrnn_var3(
   }
   time_heap = omp_get_wtime() - beg;
 
-  //printf( "gsrnn sq2nrm: %5.3lf, heap: %5.3lf\n", time_sq2nrm, time_heap );
+  //printf( "gsknn sq2nrm: %5.3lf, heap: %5.3lf\n", time_sq2nrm, time_heap );
 
   free( C );
 }
 
 
-void dgsrnn_var1(
+void dgsknn_var1(
     int    m,
     int    n,
     int    k,
@@ -428,7 +429,7 @@ void dgsrnn_var1(
 
   // Early return if possible
   if ( m == 0 || n == 0 || k == 0 ) {
-    printf( "dgsrnn(): early return\n" );
+    printf( "dgsknn(): early return\n" );
     return;
   }
 
@@ -451,39 +452,39 @@ void dgsrnn_var1(
 
 
   // Allocate packing buffers
-  packA  = rnn_malloc_aligned( DRNN_KC, ( DRNN_MC + 1 ) * rnn_ic_nt, sizeof(double) );
-  packB  = rnn_malloc_aligned( DRNN_KC, ( DRNN_NC + 1 )            , sizeof(double) );
-  packA2 = rnn_malloc_aligned(       1, ( DRNN_MC + 1 ) * rnn_ic_nt, sizeof(double) );
-  packB2 = rnn_malloc_aligned(       1, ( DRNN_NC + 1 )            , sizeof(double) );
+  packA  = rnn_malloc_aligned( DKNN_KC, ( DKNN_MC + 1 ) * rnn_ic_nt, sizeof(double) );
+  packB  = rnn_malloc_aligned( DKNN_KC, ( DKNN_NC + 1 )            , sizeof(double) );
+  packA2 = rnn_malloc_aligned(       1, ( DKNN_MC + 1 ) * rnn_ic_nt, sizeof(double) );
+  packB2 = rnn_malloc_aligned(       1, ( DKNN_NC + 1 )            , sizeof(double) );
 
 
-  if ( k > DRNN_KC ) {
-    ldc  = ( ( m - 1 ) / DRNN_MR + 1 ) * DRNN_MR;
-    padn = DRNN_NC;
-    if ( n < DRNN_NC ) {
-      padn = ( ( n - 1 ) / DRNN_NR + 1 ) * DRNN_NR;
+  if ( k > DKNN_KC ) {
+    ldc  = ( ( m - 1 ) / DKNN_MR + 1 ) * DKNN_MR;
+    padn = DKNN_NC;
+    if ( n < DKNN_NC ) {
+      padn = ( ( n - 1 ) / DKNN_NR + 1 ) * DKNN_NR;
     }
 
 
     packC  = rnn_malloc_aligned( ldc, padn, sizeof(double) );
 
 
-    for ( jc = 0; jc < n; jc += DRNN_NC ) {           // 6-th loop
-      jb = min( n - jc, DRNN_NC );
-      for ( pc = 0; pc < k; pc += DRNN_KC ) {         // 5-th loop
-        pb = min( k - pc, DRNN_KC );
+    for ( jc = 0; jc < n; jc += DKNN_NC ) {           // 6-th loop
+      jb = min( n - jc, DKNN_NC );
+      for ( pc = 0; pc < k; pc += DKNN_KC ) {         // 5-th loop
+        pb = min( k - pc, DKNN_KC );
 
         // packB, packw, packbb
         #pragma omp parallel for num_threads( rnn_ic_nt ) private( jr )
-        for ( j = 0; j < jb; j += DRNN_NR ) {
-          if ( pc + DRNN_KC >= k ) {
+        for ( j = 0; j < jb; j += DKNN_NR ) {
+          if ( pc + DKNN_KC >= k ) {
             // packw and packB2
-            for ( jr = 0; jr < min( jb - j, DRNN_NR ); jr ++ ) {
+            for ( jr = 0; jr < min( jb - j, DKNN_NR ); jr ++ ) {
                 packB2[ j + jr ] = XB2[ bmap[ jc + j + jr ] ];
             }
           }
           packB_kcxnc(
-              min( jb - j, DRNN_NR ),
+              min( jb - j, DKNN_NR ),
               pb,
               &XB[ pc ],
               k, // should be ldXB instead
@@ -493,53 +494,53 @@ void dgsrnn_var1(
         }
 
         #pragma omp parallel for num_threads( rnn_ic_nt ) private( ic, ib, i, ir )
-        for ( ic = 0; ic < m; ic += DRNN_MC ) {       // 4-th loop
+        for ( ic = 0; ic < m; ic += DKNN_MC ) {       // 4-th loop
           //int     tid = 0;
           int     tid = omp_get_thread_num();
 
-          ib = min( m - ic, DRNN_MC );
-          for ( i = 0; i < ib; i += DRNN_MR ) {
-            if ( pc + DRNN_KC >= k ) {
-              for ( ir = 0; ir < min( ib - i, DRNN_MR ); ir ++ ) {
-                packA2[ tid * DRNN_MC + i + ir ] = XA2[ amap[ ic + i + ir ] ];
+          ib = min( m - ic, DKNN_MC );
+          for ( i = 0; i < ib; i += DKNN_MR ) {
+            if ( pc + DKNN_KC >= k ) {
+              for ( ir = 0; ir < min( ib - i, DKNN_MR ); ir ++ ) {
+                packA2[ tid * DKNN_MC + i + ir ] = XA2[ amap[ ic + i + ir ] ];
               }
             }
             packA_kcxmc(
-                min( ib - i, DRNN_MR ),
+                min( ib - i, DKNN_MR ),
                 pb,
                 &XA[ pc ],
                 k,
                 &amap[ ic + i ],
-                &packA[ tid * DRNN_MC * pb + i * pb ]
+                &packA[ tid * DKNN_MC * pb + i * pb ]
                 );
           }
 
           // Check if this is the last kc interation
-          if ( pc + DRNN_KC < k ) {
+          if ( pc + DKNN_KC < k ) {
             rank_k_macro_kernel(
                 ib,
                 jb,
                 pb,
-                packA + tid * DRNN_MC * pb,
+                packA + tid * DKNN_MC * pb,
                 packB,
                 &packC[ ic * padn ], // packed
-                ( ( ib - 1 ) / DRNN_MR + 1 ) * DRNN_MR, // packed
+                ( ( ib - 1 ) / DKNN_MR + 1 ) * DKNN_MR, // packed
                 pc
                 );
           }
           else {
-            dgsrnn_macro_kernel_row(                      // 1~3 loops
+            dgsknn_macro_kernel_row(                      // 1~3 loops
                 ib,
                 jb,
                 pb,
                 r,
-                packA  + tid * DRNN_MC * pb,
-                packA2 + tid * DRNN_MC,
+                packA  + tid * DKNN_MC * pb,
+                packA2 + tid * DKNN_MC,
                 packB,
                 packB2,
                 bmap   + jc,
                 &packC[ ic * padn ], // packed
-                ( ( ib - 1 ) / DRNN_MR + 1 ) * DRNN_MR, // packed
+                ( ( ib - 1 ) / DKNN_MR + 1 ) * DKNN_MR, // packed
                 pc,
                 D      + ic * ldr, // D is m x ldr (d-array heap) 
                 I      + ic * ldr, // I is m x ldr (d-array heap)
@@ -554,18 +555,18 @@ void dgsrnn_var1(
   }
   else {
 
-    for ( jc = 0; jc < n; jc += DRNN_NC ) {                // 6-th loop
-      jb = min( n - jc, DRNN_NC );
-      for ( pc = 0; pc < k; pc += DRNN_KC ) {              // 5-th loop
-        pb = min( k - pc, DRNN_KC );
+    for ( jc = 0; jc < n; jc += DKNN_NC ) {                // 6-th loop
+      jb = min( n - jc, DKNN_NC );
+      for ( pc = 0; pc < k; pc += DKNN_KC ) {              // 5-th loop
+        pb = min( k - pc, DKNN_KC );
 
         #pragma omp parallel for num_threads( rnn_ic_nt ) private( jr )
-        for ( j = 0; j < jb; j += DRNN_NR ) {
-          for ( jr = 0; jr < min( jb - j, DRNN_NR ); jr ++ ) {
+        for ( j = 0; j < jb; j += DKNN_NR ) {
+          for ( jr = 0; jr < min( jb - j, DKNN_NR ); jr ++ ) {
             packB2[ j + jr ] = XB2[ bmap[ jc + j + jr ] ];
           }
           packB_kcxnc(
-              min( jb - j, DRNN_NR ),
+              min( jb - j, DKNN_NR ),
               pb,
               XB,
               k, // should be ldXB instead
@@ -575,31 +576,31 @@ void dgsrnn_var1(
         }
 
         #pragma omp parallel for num_threads( rnn_ic_nt ) private( ic, ib, i, ir )
-        for ( ic = 0; ic < m; ic += DRNN_MC ) {            // 4-th loop
+        for ( ic = 0; ic < m; ic += DKNN_MC ) {            // 4-th loop
           int     tid = omp_get_thread_num();
 
-          ib = min( m - ic, DRNN_MC );
-          for ( i = 0; i < ib; i += DRNN_MR ) {
-            for ( ir = 0; ir < min( ib - i, DRNN_MR ); ir ++ ) {
-              packA2[ tid * DRNN_MC + i + ir ] = XA2[ amap[ ic + i + ir ] ];
+          ib = min( m - ic, DKNN_MC );
+          for ( i = 0; i < ib; i += DKNN_MR ) {
+            for ( ir = 0; ir < min( ib - i, DKNN_MR ); ir ++ ) {
+              packA2[ tid * DKNN_MC + i + ir ] = XA2[ amap[ ic + i + ir ] ];
             }
             packA_kcxmc(
-                min( ib - i, DRNN_MR ),
+                min( ib - i, DKNN_MR ),
                 pb,
                 XA,
                 k,
                 &amap[ ic + i ],
-                &packA[ tid * DRNN_MC * pb + i * pb ]
+                &packA[ tid * DKNN_MC * pb + i * pb ]
                 );
           }
 
-          dgsrnn_macro_kernel_row(                      // 1~3 loops
+          dgsknn_macro_kernel_row(                      // 1~3 loops
               ib,
               jb,
               pb,
               r,
-              packA  + tid * DRNN_MC * pb,
-              packA2 + tid * DRNN_MC,
+              packA  + tid * DKNN_MC * pb,
+              packA2 + tid * DKNN_MC,
               packB,
               packB2,
               bmap   + jc,
@@ -624,9 +625,9 @@ void dgsrnn_var1(
 
 
 #ifdef KNN_PREC_SINGLE 
-void sgsrnn
+void sgsknn
 #else
-void dgsrnn
+void dgsknn
 #endif
     (
     int    m,
@@ -644,11 +645,11 @@ void dgsrnn
 {
   int    i, j;
 
-  if ( r > RNN_VAR_THRES ) {
+  if ( r > KNN_VAR_THRES ) {
 #ifdef KNN_PREC_SINGLE
-    sgsrnn_var3
+    sgsknn_var3
 #else
-    dgsrnn_var3
+    dgsknn_var3
 #endif      
       (
         m,
@@ -666,9 +667,9 @@ void dgsrnn
   }
   else {
 #ifdef KNN_PREC_SINGLE
-    sgsrnn_var1
+    sgsknn_var1
 #else
-    dgsrnn_var1
+    dgsknn_var1
 #endif
       (
         n,

@@ -6,12 +6,12 @@ endif
 
 
 FRAME_CC_SRC=  \
-							 frame/dgsrnn.c \
+							 frame/gsknn.c \
 							 frame/rnn_util.c \
-							 frame/dgsrnn_ref.c \
+							 frame/gsknn_ref.c \
 
 FRAME_CPP_SRC= \
-							 frame/dgsrnn_ref_stl.cpp \
+							 frame/gsknn_ref_stl.cpp \
 
 KERNEL_SRC=    \
 							 kernels/$(GSKNN_ARCH)/rnn_heap.c \
@@ -33,7 +33,7 @@ $(LIBGSKNN): $(GSKNN_OBJ)
 	$(RANLIB) $@
 
 $(SHAREDLIBGSKNN): $(GSKNN_OBJ)
-	$(CC) $(CFLAGS) -shared -fPIC -o $@ $(GSKNN_OBJ) $(LDLIBS)
+	$(CC) $(CFLAGS) -shared -o $@ $(GSKNN_OBJ) $(LDLIBS)
 
 # ---------------------------------------------------------------------------
 # Object files compiling rules

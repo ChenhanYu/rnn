@@ -18,9 +18,9 @@ void sgemm(char*, char*, int*, int*, int*, float*, float*,
 
 // This reference function will call BLAS.
 #ifdef KNN_PREC_SINGLE
-void sgsrnn_ref
+void sgsknn_ref
 #else
-void dgsrnn_ref
+void dgsknn_ref
 #endif
     (
     int    m,

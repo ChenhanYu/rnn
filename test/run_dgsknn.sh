@@ -8,8 +8,8 @@ r=10
 echo "var1_k16=["
 for (( k=4; k<1024; k+=31 ))
 do
-  ./test_dgsrnn.x     $m $n $k $r
-  ./test_dgsrnn_stl.x $m $n $k $r
+  ./test_dgsknn.x     $m $n $k $r
+  ./test_dgsknn_stl.x $m $n $k $r
   echo ""
 done
 echo "];"

@@ -6,10 +6,10 @@ endif
 
 
 GSKNN_TEST_CC_SRC= \
-									 test_dgsrnn.c \
+									 test_dgsknn.c \
 
 GSKNN_TEST_CPP_SRC=\
-									 test_dgsrnn_stl.cpp \
+									 test_dgsknn_stl.cpp \
 
 
 GSKNN_TEST_EXE= $(GSKNN_TEST_CC_SRC:.c=.x) $(GSKNN_TEST_CPP_SRC:.cpp=.x)
@@ -21,7 +21,7 @@ all: $(GSKNN_TEST_EXE)
 # Executable files compiling rules
 # ---------------------------------------------------------------------------
 %.x: %.c 
-	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS) -L$(GSKNN_DIR)/lib -lrnn
+	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS) $(LDLIBS)
 
 %.x: %.cpp 
 	$(CXX) $(CXXFLAGS) $< -o $@ $(LDFLAGS) $(LDLIBS)

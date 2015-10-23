@@ -3,6 +3,7 @@
 #include <omp.h>
 
 #include <gsknn.h>
+#include <gsknn_config.h>
 
 double *rnn_malloc_aligned(
     int    m,
@@ -13,7 +14,7 @@ double *rnn_malloc_aligned(
   double *ptr;
   int    err;
 
-  err = posix_memalign( (void**)&ptr, (size_t)DRNN_SIMD_ALIGN_SIZE, size * m * n );
+  err = posix_memalign( (void**)&ptr, (size_t)DKNN_SIMD_ALIGN_SIZE, size * m * n );
 
   if ( err ) {
     printf( "rnn_malloc_aligned(): posix_memalign() failures" );

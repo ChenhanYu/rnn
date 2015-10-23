@@ -77,14 +77,14 @@ file (GLOB KERNEL_SRC ${CMAKE_SOURCE_DIR}/kernels/${GSKNN_ARCH}/*.c)
 
 
 # Build the static library.
-add_library (rnn ${FRAME_CC_SRC} ${FRAME_CXX_SRC} ${KERNEL_SRC})
+add_library (gsknn ${FRAME_CC_SRC} ${FRAME_CXX_SRC} ${KERNEL_SRC})
 
 
 # Build the executable files.
-add_executable (test_dgsrnn_stl.x ${CMAKE_SOURCE_DIR}/test/test_dgsrnn_stl.cpp)
-target_link_libraries(test_dgsrnn_stl.x rnn)
-add_executable (test_dgsrnn.x ${CMAKE_SOURCE_DIR}/test/test_dgsrnn.c)
-target_link_libraries(test_dgsrnn.x rnn)
+add_executable (test_dgsknn_stl.x ${CMAKE_SOURCE_DIR}/test/test_dgsknn_stl.cpp)
+target_link_libraries(test_dgsknn_stl.x gsknn)
+add_executable (test_dgsknn.x ${CMAKE_SOURCE_DIR}/test/test_dgsknn.c)
+target_link_libraries(test_dgsknn.x gsknn)
 
 
 # Install shell script

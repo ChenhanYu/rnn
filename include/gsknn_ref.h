@@ -1,4 +1,4 @@
-void dgsrnn_ref(
+void dgsknn_ref(
     int    m,
     int    n,
     int    k,
@@ -13,7 +13,7 @@ void dgsrnn_ref(
     int    *I
     );
 
-void sgsrnn_ref(
+void sgsknn_ref(
     int    m,
     int    n,
     int    k,

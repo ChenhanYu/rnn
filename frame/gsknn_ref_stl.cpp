@@ -35,9 +35,9 @@ struct lessthan {
 // This reference function will call MKL
 extern "C"
 #ifdef KNN_PREC_SINGLE
-void sgsrnn_ref_stl
+void sgsknn_ref_stl
 #else
-void dgsrnn_ref_stl
+void dgsknn_ref_stl
 #endif
     (
     int    m,

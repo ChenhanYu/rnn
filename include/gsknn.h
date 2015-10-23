@@ -7,22 +7,14 @@
 #define prec_t double
 #endif
 
-#define RNN_NUM_THD_MC 1
-#define RNN_VAR_THRES 512
-
-#define DRNN_SIMD_ALIGN_SIZE 32
-#define DRNN_MC 104
-#define DRNN_NC 2048
-#define DRNN_KC 256
-#define DRNN_MR 8
-#define DRNN_NR 4
+#define KNN_VAR_THRES 512
 
 typedef unsigned long long dim_t;
 
 typedef enum {
-  RNN_2NORM,
-  RNN_1NORM
-} rnn_type;
+  KNN_2NORM,
+  KNN_1NORM
+} knn_type;
 
 struct aux_s {
   double *b_next;
@@ -45,12 +37,12 @@ struct heap_s {
   double ro;
   double *D;
   int    *I;
-  rnn_type type;
+  knn_type type;
 };
 
 typedef struct heap_s heap_t;
 
-void dgsrnn(
+void dgsknn(
     int    m,
     int    n,
     int    k,
@@ -64,7 +56,7 @@ void dgsrnn(
     heap_t *heap
     );
 
-void dgsrnn_var1(
+void dgsknn_var1(
     int    m,
     int    n,
     int    k,
@@ -78,7 +70,7 @@ void dgsrnn_var1(
     heap_t *heap
     );
 
-void dgsrnn_var3(
+void dgsknn_var3(
     int    m,
     int    n,
     int    k,
