@@ -55,6 +55,26 @@ void sq2nrm_asm_d8x4(
     aux_t  *aux
     );
 
+void gsknn_heapselect_int_d4(
+    int    m,
+    int    k,
+    double *key,
+    int    *val,
+    double *D,
+    int    *I
+    );
+
+void (*select)(
+    int    m,
+    int    k,
+    double *key,
+    int    *val,
+    double *D,
+    int    *I
+    ) ={
+  gsknn_heapselect_int_d4
+};
+
 void (*micro[ 2 ]) (
     int    k,
     int    r,

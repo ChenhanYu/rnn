@@ -8,6 +8,7 @@
 #endif
 
 #define KNN_VAR_THRES 512
+#define KNN_HEAP_OFFSET 3
 
 typedef unsigned long long dim_t;
 
@@ -156,4 +157,22 @@ void heapSelect_dheap(
     int    *val,
     double *D,
     int    *I
+    );
+
+void swap_float( 
+    float  *x, 
+    int    i, 
+    int    j 
+    );
+
+void swap_double( 
+    double *x, 
+    int    i, 
+    int    j 
+    );
+
+void swap_int( 
+    int    *I, 
+    int    i, 
+    int    j 
     );

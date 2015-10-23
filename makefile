@@ -7,6 +7,7 @@ endif
 
 FRAME_CC_SRC=  \
 							 frame/gsknn.c \
+							 frame/gsknn_heap.c \
 							 frame/rnn_util.c \
 							 frame/gsknn_ref.c \
 
@@ -14,7 +15,7 @@ FRAME_CPP_SRC= \
 							 frame/gsknn_ref_stl.cpp \
 
 KERNEL_SRC=    \
-							 kernels/$(GSKNN_ARCH)/rnn_heap.c \
+							 kernels/$(GSKNN_ARCH)/gsknn_heapselect_int_d4.c \
 							 kernels/$(GSKNN_ARCH)/rnn_rank_k_asm_d8x4.c \
 							 kernels/$(GSKNN_ARCH)/rnn_r_int_d8x4_row.c \
 							 kernels/$(GSKNN_ARCH)/sq2nrm_asm_d8x4.c \
