@@ -392,7 +392,7 @@ void dgsknn_var3(
   for ( j = 0; j < n; j ++ ) {
     //heap_sort( m, r, &C[ j * ldc ], amap, &D[ j * r ], &I[ j * r ] );
     //heapSelect_dheap( m, r, &C[ j * ldc ], amap, &D[ j * ldr ], &I[ j * ldr ] );
-    ( *select ) (
+    ( *kselect ) (
         m, 
         r, 
         &C[ j * ldc ], 

@@ -64,7 +64,7 @@ void gsknn_heapselect_int_d4(
     int    *I
     );
 
-void (*select)(
+void (*kselect)(
     int    m,
     int    k,
     double *key,
