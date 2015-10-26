@@ -135,9 +135,9 @@ void HeapAdjust_d(
 void heap_sort_s(
     int    m,
     int    r,
-    double *x, 
+    float  *x, 
     int    *alpha, 
-    double *D,
+    float  *D,
     int    *I
     );
 

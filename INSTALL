@@ -6,16 +6,17 @@ INSTALL
 
 
 GSKNN is tested on LINUX and OSX
-REQUIRES Intel compilers and MKL. 
+REQUIRES Intel or GNU compilers. 
 
-LINUX:
+LINUX and OSX:
 edit set_env.sh and make.inc to set the paths to the libraries. 
+Set GSKNN_USE_INTEL=false to use GNU compilers.
+Set GSKNN_USE_BLAS=false if you don't have a BLAS library.
+The default BLAS library for Intel compiler is MKL, and the 
+default for GNU is Netlib (-lblas). If you want to use other 
+implementations, change set_env.sh, makefile, make.inc accordingly.
 
-OSX: 
-edit set_env_osx.sh and make.osx.inc to set the paths to the libraries. 
-edit the first line in makefile to change make.inc to make.osx.inc 
-
-For LINUX (and similarly for OSX), to use the standard makefil:
+For LINUX (and similarly for OSX), to use the standard makefile:
 >source set_env.sh
 >make
 
@@ -31,9 +32,7 @@ GSKNN requires C and C++ compilers that support OpenMP, and the
 default micro-kernel (uses AVX) requires the a Sandy-Bridge
 processor or any successor. 
 
-The current reference function requires the support of the MKL
-library which will be changed in the future. The default 
-compilation will also compile all the test drivers. To run
+The default compilation will also compile all the test drivers. To run
 some basic example from the testing drivers:
 
 >cd test
@@ -41,7 +40,8 @@ some basic example from the testing drivers:
 
 To embed GSKNN in a specific application, you need to include the
 header files <gsknn.h> and make the right function calls. 
-GSKNN can be linked statically with lib/libgsknn.a.
+GSKNN can be linked statically with lib/libgsknn.a or dynamically
+using -lgsknn.
 
 C/C++ example:
 ...

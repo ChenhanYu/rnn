@@ -1,6 +1,24 @@
 #ifndef __RNN_KERNEL_H__
 #define __RNN_KERNEL_H__
 
+void knn_rank_k_ref_s8x8(
+    int    k,
+    float  *a,
+    float  *b,
+    float  *c,
+    int    ldc,
+    aux_t  *aux
+    );
+
+void knn_rank_k_abs_ref_s8x8(
+    int    k,
+    float  *a,
+    float  *b,
+    float  *c,
+    int    ldc,
+    aux_t  *aux
+    );
+
 void rnn_rank_k_asm_d8x4(
     int    k,
     double* a,
@@ -90,7 +108,20 @@ void (*micro[ 2 ]) (
   rnn_r_1norm_int_d8x4_row
 };
 
-void (*rankk[ 2 ]) (
+
+#ifdef KNN_PREC_SINGLE
+void (*rankk_s[ 2 ]) (
+    int    k,
+    float  *a,
+    float  *b,
+    float  *c,
+    int    ldc,
+    aux_t  *aux
+    ) = {
+  knn_rank_k_ref_s8x8
+};
+#else
+void (*rankk_d[ 2 ]) (
     int    k,
     double *a,
     double *b,
@@ -101,6 +132,8 @@ void (*rankk[ 2 ]) (
   rnn_rank_k_asm_d8x4,
   rnn_rank_k_abs_int_d8x4
 };
+#endif
+
 
 void (*sq2nrm) (
     int    k,

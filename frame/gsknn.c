@@ -6,17 +6,22 @@
 #include <gsknn_config.h>
 #include <gsknn_kernel.h>
 
-inline void packA_kcxmc(
+#ifdef KNN_PREC_SINGLE
+inline void packA_kcxmc_s
+#else
+inline void packA_kcxmc_d
+#endif
+    (
     int    m,
     int    k,
-    double *XA,
+    prec_t *XA,
     int    ldXA,
     int    *amap,
-    double *packA
+    prec_t *packA
     )
 {
   int    i, p;
-  double *a_pntr[ DKNN_MR ];
+  prec_t *a_pntr[ DKNN_MR ];
 
   for ( i = 0; i < m; i ++ ) {
     a_pntr[ i ] = XA + ldXA * amap[ i ];
@@ -34,18 +39,22 @@ inline void packA_kcxmc(
 }
 
 
-// Pack B from 4 different columns of XB
-inline void packB_kcxnc(
+#ifdef KNN_PREC_SINGLE
+inline void packB_kcxnc_s
+#else
+inline void packB_kcxnc_d
+#endif
+    (
     int    n,
     int    k,
-    double *XB,
+    prec_t *XB,
     int    ldXB, // ldXB is the original k
     int    *bmap,
-    double *packB
+    prec_t *packB
     )
 {
   int    j, p; 
-  double *b_pntr[ DKNN_NR ];
+  prec_t *b_pntr[ DKNN_NR ];
 
   for ( j = 0; j < n; j ++ ) {
     b_pntr[ j ] = XB + ldXB * bmap[ j ];
@@ -81,13 +90,18 @@ inline void packB_kcxnc(
  *                  first iteration
  * --------------------------------------------------------------------------
  */
-void rank_k_macro_kernel(
+#ifdef KNN_PREC_SINGLE
+void rank_k_macro_kernel_s
+#else
+void rank_k_macro_kernel_d
+#endif
+    (
     int    m,
     int    n,
     int    k,
-    double *packA,
-    double *packB,
-    double *packC,
+    prec_t *packA,
+    prec_t *packB,
+    prec_t *packC,
     int    ldc,
     int    pc
     )
@@ -103,7 +117,12 @@ void rank_k_macro_kernel(
       if ( i + DKNN_MR >= m ) {
         aux.b_next += DKNN_NR * k;
       }
-      ( *rankk[ 0 ] ) (
+#ifdef KNN_PREC_SINGLE
+      ( *rankk_s[ 0 ] ) 
+#else
+      ( *rankk_d[ 0 ] ) 
+#endif
+          (
           k,
           &packA[ i * k ],
           &packB[ j * k ],
@@ -287,7 +306,12 @@ void dgssq2nrm(
             packB2[ j + jr ] = XB2[ bmap[ jc + j + jr ] ];
           }
         }
-        packB_kcxnc(
+#ifdef KNN_PREC_SINGLE
+        packB_kcxnc_s
+#else
+        packB_kcxnc_d
+#endif
+          (
             min( jb - j, DKNN_NR ),
             pb,
             &XB[ pc ],
@@ -308,7 +332,12 @@ void dgssq2nrm(
               packA2[ tid * DKNN_MC + i + ir ] = XA2[ amap[ ic + i + ir ] ];
             }
           }
-          packA_kcxmc(
+#ifdef KNN_PREC_SINGLE
+          packA_kcxmc_s
+#else 
+          packA_kcxmc_d
+#endif
+            (
               min( ib - i, DKNN_MR ),
               pb,
               &XA[ pc ],
@@ -491,7 +520,12 @@ void dgsknn_var1(
                 packB2[ j + jr ] = XB2[ bmap[ jc + j + jr ] ];
             }
           }
-          packB_kcxnc(
+#ifdef KNN_PREC_SINGLE          
+          packB_kcxnc_s
+#else
+          packB_kcxnc_d
+#endif
+            (
               min( jb - j, DKNN_NR ),
               pb,
               &XB[ pc ],
@@ -513,7 +547,12 @@ void dgsknn_var1(
                 packA2[ tid * DKNN_MC + i + ir ] = XA2[ amap[ ic + i + ir ] ];
               }
             }
-            packA_kcxmc(
+#ifdef KNN_PREC_SINGLE
+            packA_kcxmc_s
+#else
+            packA_kcxmc_d
+#endif
+              (
                 min( ib - i, DKNN_MR ),
                 pb,
                 &XA[ pc ],
@@ -525,7 +564,12 @@ void dgsknn_var1(
 
           // Check if this is the last kc interation
           if ( pc + DKNN_KC < k ) {
-            rank_k_macro_kernel(
+#ifdef KNN_PREC_SINGLE
+            rank_k_macro_kernel_s
+#else
+            rank_k_macro_kernel_d
+#endif
+              (
                 ib,
                 jb,
                 pb,
@@ -573,7 +617,12 @@ void dgsknn_var1(
           for ( jr = 0; jr < min( jb - j, DKNN_NR ); jr ++ ) {
             packB2[ j + jr ] = XB2[ bmap[ jc + j + jr ] ];
           }
-          packB_kcxnc(
+#ifdef KNN_PREC_SINGLE
+          packB_kcxnc_s
+#else
+          packB_kcxnc_d
+#endif
+            (
               min( jb - j, DKNN_NR ),
               pb,
               XB,
@@ -592,7 +641,12 @@ void dgsknn_var1(
             for ( ir = 0; ir < min( ib - i, DKNN_MR ); ir ++ ) {
               packA2[ tid * DKNN_MC + i + ir ] = XA2[ amap[ ic + i + ir ] ];
             }
-            packA_kcxmc(
+#ifdef KNN_PREC_SINGLE
+            packA_kcxmc_s
+#else
+            packA_kcxmc_d
+#endif
+              (
                 min( ib - i, DKNN_MR ),
                 pb,
                 XA,
