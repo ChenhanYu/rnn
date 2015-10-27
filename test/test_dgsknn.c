@@ -222,8 +222,8 @@ void test_dgsknn(
 
 
 
-  ref_time    /= ( n_iter - 1 );
-  dgsknn_time /= ( n_iter - 1 );
+  ref_time    /= ( n_iter - 0 );
+  dgsknn_time /= ( n_iter - 0 );
   flops = ( m * n / ( 1024.0 * 1024.0 * 1024.0 ) )* ( 2 * k + 3 );
 
 

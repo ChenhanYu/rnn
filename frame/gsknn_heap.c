@@ -34,7 +34,7 @@ inline void HeapAdjust_s
 inline void HeapAdjust_d
 #endif
     (
-    prec_t *D, 
+    double *D, 
     int    s, 
     int    n, 
     int    *I
@@ -72,9 +72,9 @@ inline void heap_sort_d
     (
     int    m,
     int    r,
-    prec_t *x, 
+    double *x, 
     int    *alpha, 
-    prec_t *D,
+    double *D,
     int    *I
     ) 
 {

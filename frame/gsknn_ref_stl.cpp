@@ -26,7 +26,7 @@ extern "C" void sgemm( char*, char*, int*, int*, int*, float*, float*,
 
 // Heap operator
 struct lessthan {
-  bool operator()(const std::pair<int, prec_t> &a, const std::pair<int, prec_t> &b ) const {
+  bool operator()(const std::pair<int, double> &a, const std::pair<int, double> &b ) const {
     return a.second < b.second;
   }
 };
@@ -34,30 +34,25 @@ struct lessthan {
 
 // This reference function will call MKL
 extern "C"
-#ifdef KNN_PREC_SINGLE
-void sgsknn_ref_stl
-#else
-void dgsknn_ref_stl
-#endif
-    (
+void dgsknn_ref_stl(
     int    m,
     int    n,
     int    k,
     int    r,
-    prec_t *XA,
-    prec_t *XA2,
+    double *XA,
+    double *XA2,
     int    *alpha,
-    prec_t *XB,
-    prec_t *XB2,
+    double *XB,
+    double *XB2,
     int    *beta,
-    prec_t *D,
+    double *D,
     int    *I
     )
 {
   int    i, j, l, p;
   double beg, time_collect, time_dgemm, time_square, time_heap;
-  prec_t *As, *Bs, *Cs;
-  prec_t fneg2 = -2.0, fzero = 0.0;
+  double *As, *Bs, *Cs;
+  double fneg2 = -2.0, fzero = 0.0;
 
 
   // Sanity check for early return.
@@ -66,9 +61,9 @@ void dgsknn_ref_stl
   }
 
   // Allocate buffers.
-  As = (prec_t*)malloc( sizeof(prec_t) * m * k );
-  Bs = (prec_t*)malloc( sizeof(prec_t) * n * k );
-  Cs = (prec_t*)malloc( sizeof(prec_t) * m * n );
+  As = (double*)malloc( sizeof(double) * m * k );
+  Bs = (double*)malloc( sizeof(double) * n * k );
+  Cs = (double*)malloc( sizeof(double) * m * n );
 
   #include "gsknn_ref_impl.h"
 
@@ -77,7 +72,7 @@ void dgsknn_ref_stl
   beg = omp_get_wtime();
   #pragma omp parallel for private( i )
   for ( j = 0; j < n; j ++ ) {
-    std::vector<std::pair<int, prec_t> > myheap( r );
+    std::vector<std::pair<int, double> > myheap( r );
     for ( i = 0; i < r; i ++ ) {
       myheap[ i ] = std::make_pair( I[ j * r + i ], D[ j * r + i] );
     }

@@ -6,22 +6,50 @@
 #include <gsknn_config.h>
 #include <gsknn_kernel.h>
 
-#ifdef KNN_PREC_SINGLE
-inline void packA_kcxmc_s
-#else
-inline void packA_kcxmc_d
-#endif
-    (
+
+
+/*
+ *
+ */
+inline void packA_kcxmc_s(
     int    m,
     int    k,
-    prec_t *XA,
+    float  *XA,
     int    ldXA,
     int    *amap,
-    prec_t *packA
+    float  *packA
     )
 {
   int    i, p;
-  prec_t *a_pntr[ DKNN_MR ];
+  float *a_pntr[ SKNN_MR ];
+
+  for ( i = 0; i < m; i ++ ) {
+    a_pntr[ i ] = XA + ldXA * amap[ i ];
+  }
+
+  for ( i = m; i < SKNN_MR; i ++ ) {
+    a_pntr[ i ] = XA + ldXA * amap[ 0 ];
+  }
+
+  for ( p = 0; p < k; p ++ ) {
+    for ( i = 0; i < SKNN_MR; i ++ ) {
+      *packA ++ = *a_pntr[ i ] ++;
+    }
+  }
+}
+
+
+inline void packA_kcxmc_d(
+    int    m,
+    int    k,
+    double *XA,
+    int    ldXA,
+    int    *amap,
+    double *packA
+    )
+{
+  int    i, p;
+  double *a_pntr[ DKNN_MR ];
 
   for ( i = 0; i < m; i ++ ) {
     a_pntr[ i ] = XA + ldXA * amap[ i ];
@@ -39,22 +67,48 @@ inline void packA_kcxmc_d
 }
 
 
-#ifdef KNN_PREC_SINGLE
-inline void packB_kcxnc_s
-#else
-inline void packB_kcxnc_d
-#endif
-    (
+/*
+ *
+ */ 
+inline void packB_kcxnc_s(
     int    n,
     int    k,
-    prec_t *XB,
+    float  *XB,
     int    ldXB, // ldXB is the original k
     int    *bmap,
-    prec_t *packB
+    float  *packB
     )
 {
   int    j, p; 
-  prec_t *b_pntr[ DKNN_NR ];
+  float  *b_pntr[ SKNN_NR ];
+
+  for ( j = 0; j < n; j ++ ) {
+    b_pntr[ j ] = XB + ldXB * bmap[ j ];
+  }
+
+  for ( j = n; j < SKNN_NR; j ++ ) {
+    b_pntr[ j ] = XB + ldXB * bmap[ 0 ];
+  }
+
+  for ( p = 0; p < k; p ++ ) {
+    for ( j = 0; j < SKNN_NR; j ++ ) {
+      *packB ++ = *b_pntr[ j ] ++;
+    }
+  }
+}
+
+
+inline void packB_kcxnc_d(
+    int    n,
+    int    k,
+    double *XB,
+    int    ldXB, // ldXB is the original k
+    int    *bmap,
+    double *packB
+    )
+{
+  int    j, p; 
+  double *b_pntr[ DKNN_NR ];
 
   for ( j = 0; j < n; j ++ ) {
     b_pntr[ j ] = XB + ldXB * bmap[ j ];
@@ -70,7 +124,6 @@ inline void packB_kcxnc_d
     }
   }
 }
-
 
 
 
@@ -90,18 +143,28 @@ inline void packB_kcxnc_d
  *                  first iteration
  * --------------------------------------------------------------------------
  */
-#ifdef KNN_PREC_SINGLE
-void rank_k_macro_kernel_s
-#else
-void rank_k_macro_kernel_d
-#endif
-    (
+void rank_k_macro_kernel_s(
     int    m,
     int    n,
     int    k,
-    prec_t *packA,
-    prec_t *packB,
-    prec_t *packC,
+    float  *packA,
+    float  *packB,
+    float  *packC,
+    int    ldc,
+    int    pc
+    )
+{
+  printf( "rank_k_macro_kernel_s(): Not implemented yet." );
+}
+
+
+void rank_k_macro_kernel_d(
+    int    m,
+    int    n,
+    int    k,
+    double *packA,
+    double *packB,
+    double *packC,
     int    ldc,
     int    pc
     )
@@ -117,12 +180,7 @@ void rank_k_macro_kernel_d
       if ( i + DKNN_MR >= m ) {
         aux.b_next += DKNN_NR * k;
       }
-#ifdef KNN_PREC_SINGLE
-      ( *rankk_s[ 0 ] ) 
-#else
-      ( *rankk_d[ 0 ] ) 
-#endif
-          (
+      ( *rankk_d[ 0 ] )(
           k,
           &packA[ i * k ],
           &packB[ j * k ],
@@ -132,6 +190,32 @@ void rank_k_macro_kernel_d
           );
     }
   }
+}
+
+
+
+/*
+ *
+ */ 
+void sgsknn_macro_kernel_row(
+    int    m,
+    int    n,
+    int    k,
+    int    r,
+    float  *packA,
+    float  *packA2,
+    float  *packB,
+    float  *packB2,
+    int    *bmap,
+    float  *packC,
+    int    ldc,
+    int    pc,
+    float  *D,
+    int    *I,
+    int    ldr
+    )
+{
+  printf( "sgsknn_macro_kernel_row(): Not implemented yet.");
 }
 
 
@@ -306,12 +390,7 @@ void dgssq2nrm(
             packB2[ j + jr ] = XB2[ bmap[ jc + j + jr ] ];
           }
         }
-#ifdef KNN_PREC_SINGLE
-        packB_kcxnc_s
-#else
-        packB_kcxnc_d
-#endif
-          (
+        packB_kcxnc_d(
             min( jb - j, DKNN_NR ),
             pb,
             &XB[ pc ],
@@ -332,12 +411,7 @@ void dgssq2nrm(
               packA2[ tid * DKNN_MC + i + ir ] = XA2[ amap[ ic + i + ir ] ];
             }
           }
-#ifdef KNN_PREC_SINGLE
-          packA_kcxmc_s
-#else 
-          packA_kcxmc_d
-#endif
-            (
+          packA_kcxmc_d(
               min( ib - i, DKNN_MR ),
               pb,
               &XA[ pc ],
@@ -438,6 +512,27 @@ void dgsknn_var3(
 }
 
 
+/*
+ *
+ */ 
+void sgsknn_var1(
+    int    m,
+    int    n,
+    int    k,
+    int    r,
+    float  *XA,
+    float  *XA2,
+    int    *amap,
+    float  *XB,
+    float  *XB2,
+    int    *bmap,
+    heap_t *heap
+    )
+{
+  printf( "sgsknn_var1(): Not implemented yet." );
+}
+
+
 void dgsknn_var1(
     int    m,
     int    n,
@@ -520,12 +615,7 @@ void dgsknn_var1(
                 packB2[ j + jr ] = XB2[ bmap[ jc + j + jr ] ];
             }
           }
-#ifdef KNN_PREC_SINGLE          
-          packB_kcxnc_s
-#else
-          packB_kcxnc_d
-#endif
-            (
+          packB_kcxnc_d(
               min( jb - j, DKNN_NR ),
               pb,
               &XB[ pc ],
@@ -547,12 +637,7 @@ void dgsknn_var1(
                 packA2[ tid * DKNN_MC + i + ir ] = XA2[ amap[ ic + i + ir ] ];
               }
             }
-#ifdef KNN_PREC_SINGLE
-            packA_kcxmc_s
-#else
-            packA_kcxmc_d
-#endif
-              (
+            packA_kcxmc_d(
                 min( ib - i, DKNN_MR ),
                 pb,
                 &XA[ pc ],
@@ -564,12 +649,7 @@ void dgsknn_var1(
 
           // Check if this is the last kc interation
           if ( pc + DKNN_KC < k ) {
-#ifdef KNN_PREC_SINGLE
-            rank_k_macro_kernel_s
-#else
-            rank_k_macro_kernel_d
-#endif
-              (
+            rank_k_macro_kernel_d(
                 ib,
                 jb,
                 pb,
@@ -617,12 +697,7 @@ void dgsknn_var1(
           for ( jr = 0; jr < min( jb - j, DKNN_NR ); jr ++ ) {
             packB2[ j + jr ] = XB2[ bmap[ jc + j + jr ] ];
           }
-#ifdef KNN_PREC_SINGLE
-          packB_kcxnc_s
-#else
-          packB_kcxnc_d
-#endif
-            (
+          packB_kcxnc_d(
               min( jb - j, DKNN_NR ),
               pb,
               XB,
@@ -641,12 +716,7 @@ void dgsknn_var1(
             for ( ir = 0; ir < min( ib - i, DKNN_MR ); ir ++ ) {
               packA2[ tid * DKNN_MC + i + ir ] = XA2[ amap[ ic + i + ir ] ];
             }
-#ifdef KNN_PREC_SINGLE
-            packA_kcxmc_s
-#else
-            packA_kcxmc_d
-#endif
-              (
+            packA_kcxmc_d(
                 min( ib - i, DKNN_MR ),
                 pb,
                 XA,
@@ -686,34 +756,52 @@ void dgsknn_var1(
 }
 
 
-#ifdef KNN_PREC_SINGLE 
-void sgsknn
-#else
-void dgsknn
-#endif
-    (
+void sgsknn(
     int    m,
     int    n,
     int    k,
     int    r,
-    prec_t *XA,
-    prec_t *XA2,
+    float  *XA,
+    float  *XA2,
     int    *amap,
-    prec_t *XB,
-    prec_t *XB2,
+    float  *XB,
+    float  *XB2,
     int    *bmap,
     heap_t *heap
     )
 {
-  int    i, j;
+  sgsknn_var1(
+      n,
+      m,
+      k,
+      r,
+      XB,
+      XB2,
+      bmap,
+      XA,
+      XA2,
+      amap,
+      heap
+      );
+}
 
+
+void dgsknn(
+    int    m,
+    int    n,
+    int    k,
+    int    r,
+    double *XA,
+    double *XA2,
+    int    *amap,
+    double *XB,
+    double *XB2,
+    int    *bmap,
+    heap_t *heap
+    )
+{
   if ( r > KNN_VAR_THRES ) {
-#ifdef KNN_PREC_SINGLE
-    sgsknn_var3
-#else
-    dgsknn_var3
-#endif      
-      (
+    dgsknn_var3(
         m,
         n,
         k,
@@ -728,12 +816,7 @@ void dgsknn
         );
   }
   else {
-#ifdef KNN_PREC_SINGLE
-    sgsknn_var1
-#else
-    dgsknn_var1
-#endif
-      (
+    dgsknn_var1(
         n,
         m,
         k,

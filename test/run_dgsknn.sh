@@ -1,7 +1,7 @@
 #!/bin/bash
 export DYLD_LIBRARY_PATH=/opt/intel/lib:/opt/intel/mkl/lib
 
-m=257
+m=4097
 n=4097
 
 r=10

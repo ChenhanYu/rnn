@@ -11,9 +11,6 @@ FRAME_CC_SRC=  \
 							 frame/gsknn_util.c \
 							 frame/gsknn_ref.c \
 
-#FRAME_CC_SRC_S= \
-#							 frame/gsknn_heap.c \
-
 FRAME_CPP_SRC= \
 							 frame/gsknn_ref_stl.cpp \
 
@@ -57,5 +54,5 @@ $(SHAREDLIBGSKNN): $(GSKNN_OBJ)
 # ---------------------------------------------------------------------------
 
 clean:
-	rm $(GSKNN_OBJ)
+	rm $(GSKNN_OBJ) $(LIBGSKNN) $(SHAREDLIBGSKNN)
 	cd $(GSKNN_DIR)/test && $(MAKE) clean && cd $(GSKNN_DIR)
