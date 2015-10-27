@@ -11,6 +11,7 @@ GSKNN_TEST_CC_SRC= \
 
 GSKNN_TEST_CPP_SRC=\
 									 test_dgsknn_stl.cpp \
+									 test_sgsknn_stl.cpp \
 
 
 GSKNN_TEST_EXE= $(GSKNN_TEST_CC_SRC:.c=.x) $(GSKNN_TEST_CPP_SRC:.cpp=.x)

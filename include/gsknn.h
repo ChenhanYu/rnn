@@ -43,6 +43,21 @@ struct heap_s {
 
 typedef struct heap_s heap_t;
 
+
+void sgsknn(
+    int    m,
+    int    n,
+    int    k,
+    int    r,
+    float  *XA,
+    float  *XA2,
+    int    *alpha,
+    float  *XB,
+    float  *XB2,
+    int    *beta,
+    heap_t *heap
+    );
+
 void dgsknn(
     int    m,
     int    n,
@@ -53,6 +68,20 @@ void dgsknn(
     int    *alpha,
     double *XB,
     double *XB2,
+    int    *beta,
+    heap_t *heap
+    );
+
+void sgsknn_var1(
+    int    m,
+    int    n,
+    int    k,
+    int    r,
+    float  *XA,
+    float  *XA2,
+    int    *alpha,
+    float  *XB,
+    float  *XB2,
     int    *beta,
     heap_t *heap
     );

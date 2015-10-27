@@ -8,10 +8,9 @@ extern "C" {
 #include <gsknn_ref_stl.hpp>
 }
 
-
 void bubble_sort(
     int    r,
-    double *D,
+    float  *D,
     int    *I
     )
 {
@@ -20,7 +19,7 @@ void bubble_sort(
   for ( i = 0; i < r - 1; i ++ ) {
     for ( j = 0; j < r - 1 - i; j ++ ) {
        if ( D[ j ] > D[ j + 1 ] ) {
-         double dtmp;
+         float  dtmp;
          int    itmp;
          dtmp = D[ j ];
          D[ j ] = D[ j + 1 ];
@@ -36,20 +35,21 @@ void bubble_sort(
 void compute_error(
     int    r,
     int    n,
-    double *D,
+    float  *D,
     int    *I,
-    double *D_gold,
+    float  *D_gold,
     int    *I_gold
     )
 {
   int    i, j;
-  double *D1, *D2;
+  float  *D1, *D2;
   int    *I1, *I2;
 
-  D1 = (double*)malloc( sizeof(double) * r * n );
-  D2 = (double*)malloc( sizeof(double) * r * n );
+  D1 = (float*)malloc( sizeof(float) * r * n );
+  D2 = (float*)malloc( sizeof(float) * r * n );
   I1 = (int*)malloc( sizeof(int) * r * n );
   I2 = (int*)malloc( sizeof(int) * r * n );
+
 
   // bubble sort
   for ( j = 0; j < n; j ++ ) {
@@ -66,19 +66,15 @@ void compute_error(
   for ( j = 0; j < n; j ++ ) {
     for ( i = 0; i < r; i ++ ) {
       if ( I1[ j * r + i ] != I2[ j * r + i ] ) {
-        if ( fabs( D1[ j * r + i ] - D2[ j * r + i ] ) > 1E-13 ) {
+        if ( fabs( D1[ j * r + i ] - D2[ j * r + i ] ) > 1E-5 ) {
           printf( "D[ %d ][ %d ] != D_gold, %E, %E\n", i, j, D1[ j * r + i ], D2[ j * r + i ] );
           printf( "I[ %d ][ %d ] != I_gold, %d, %d\n", i, j, I1[ j * r + i ], I2[ j * r + i ] );
           break;
         }
       }
-      //if ( I1[ j * r + i ] != I2[ j * r + i ] ) {
-      //  printf( "I[ %d ][ %d ] != I_gold, %d, %d\n", i, j, I1[ j * r + i ], I2[ j * r + i ] );
-      //  printf( "D[ %d ][ %d ] != D_gold, %E, %E\n", i, j, D1[ j * r + i ], D2[ j * r + i ] );
-      //  break;
-      //}
     }
   }
+
 
   free( D1 );
   free( D2 );
@@ -87,7 +83,8 @@ void compute_error(
 }
 
 
-void test_dgsknn(
+
+void test_sgsknn(
     int m,
     int n,
     int k,
@@ -96,12 +93,11 @@ void test_dgsknn(
 {
   int    i, j, p, nx, iter, n_iter;
   int    *amap, *bmap, *I, *I_mkl;
-  double *XA, *XB, *XA2, *XB2, *D, *D_mkl;
-  double tmp, error, flops;
-  double ref_beg, ref_time, dgsknn_beg, dgsknn_time;
+  float  *XA, *XB, *XA2, *XB2, *D, *D_mkl;
+  float  tmp, error;
+  double flops, ref_beg, ref_time, gsknn_beg, gsknn_time;
 
-
-  nx     = 4096 * 30;
+  nx     = 4096 * 5;
   n_iter = 1;
 
 
@@ -109,12 +105,14 @@ void test_dgsknn(
   bmap  = (int*)malloc( sizeof(int) * n );
   I     = (int*)malloc( sizeof(int) * r * n );
   I_mkl = (int*)malloc( sizeof(int) * r * n );
-  XA    = (double*)malloc( sizeof(double) * k * nx );
-  XA2   = (double*)malloc( sizeof(double) * nx ); 
-  D     = (double*)malloc( sizeof(double) * r * n );
-  D_mkl = (double*)malloc( sizeof(double) * r * n );
+  XA    = (float*)malloc( sizeof(float) * k * nx );
+  XA2   = (float*)malloc( sizeof(float) * nx ); 
+  D     = (float*)malloc( sizeof(float) * r * n );
+  D_mkl = (float*)malloc( sizeof(float) * r * n );
 
-  heap_t *heap = gsknn_heapCreate( n, r, 1.79E+308 );
+
+  // Need to create single heap here.
+  heap_t *heap = gsknn_heapCreate( n, r, 1.79E+30 );
 
   for ( i = 0; i < m; i ++ ) {
     amap[ i ] = i;
@@ -128,10 +126,9 @@ void test_dgsknn(
   // random[ 0, 0.1 ]
   for ( i = 0; i < nx; i ++ ) {
     for ( p = 0; p < k; p ++ ) {
-      XA[ i * k + p ] = (double)( rand() % 1000 ) / 1000.0;	
+      XA[ i * k + p ] = (float)( rand() % 1000 ) / 1000.0;	
     }
   }
-
 
   // Compute XA2
   for ( i = 0; i < nx; i ++ ) {
@@ -142,7 +139,6 @@ void test_dgsknn(
     XA2[ i ] = tmp;
   }
 
-
   // Use the same coordinate table
   XB  = XA;
   XB2 = XA2;
@@ -151,17 +147,17 @@ void test_dgsknn(
   // Initialize D to the maximum double and I to -1.
   for ( j = 0; j < n; j ++ ) {
     for ( i = 0; i < r; i ++ ) {
-      D[ j * r + i ]     = 1.79E+308;
-      D_mkl[ j * r + i ] = 1.79E+308;
+      D[ j * r + i ]     = 1.79E+30;
+      D_mkl[ j * r + i ] = 1.79E+30;
       I[ j * r + i ]     = -1;
       I_mkl[ j * r + i ] = -1;
     }
   }
 
 
-  dgsknn_beg = omp_get_wtime();
+  gsknn_beg = omp_get_wtime();
   {
-    dgsknn(
+    sgsknn(
         m,
         n,
         k,
@@ -175,12 +171,12 @@ void test_dgsknn(
         heap
         );
   }
-  dgsknn_time = omp_get_wtime() - dgsknn_beg;
+  gsknn_time = omp_get_wtime() - gsknn_beg;
 
 
   ref_beg = omp_get_wtime();
   {
-    dgsknn_ref_stl(
+    sgsknn_ref_stl(
         m,
         n,
         k,
@@ -198,24 +194,12 @@ void test_dgsknn(
   ref_time = omp_get_wtime() - ref_beg;
 
 
-  if ( r > KNN_VAR_THRES ) { 
-    for ( j = 0; j < n; j ++ ) {
-      for ( i = 0; i < r; i ++ ) {
-        D[ j * r + i ] = heap->D[ j * heap->ldk + i + 3 ];
-        I[ j * r + i ] = heap->I[ j * heap->ldk + i + 3 ];
-      }
+  for ( j = 0; j < n; j ++ ) {
+    for ( i = 0; i < r; i ++ ) {
+      D[ j * r + i ] = heap->D[ j * heap->ldk + i ];
+      I[ j * r + i ] = heap->I[ j * heap->ldk + i ];
     }
   }
-  else {
-    for ( j = 0; j < n; j ++ ) {
-      for ( i = 0; i < r; i ++ ) {
-        D[ j * r + i ] = heap->D[ j * heap->ldk + i ];
-        I[ j * r + i ] = heap->I[ j * heap->ldk + i ];
-      }
-    }
-  }
-
-
 
 
   // Compute error
@@ -230,13 +214,13 @@ void test_dgsknn(
 
 
 
-  ref_time /=    ( n_iter - 0 );
-  dgsknn_time /= ( n_iter - 0 );
+  ref_time   /= ( n_iter - 0 );
+  gsknn_time /= ( n_iter - 0 );
   flops = ( m * n / ( 1024.0 * 1024.0 * 1024.0 ) )* ( 2 * k + 3 );
+
+
   printf( "%d, %d, %d, %d, %5.2lf, %5.2lf;\n", 
-      m, n, k, r, flops / dgsknn_time, flops / ref_time );
-  //printf( "%d, %d, %d, %d, %5.3lf, %5.3lf;\n", 
-  //    m, n, k, r, dgsknn_time, ref_time );
+      m, n, k, r, flops / gsknn_time, flops / ref_time );
 
 
   free( XA );
@@ -255,8 +239,7 @@ void test_dgsknn(
 
 int main( int argc, char *argv[] )
 {
-  int    m, n, k, r; 
-
+  int    m, n, k, r;
 
   if ( argc != 5 ) {
     printf("argc: %d\n", argc);
@@ -269,7 +252,9 @@ int main( int argc, char *argv[] )
   sscanf( argv[ 3 ], "%d", &k );
   sscanf( argv[ 4 ], "%d", &r );
 
-  test_dgsknn( m, n, k, r );
+
+  test_sgsknn( m, n, k, r );
+
 
   return 0;
 }
