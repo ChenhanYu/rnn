@@ -65,9 +65,12 @@ void compute_error(
 
   for ( j = 0; j < n; j ++ ) {
     for ( i = 0; i < r; i ++ ) {
-      if ( fabs( D1[ j * r + i ] - D2[ j * r + i ] ) > 0.0000000001 ) {
-        printf( "D[ %d ][ %d ] != D_gold, %E, %E\n", i, j, D1[ j * r + i ], D2[ j * r + i ] );
-        break;
+      if ( I1[ j * r + i ] != I2[ j * r + i ] ) {
+        if ( fabs( D1[ j * r + i ] - D2[ j * r + i ] ) > 1E-13 ) {
+          printf( "D[ %d ][ %d ] != D_gold, %E, %E\n", i, j, D1[ j * r + i ], D2[ j * r + i ] );
+          printf( "I[ %d ][ %d ] != I_gold, %d, %d\n", i, j, I1[ j * r + i ], I2[ j * r + i ] );
+          break;
+        }
       }
       //if ( I1[ j * r + i ] != I2[ j * r + i ] ) {
       //  printf( "I[ %d ][ %d ] != I_gold, %d, %d\n", i, j, I1[ j * r + i ], I2[ j * r + i ] );
@@ -99,23 +102,19 @@ void test_dgsknn(
 
 
   nx     = 4096 * 30;
-  n_iter = 4;
+  n_iter = 1;
 
 
   amap  = (int*)malloc( sizeof(int) * m );
   bmap  = (int*)malloc( sizeof(int) * n );
-  I     = (int*)malloc( sizeof(int) * r * m );
-  I_mkl = (int*)malloc( sizeof(int) * r * m );
+  I     = (int*)malloc( sizeof(int) * r * n );
+  I_mkl = (int*)malloc( sizeof(int) * r * n );
   XA    = (double*)malloc( sizeof(double) * k * nx );
   XA2   = (double*)malloc( sizeof(double) * nx ); 
-  D     = (double*)malloc( sizeof(double) * r * m );
-  D_mkl = (double*)malloc( sizeof(double) * r * m );
+  D     = (double*)malloc( sizeof(double) * r * n );
+  D_mkl = (double*)malloc( sizeof(double) * r * n );
 
-  heap_t *heap = gsknn_heapCreate( m, r, 1.79E+308 );
-
-  //printf( "gsknn_heapCreate(): %d, %d, %d\n", 
-  //    heap->I[ 0 ], heap->I[ 1 ], heap->I[ 2 ] );
-
+  heap_t *heap = gsknn_heapCreate( n, r, 1.79E+308 );
 
   for ( i = 0; i < m; i ++ ) {
     amap[ i ] = i;
@@ -150,7 +149,7 @@ void test_dgsknn(
 
 
   // Initialize D to the maximum double and I to -1.
-  for ( j = 0; j < m; j ++ ) {
+  for ( j = 0; j < n; j ++ ) {
     for ( i = 0; i < r; i ++ ) {
       D[ j * r + i ]     = 1.79E+308;
       D_mkl[ j * r + i ] = 1.79E+308;
@@ -159,6 +158,8 @@ void test_dgsknn(
     }
   }
 
+
+  dgsknn_beg = omp_get_wtime();
   {
     dgsknn(
         m,
@@ -167,24 +168,6 @@ void test_dgsknn(
         r,
         XA,
         XA2,
-        amap,
-        XB,
-        XB2,
-        bmap,
-        heap
-        );
-  }
-
-  dgsknn_beg = omp_get_wtime();
-  // Call my implementation 
-  for ( iter = 1; iter < n_iter; iter ++ ) {
-    dgsknn(
-        m,
-        n,
-        k,
-        r,
-        XA  + iter * k * m,
-        XA2 + iter * m,
         amap,
         XB,
         XB2,
@@ -195,6 +178,7 @@ void test_dgsknn(
   dgsknn_time = omp_get_wtime() - dgsknn_beg;
 
 
+  ref_beg = omp_get_wtime();
   {
     dgsknn_ref_stl(
         m,
@@ -203,25 +187,6 @@ void test_dgsknn(
         r,
         XA,
         XA2,
-        amap,
-        XB,
-        XB2,
-        bmap,
-        D_mkl,
-        I_mkl
-        );
-  }
-
-  ref_beg = omp_get_wtime();
-  // Call the reference function ( we use the transpose to solve the problem. )
-  for ( iter = 1; iter < n_iter; iter ++ ) {
-    dgsknn_ref_stl(
-        m,
-        n,
-        k,
-        r,
-        XA  + iter * k * m,
-        XA2 + iter * m,
         amap,
         XB,
         XB2,
@@ -234,7 +199,7 @@ void test_dgsknn(
 
 
   if ( r > KNN_VAR_THRES ) { 
-    for ( j = 0; j < m; j ++ ) {
+    for ( j = 0; j < n; j ++ ) {
       for ( i = 0; i < r; i ++ ) {
         D[ j * r + i ] = heap->D[ j * heap->ldk + i + 3 ];
         I[ j * r + i ] = heap->I[ j * heap->ldk + i + 3 ];
@@ -242,7 +207,7 @@ void test_dgsknn(
     }
   }
   else {
-    for ( j = 0; j < m; j ++ ) {
+    for ( j = 0; j < n; j ++ ) {
       for ( i = 0; i < r; i ++ ) {
         D[ j * r + i ] = heap->D[ j * heap->ldk + i ];
         I[ j * r + i ] = heap->I[ j * heap->ldk + i ];
@@ -256,7 +221,7 @@ void test_dgsknn(
   // Compute error
   compute_error(
       r,
-      m,
+      n,
       D,
       I,
       D_mkl,
