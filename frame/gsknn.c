@@ -154,7 +154,7 @@ void rank_k_macro_kernel_s(
     int    pc
     )
 {
-  printf( "rank_k_macro_kernel_s(): Not implemented yet." );
+  printf( "rank_k_macro_kernel_s(): Not implemented yet.\n" );
 }
 
 
@@ -215,7 +215,7 @@ void sgsknn_macro_kernel_row(
     int    ldr
     )
 {
-  printf( "sgsknn_macro_kernel_row(): Not implemented yet.");
+  printf( "sgsknn_macro_kernel_row(): Not implemented yet.\n");
 }
 
 
@@ -529,7 +529,7 @@ void sgsknn_var1(
     heap_t *heap
     )
 {
-  printf( "sgsknn_var1(): Not implemented yet." );
+  printf( "sgsknn_var1(): Not implemented yet.\n" );
 }
 
 

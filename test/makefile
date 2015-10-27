@@ -7,6 +7,7 @@ endif
 
 GSKNN_TEST_CC_SRC= \
 									 test_dgsknn.c \
+									 test_sgsknn.c \
 
 GSKNN_TEST_CPP_SRC=\
 									 test_dgsknn_stl.cpp \

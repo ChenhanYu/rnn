@@ -37,7 +37,7 @@ void sgsknn_ref(
     int    *I
     )
 {
-  printf( "sgsknn_ref(): Not implemented yet." );
+  printf( "sgsknn_ref(): Not implemented yet.\n" );
   //int    i, j, p;
   //double beg, time_collect, time_dgemm, time_square, time_heap;
   //float  *As, *Bs, *Cs;
@@ -103,7 +103,7 @@ void dgsknn_ref(
   Cs = (double*)malloc( sizeof(double) * m * n );
 
 
-  #include "gsknn_ref_impl.h"
+  #include "dgsknn_ref_impl.h"
 
 
   // Pure C Max Heap implementation. 
