@@ -237,7 +237,7 @@ void sgsknn_macro_kernel_row(
     int    ldr
     )
 {
-  printf( "sgsknn_macro_kernel_row(): Not implemented yet.\n");
+  //printf( "sgsknn_macro_kernel_row(): Not implemented yet.\n");
   float  c[ SKNN_MC * SKNN_NC ] __attribute__((aligned(32)));
   float  *cbuff = c;
   int    i, ii, j;
@@ -246,8 +246,6 @@ void sgsknn_macro_kernel_row(
   aux.pc       = pc;
   aux.b_next_s = packB;
   aux.ldr      = ldr;
-
-  printf( "ldr = %d\n", ldr );
 
   for ( j = 0; j < n; j += SKNN_NR ) {
     aux.n  = min( n - j, SKNN_NR );
@@ -588,7 +586,7 @@ void sgsknn_var1(
     heap_t *heap
     )
 {
-  printf( "sgsknn_var1(): Not implemented yet.\n" );
+  //printf( "sgsknn_var1(): Not implemented yet.\n" );
   int    i, j, p, gsknn_ic_nt;
   int    ic, ib, jc, jb, pc, pb;
   int    ir, jr;

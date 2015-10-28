@@ -53,20 +53,20 @@ void knn_r_ref_s8x8_row(
     }
   }
 
-    for ( j = 0; j < SKNN_NR; j ++ ) {
-      printf( "%d, ", bmap[ j ] );
-    }
-    printf( "\n\n" );
+  //for ( j = 0; j < SKNN_NR; j ++ ) {
+  //  printf( "%d, ", bmap[ j ] );
+  //}
+  //printf( "\n\n" );
 
 
-  for ( i = 0; i < SKNN_MR; i ++ ) {
-    for ( j = 0; j < SKNN_NR; j ++ ) {
-      printf( "%E, ", cr[ i * SKNN_NR + j ] );
-    }
-    printf( "\n" );
-  }
+  //for ( i = 0; i < SKNN_MR; i ++ ) {
+  //  for ( j = 0; j < SKNN_NR; j ++ ) {
+  //    printf( "%E, ", cr[ i * SKNN_NR + j ] );
+  //  }
+  //  printf( "\n" );
+  //}
 
-  printf( "%d, %d, %d\n", aux->m, aux->n, ldr );
+  //printf( "%d, %d, %d\n", aux->m, aux->n, ldr );
 
   for ( i = 0; i < aux->m; i ++ ) {
     heapSelect_s( aux->n, r, cr + i * SKNN_NR, bmap, D + i * ldr, I + i * ldr ); 
