@@ -530,6 +530,204 @@ void sgsknn_var1(
     )
 {
   printf( "sgsknn_var1(): Not implemented yet.\n" );
+  int    i, j, p, gsknn_ic_nt;
+  int    ic, ib, jc, jb, pc, pb;
+  int    ir, jr;
+  int    ldc, padn, ldr;
+  float  *packA, *packB, *packC, *packw, *packu, *packA2, *packB2;
+  char   *str;
+  float   *D = heap->D_s;
+  int    *I = heap->I;
+
+  // Early return if possible
+  if ( m == 0 || n == 0 || k == 0 ) {
+    printf( "sgsknn_var1(): early return\n" );
+    return;
+  }
+
+
+  // sequential is the default situation
+  gsknn_ic_nt = 1;
+
+
+  // check the environment variable
+  str = getenv( "GSKNN_IC_NT" );
+  if ( str != NULL ) {
+    gsknn_ic_nt = (int)strtol( str, NULL, 10 );
+  }
+
+
+  // D-array heap leading dimenstion.
+  ldr = heap->ldk;
+
+
+  // Allocate packing buffers
+  packA  = (float*)gsknn_malloc_aligned( SKNN_KC, ( SKNN_MC + 1 ) * gsknn_ic_nt, sizeof(float) );
+  packB  = (float*)gsknn_malloc_aligned( SKNN_KC, ( SKNN_NC + 1 )              , sizeof(float) );
+  packA2 = (float*)gsknn_malloc_aligned(       1, ( SKNN_MC + 1 ) * gsknn_ic_nt, sizeof(float) );
+  packB2 = (float*)gsknn_malloc_aligned(       1, ( SKNN_NC + 1 )              , sizeof(float) );
+
+  if ( k > SKNN_KC ) {
+    ldc  = ( ( m - 1 ) / SKNN_MR + 1 ) * SKNN_MR;
+    padn = SKNN_NC;
+    if ( n < SKNN_NC ) {
+      padn = ( ( n - 1 ) / SKNN_NR + 1 ) * SKNN_NR;
+    }
+
+
+    packC = (float*)gsknn_malloc_aligned( ldc, padn, sizeof(float) );
+
+    for ( jc = 0; jc < n; jc += SKNN_NC ) {           // 6-th loop
+      jb = min( n - jc, SKNN_NC );
+      for ( pc = 0; pc < k; pc += SKNN_KC ) {         // 5-th loop
+        pb = min( k - pc, SKNN_KC );
+
+        // packB, packw, packbb
+        #pragma omp parallel for num_threads( gsknn_ic_nt ) private( jr )
+        for ( j = 0; j < jb; j += SKNN_NR ) {
+          if ( pc + SKNN_KC >= k ) {
+            // packw and packB2
+            for ( jr = 0; jr < min( jb - j, SKNN_NR ); jr ++ ) {
+                packB2[ j + jr ] = XB2[ bmap[ jc + j + jr ] ];
+            }
+          }
+          packB_kcxnc_s(
+              min( jb - j, SKNN_NR ),
+              pb,
+              &XB[ pc ],
+              k, // should be ldXB instead
+              &bmap[ jc + j ],
+              &packB[ j * pb ]
+              );
+        }
+
+        #pragma omp parallel for num_threads( gsknn_ic_nt ) private( ic, ib, i, ir )
+        for ( ic = 0; ic < m; ic += SKNN_MC ) {       // 4-th loop
+          //int     tid = 0;
+          int     tid = omp_get_thread_num();
+
+          ib = min( m - ic, SKNN_MC );
+          for ( i = 0; i < ib; i += SKNN_MR ) {
+            if ( pc + SKNN_KC >= k ) {
+              for ( ir = 0; ir < min( ib - i, SKNN_MR ); ir ++ ) {
+                packA2[ tid * SKNN_MC + i + ir ] = XA2[ amap[ ic + i + ir ] ];
+              }
+            }
+            packA_kcxmc_s(
+                min( ib - i, SKNN_MR ),
+                pb,
+                &XA[ pc ],
+                k,
+                &amap[ ic + i ],
+                &packA[ tid * SKNN_MC * pb + i * pb ]
+                );
+          }
+
+          // Check if this is the last kc interation
+          if ( pc + SKNN_KC < k ) {
+            rank_k_macro_kernel_s(
+                ib,
+                jb,
+                pb,
+                packA + tid * SKNN_MC * pb,
+                packB,
+                &packC[ ic * padn ], // packed
+                ( ( ib - 1 ) / SKNN_MR + 1 ) * SKNN_MR, // packed
+                pc
+                );
+          }
+          else {
+            sgsknn_macro_kernel_row(                      // 1~3 loops
+                ib,
+                jb,
+                pb,
+                r,
+                packA  + tid * SKNN_MC * pb,
+                packA2 + tid * SKNN_MC,
+                packB,
+                packB2,
+                bmap   + jc,
+                &packC[ ic * padn ], // packed
+                ( ( ib - 1 ) / SKNN_MR + 1 ) * SKNN_MR, // packed
+                pc,
+                D      + ic * ldr, // D is m x ldr (d-array heap) 
+                I      + ic * ldr, // I is m x ldr (d-array heap)
+                ldr
+                );
+          }
+        }
+      }
+    }
+
+    free( packC );
+  }
+  else {
+
+    for ( jc = 0; jc < n; jc += SKNN_NC ) {                // 6-th loop
+      jb = min( n - jc, SKNN_NC );
+      for ( pc = 0; pc < k; pc += SKNN_KC ) {              // 5-th loop
+        pb = min( k - pc, SKNN_KC );
+
+        #pragma omp parallel for num_threads( gsknn_ic_nt ) private( jr )
+        for ( j = 0; j < jb; j += SKNN_NR ) {
+          for ( jr = 0; jr < min( jb - j, SKNN_NR ); jr ++ ) {
+            packB2[ j + jr ] = XB2[ bmap[ jc + j + jr ] ];
+          }
+          packB_kcxnc_s(
+              min( jb - j, SKNN_NR ),
+              pb,
+              XB,
+              k, // should be ldXB instead
+              &bmap[ jc + j ],
+              &packB[ j * pb ]
+              );
+        }
+
+        #pragma omp parallel for num_threads( gsknn_ic_nt ) private( ic, ib, i, ir )
+        for ( ic = 0; ic < m; ic += SKNN_MC ) {            // 4-th loop
+          int     tid = omp_get_thread_num();
+
+          ib = min( m - ic, SKNN_MC );
+          for ( i = 0; i < ib; i += SKNN_MR ) {
+            for ( ir = 0; ir < min( ib - i, SKNN_MR ); ir ++ ) {
+              packA2[ tid * SKNN_MC + i + ir ] = XA2[ amap[ ic + i + ir ] ];
+            }
+            packA_kcxmc_s(
+                min( ib - i, SKNN_MR ),
+                pb,
+                XA,
+                k,
+                &amap[ ic + i ],
+                &packA[ tid * SKNN_MC * pb + i * pb ]
+                );
+          }
+
+          sgsknn_macro_kernel_row(                      // 1~3 loops
+              ib,
+              jb,
+              pb,
+              r,
+              packA  + tid * SKNN_MC * pb,
+              packA2 + tid * SKNN_MC,
+              packB,
+              packB2,
+              bmap   + jc,
+              NULL,
+              0,
+              pc,
+              D      + ic * ldr, // D is m x ldr (d-array heap) 
+              I      + ic * ldr, // I is m x ldr (d-array heap)
+              ldr
+              );
+        }                                                  // End 4-th loop
+      }                                                    // End 5-th loop
+    }                                                      // end 6-th loop
+  }
+
+  free( packA );
+  free( packB );
+  free( packA2 );
+  free( packB2 );
 }
 
 

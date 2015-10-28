@@ -6,7 +6,7 @@ n=4
 
 r=4
 echo "var1_k16=["
-for (( k=4; k<128; k+=31 ))
+for (( k=4; k<512; k+=31 ))
 do
 #  ./test_dgsknn.x     $m $n $k $r
 #  ./test_dgsknn_stl.x $m $n $k $r
