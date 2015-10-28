@@ -84,7 +84,7 @@ void sgsknn_ref_stl(
     }
     for ( i = 0; i < m; i ++ ) {
       if ( myheap.front().second > Cs[ j * m + i] ) {
-        myheap.front().first  = i;
+        myheap.front().first  = alpha[ i ];
         myheap.front().second = Cs[ j * m + i ];
         std::pop_heap( myheap.begin(), myheap.end(), lessthan_s() );
         std::push_heap( myheap.begin(), myheap.end(), lessthan_s() );
@@ -153,7 +153,7 @@ void dgsknn_ref_stl(
     }
     for ( i = 0; i < m; i ++ ) {
       if ( myheap.front().second > Cs[ j * m + i] ) {
-        myheap.front().first  = i;
+        myheap.front().first  = alpha[ i ];
         myheap.front().second = Cs[ j * m + i ];
         std::pop_heap( myheap.begin(), myheap.end(), lessthan_d() );
         std::push_heap( myheap.begin(), myheap.end(), lessthan_d() );

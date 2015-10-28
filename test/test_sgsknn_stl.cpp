@@ -115,7 +115,7 @@ void test_sgsknn(
   heap_t *heap = heapCreate_s( n, r, 1.79E+30 );
 
   for ( i = 0; i < m; i ++ ) {
-    amap[ i ] =  2 * i;
+    amap[ i ] = 2 * i;
   }
 
   for ( j = 0; j < n; j ++ ) {

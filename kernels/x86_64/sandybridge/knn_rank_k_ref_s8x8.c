@@ -1,7 +1,7 @@
 #include <gsknn.h>
 #include <gsknn_config.h>
 
-void knn_rank_k_ref_d8x8(
+void knn_rank_k_ref_s8x8(
     int    k,
     float  *a,
     float  *b,
@@ -46,7 +46,7 @@ void knn_rank_k_ref_d8x8(
   }
 }
 
-void knn_rank_k_abs_ref_d8x8(
+void knn_rank_k_abs_ref_s8x8(
     int    k,
     float  *a,
     float  *b,

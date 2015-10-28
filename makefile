@@ -21,10 +21,8 @@ KERNEL_SRC=    \
 							 kernels/$(GSKNN_ARCH)/sq2nrm_asm_d8x4.c \
 							 kernels/$(GSKNN_ARCH)/rnn_r_1norm_int_d8x4_row.c \
 							 kernels/$(GSKNN_ARCH)/rnn_rank_k_abs_int_d8x4.c \
-
-#KERNEL_SRC_S=  \
-#							 kernels/$(GSKNN_ARCH)/knn_rank_k_ref_s8x8.c \
-#							 kernels/$(GSKNN_ARCH)/knn_r_ref_s8x8_row.c \
+							 kernels/$(GSKNN_ARCH)/knn_rank_k_ref_s8x8.c \
+							 kernels/$(GSKNN_ARCH)/knn_r_ref_s8x8_row.c \
 
 GSKNN_OBJ=$(FRAME_CC_SRC:.c=.o) $(FRAME_CPP_SRC:.cpp=.o) $(KERNEL_SRC:.c=.o) $(FRAME_CC_SRC_S:.c=.os) $(KERNEL_SRC_S:.c=.os)
 

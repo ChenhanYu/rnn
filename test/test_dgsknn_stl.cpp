@@ -66,7 +66,7 @@ void compute_error(
   for ( j = 0; j < n; j ++ ) {
     for ( i = 0; i < r; i ++ ) {
       if ( I1[ j * r + i ] != I2[ j * r + i ] ) {
-        if ( fabs( D1[ j * r + i ] - D2[ j * r + i ] ) > 1E-13 ) {
+        if ( fabs( D1[ j * r + i ] - D2[ j * r + i ] ) > 1E-15 ) {
           printf( "D[ %d ][ %d ] != D_gold, %E, %E\n", i, j, D1[ j * r + i ], D2[ j * r + i ] );
           printf( "I[ %d ][ %d ] != I_gold, %d, %d\n", i, j, I1[ j * r + i ], I2[ j * r + i ] );
           break;
@@ -117,11 +117,11 @@ void test_dgsknn(
   heap_t *heap = heapCreate_d( n, r, 1.79E+308 );
 
   for ( i = 0; i < m; i ++ ) {
-    amap[ i ] = i;
+    amap[ i ] = 2 * i;
   }
 
   for ( j = 0; j < n; j ++ ) {
-    bmap[ j ] = j;
+    bmap[ j ] = 2 * j + 1;
   }
 
 

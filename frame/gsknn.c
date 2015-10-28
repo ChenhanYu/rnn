@@ -154,7 +154,28 @@ void rank_k_macro_kernel_s(
     int    pc
     )
 {
-  printf( "rank_k_macro_kernel_s(): Not implemented yet.\n" );
+  //printf( "rank_k_macro_kernel_s(): Not implemented yet.\n" );
+  int    i, j;
+  aux_t  aux;
+
+  aux.pc       = pc;
+  aux.b_next_s = packB;
+
+  for ( j = 0; j < n; j += SKNN_NR ) {
+    for ( i = 0; i < m; i += SKNN_MR ) {
+      if ( i + SKNN_MR >= m ) {
+        aux.b_next_s += SKNN_NR * k;
+      }
+      ( *rankk_s[ 0 ] )(
+          k,
+          &packA[ i * k ],
+          &packB[ j * k ],
+          &packC[ j * ldc + i * SKNN_NR ], // packed
+          ldc,
+          &aux
+          );
+    }
+  }
 }
 
 
@@ -196,6 +217,7 @@ void rank_k_macro_kernel_d(
 
 /*
  *
+ *
  */ 
 void sgsknn_macro_kernel_row(
     int    m,
@@ -216,6 +238,43 @@ void sgsknn_macro_kernel_row(
     )
 {
   printf( "sgsknn_macro_kernel_row(): Not implemented yet.\n");
+  float  c[ SKNN_MC * SKNN_NC ] __attribute__((aligned(32)));
+  float  *cbuff = c;
+  int    i, ii, j;
+  aux_t  aux;
+
+  aux.pc       = pc;
+  aux.b_next_s = packB;
+  aux.ldr      = ldr;
+
+  printf( "ldr = %d\n", ldr );
+
+  for ( j = 0; j < n; j += SKNN_NR ) {
+    aux.n  = min( n - j, SKNN_NR );
+    for ( i = 0; i < m; i += SKNN_MR ) {
+      aux.m = min( m - i, SKNN_MR );
+      aux.I   = I + i * ldr;
+      aux.D_s = D + i * ldr;
+      if ( i + SKNN_MR >= m ) {
+        aux.b_next_s += SKNN_NR * k;
+      }
+      if ( pc ) {
+        cbuff = packC  + j * ldc + i * SKNN_NR;
+      }
+
+      ( *micro_s[ 0 ] ) (
+          k,
+          r,
+          packA2 + i,
+          packA  + i * k,
+          packB2 + j,
+          packB  + j * k,
+          cbuff,
+          &aux,
+          bmap   + j
+          );
+    }
+  }
 }
 
 
@@ -263,7 +322,7 @@ void dgsknn_macro_kernel_row(
       // --------------------------------------------------------------------
       // Combine selective square distance and the heap adjustment.
       // --------------------------------------------------------------------
-      ( *micro[ 0 ] ) (
+      ( *micro_d[ 0 ] ) (
           k,
           r,
           packA2 + i,
