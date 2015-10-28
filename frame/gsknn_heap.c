@@ -212,22 +212,14 @@ heap_t *heapCreate_s(
   heap->type = KNN_2NORM;
   heap->prec = KNN_SINGLE;
 
-  if ( posix_memalign( (void**)&(heap->D), (size_t)SKNN_SIMD_ALIGN_SIZE, 
-        sizeof(float) * ldk * m ) ) {
-    printf( "heapCreate_s(): posix_memalign() failures" );
-    exit( 1 );    
-  }
 
-  if ( posix_memalign( (void**)&(heap->I), (size_t)SKNN_SIMD_ALIGN_SIZE, 
-        sizeof(int) * ldk * m ) ) {
-    printf( "heapCreate_s(): posix_memalign() failures" );
-    exit( 1 );    
-  }
+  heap->D_s = (float*)malloc( ldk * m * sizeof(float) );
+  heap->I   = (int*)malloc( ldk * m * sizeof(int) );
 
   for ( i = 0; i < m; i ++ ) {
     for ( j = 0; j < k; j ++ ) {
-      heap->D[ i * ldk + j ] = ro_s;
-      heap->I[ i * ldk + j ] = -1;
+      heap->D_s[ i * ldk + j ] = ro_s;
+      heap->I[ i * ldk + j ]   = -1;
     }
   }
 
@@ -258,21 +250,25 @@ heap_t *heapCreate_d(
   heap->ro  = ro;
   heap->ldk = ldk;
   heap->type = KNN_2NORM;
-  heap->prec = KNN_SINGLE;
+  heap->prec = KNN_DOUBLE;
 
   //printf( "ldk = %d\n", ldk );
 
-  if ( posix_memalign( (void**)&(heap->D), (size_t)DKNN_SIMD_ALIGN_SIZE, 
-        sizeof(double) * ldk * m ) ) {
-    printf( "heapCreate_d(): posix_memalign() failures" );
-    exit( 1 );    
-  }
+  heap->D = (double*)gsknn_malloc_aligned( ldk, m, sizeof(double) );
+  heap->I = (int*)gsknn_malloc_aligned( ldk, m, sizeof(int) );
 
-  if ( posix_memalign( (void**)&(heap->I), (size_t)DKNN_SIMD_ALIGN_SIZE, 
-        sizeof(int) * ldk * m ) ) {
-    printf( "heapCreate_d(): posix_memalign() failures" );
-    exit( 1 );    
-  }
+
+  //if ( posix_memalign( (void**)&(heap->D), (size_t)DKNN_SIMD_ALIGN_SIZE, 
+  //      sizeof(double) * ldk * m ) ) {
+  //  printf( "heapCreate_d(): posix_memalign() failures" );
+  //  exit( 1 );    
+  //}
+
+  //if ( posix_memalign( (void**)&(heap->I), (size_t)DKNN_SIMD_ALIGN_SIZE, 
+  //      sizeof(int) * ldk * m ) ) {
+  //  printf( "heapCreate_d(): posix_memalign() failures" );
+  //  exit( 1 );    
+  //}
   
 
   //printf( "Create finish\n" );

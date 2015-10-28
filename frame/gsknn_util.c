@@ -14,7 +14,7 @@ double *gsknn_malloc_aligned(
   double *ptr;
   int    err;
 
-  err = posix_memalign( (void**)&ptr, (size_t)DKNN_SIMD_ALIGN_SIZE, size * m * n );
+  err = posix_memalign( (void**)&ptr, (size_t)KNN_SIMD_ALIGN_SIZE, size * m * n );
 
   if ( err ) {
     printf( "gsknn_malloc_aligned(): posix_memalign() failures" );

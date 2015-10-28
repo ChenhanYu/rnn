@@ -63,6 +63,7 @@ void compute_error(
 
   for ( j = 0; j < n; j ++ ) {
     for ( i = 0; i < r; i ++ ) {
+      //printf( "D[ %d ][ %d ], %E, %E\n", i, j, D1[ j * r + i ], D2[ j * r + i ] );
       if ( I1[ j * r + i ] != I2[ j * r + i ] ) {
         if ( fabs( D1[ j * r + i ] - D2[ j * r + i ] ) > 1E-5 ) {
           printf( "D[ %d ][ %d ] != D_gold, %E, %E\n", i, j, D1[ j * r + i ], D2[ j * r + i ] );
@@ -113,11 +114,11 @@ void test_sgsknn(
   heap_t *heap = heapCreate_s( n, r, 1.79E+30 );
 
   for ( i = 0; i < m; i ++ ) {
-    amap[ i ] = i;
+    amap[ i ] = 2 * i;
   }
 
   for ( j = 0; j < n; j ++ ) {
-    bmap[ j ] = j;
+    bmap[ j ] = 2 * j + 1;
   }
 
 
@@ -194,7 +195,7 @@ void test_sgsknn(
 
   for ( j = 0; j < n; j ++ ) {
     for ( i = 0; i < r; i ++ ) {
-      D[ j * r + i ] = heap->D[ j * heap->ldk + i ];
+      D[ j * r + i ] = heap->D_s[ j * heap->ldk + i ];
       I[ j * r + i ] = heap->I[ j * heap->ldk + i ];
     }
   }
