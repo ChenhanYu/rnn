@@ -39,7 +39,7 @@ void compute_error(
     int    *I_gold
     )
 {
-  int    i, j;
+  int    i, j, p;
   float  *D1, *D2;
   int    *I1, *I2;
 
@@ -65,7 +65,7 @@ void compute_error(
     for ( i = 0; i < r; i ++ ) {
       //printf( "D[ %d ][ %d ], %E, %E\n", i, j, D1[ j * r + i ], D2[ j * r + i ] );
       if ( I1[ j * r + i ] != I2[ j * r + i ] ) {
-        if ( fabs( D1[ j * r + i ] - D2[ j * r + i ] ) > 1E-5 ) {
+        if ( fabs( D1[ j * r + i ] - D2[ j * r + i ] ) > 1E-4 ) {
           printf( "D[ %d ][ %d ] != D_gold, %E, %E\n", i, j, D1[ j * r + i ], D2[ j * r + i ] );
           printf( "I[ %d ][ %d ] != I_gold, %d, %d\n", i, j, I1[ j * r + i ], I2[ j * r + i ] );
           break;
@@ -109,16 +109,15 @@ void test_sgsknn(
   D     = (float*)malloc( sizeof(float) * r * n );
   D_mkl = (float*)malloc( sizeof(float) * r * n );
 
-
   // Need to create single heap here.
   heap_t *heap = heapCreate_s( n, r, 1.79E+30 );
 
   for ( i = 0; i < m; i ++ ) {
-    amap[ i ] = 2 * i;
+    amap[ i ] = i;
   }
 
   for ( j = 0; j < n; j ++ ) {
-    bmap[ j ] = 2 * j + 1;
+    bmap[ j ] = j;
   }
 
 
@@ -200,7 +199,6 @@ void test_sgsknn(
     }
   }
 
-
   // Compute error
   compute_error(
       r,
@@ -239,10 +237,6 @@ void test_sgsknn(
 int main( int argc, char *argv[] )
 {
   int    m, n, k, r; 
-  //printf("start the test dgsknn!\n");
-  fflush( stdout );
-
-
 
   if ( argc != 5 ) {
     printf("argc: %d\n", argc);

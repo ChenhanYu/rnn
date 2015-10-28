@@ -1,10 +1,11 @@
 #!/bin/bash
 export DYLD_LIBRARY_PATH=/opt/intel/lib:/opt/intel/mkl/lib
 
+
 m=4097
 n=4097
 
-r=513
+r=8
 echo "var1_k16=["
 for (( k=4; k<512; k+=31 ))
 do

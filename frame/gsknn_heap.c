@@ -202,16 +202,17 @@ heap_t *heapCreate_s(
     )
 {
   int    ldk, i, j;
- 
+
+  ldk = k;
+
   heap_t *heap = malloc( sizeof(heap_t) );
   heap->m    = m;
   heap->k    = k;
   heap->d    = 2;
   heap->ro_s = ro_s;
-  heap->ldk  = k;
+  heap->ldk  = ldk;
   heap->type = KNN_2NORM;
   heap->prec = KNN_SINGLE;
-
 
   heap->D_s = (float*)malloc( ldk * m * sizeof(float) );
   heap->I   = (int*)malloc( ldk * m * sizeof(int) );

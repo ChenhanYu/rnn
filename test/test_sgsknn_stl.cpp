@@ -67,7 +67,7 @@ void compute_error(
     for ( i = 0; i < r; i ++ ) {
       //printf( "D[ %d ][ %d ], %E, %E\n", i, j, D1[ j * r + i ], D2[ j * r + i ] );
       if ( I1[ j * r + i ] != I2[ j * r + i ] ) {
-        if ( fabs( D1[ j * r + i ] - D2[ j * r + i ] ) > 1E-5 ) {
+        if ( fabs( D1[ j * r + i ] - D2[ j * r + i ] ) > 1E-4 ) {
           printf( "D[ %d ][ %d ] != D_gold, %E, %E\n", i, j, D1[ j * r + i ], D2[ j * r + i ] );
           printf( "I[ %d ][ %d ] != I_gold, %d, %d\n", i, j, I1[ j * r + i ], I2[ j * r + i ] );
           break;
