@@ -59,12 +59,26 @@ void knn_r_ref_s8x8_row(
   //printf( "\n\n" );
 
 
-  //for ( i = 0; i < SKNN_MR; i ++ ) {
-  //  for ( j = 0; j < SKNN_NR; j ++ ) {
-  //    printf( "%E, ", cr[ i * SKNN_NR + j ] );
-  //  }
-  //  printf( "\n" );
-  //}
+  /*
+  printf( "\n" );
+  for ( i = 0; i < SKNN_MR; i ++ ) {
+    for ( j = 0; j < SKNN_NR; j ++ ) {
+      printf( "%E, ", cr[ i * SKNN_NR + j ] );
+    }
+    printf( "\n" );
+  }
+  printf( "\n" );
+
+  for ( j = 0; j < SKNN_NR; j ++ ) {
+    printf( "%E, ", bb[ j ] );
+  }
+  printf( "\n" );
+
+  for ( i = 0; i < SKNN_MR; i ++ ) {
+    printf( "%E, ", aa[ i ] );
+  }
+  printf( "\n\n" );
+  */
 
   //printf( "%d, %d, %d\n", aux->m, aux->n, ldr );
 

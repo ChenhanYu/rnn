@@ -26,7 +26,7 @@
     for ( i = 0; i < m; i ++ ) {
       Cs[ j * m + i ] = 0.0;
       for ( p = 0; p < k; p ++ ) {
-        Cs[ j * m + i ] -= 2.0 * As[ i * k + p ] * Bs[ j * k + p ];
+        Cs[ j * m + i ] += As[ i * k + p ] * Bs[ j * k + p ];
       }
     }
   }
@@ -52,6 +52,7 @@
   #pragma omp parallel for private( i )
   for ( j = 0; j < n; j ++ ) {
     for ( i = 0; i < m; i ++ ) {
+      Cs[ j * m + i ] *= -2.0;
       Cs[ j * m + i ] += XA2[ alpha[ i ] ];
       Cs[ j * m + i ] += XB2[ beta[ j ] ];
     }
