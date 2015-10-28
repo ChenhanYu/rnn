@@ -114,7 +114,7 @@ void test_dgsknn(
   D     = (double*)malloc( sizeof(double) * r * n );
   D_mkl = (double*)malloc( sizeof(double) * r * n );
 
-  heap_t *heap = gsknn_heapCreate( n, r, 1.79E+308 );
+  heap_t *heap = heapCreate_d( n, r, 1.79E+308 );
 
   for ( i = 0; i < m; i ++ ) {
     amap[ i ] = i;

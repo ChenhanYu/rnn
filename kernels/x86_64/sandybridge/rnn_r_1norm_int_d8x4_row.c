@@ -352,7 +352,7 @@ void rnn_r_1norm_int_d8x4_row(
     b0.v     = _mm256_cmp_pd( c03_0.v, aa_tmp.v, 0x1 );
     if ( !_mm256_testz_pd( b0.v, b0.v ) ) {
       _mm256_store_pd( c     , c03_0.v );
-      heap_sort_d( aux->n, r, c + 0, bmap, D + 0 * ldr, I + 0 * ldr ); 
+      heapSelect_d( aux->n, r, c + 0, bmap, D + 0 * ldr, I + 0 * ldr ); 
     }
   //}
 
@@ -361,7 +361,7 @@ void rnn_r_1norm_int_d8x4_row(
     b0.v     = _mm256_cmp_pd( c03_1.v, aa_tmp.v, 0x1 );
     if ( !_mm256_testz_pd( b0.v, b0.v ) ) {
       _mm256_store_pd( c + 4, c03_1.v );
-      heap_sort_d( aux->n, r, c + 4, bmap, D + 1 * ldr, I + 1 * ldr ); 
+      heapSelect_d( aux->n, r, c + 4, bmap, D + 1 * ldr, I + 1 * ldr ); 
     }
   }
 
@@ -370,7 +370,7 @@ void rnn_r_1norm_int_d8x4_row(
     b0.v     = _mm256_cmp_pd( c03_2.v, aa_tmp.v, 0x1 );
     if ( !_mm256_testz_pd( b0.v, b0.v ) ) {
       _mm256_store_pd( c + 8, c03_2.v );
-      heap_sort_d( aux->n, r, c + 8, bmap, D + 2 * ldr, I + 2 * ldr ); 
+      heapSelect_d( aux->n, r, c + 8, bmap, D + 2 * ldr, I + 2 * ldr ); 
     }
   }
 
@@ -379,7 +379,7 @@ void rnn_r_1norm_int_d8x4_row(
     b0.v     = _mm256_cmp_pd( c03_3.v, aa_tmp.v, 0x1 );
     if ( !_mm256_testz_pd( b0.v, b0.v ) ) {
       _mm256_store_pd( c + 12, c03_3.v );
-      heap_sort_d( aux->n, r, c + 12, bmap, D + 3 * ldr, I + 3 * ldr ); 
+      heapSelect_d( aux->n, r, c + 12, bmap, D + 3 * ldr, I + 3 * ldr ); 
     }
   }
 
@@ -388,7 +388,7 @@ void rnn_r_1norm_int_d8x4_row(
     b0.v     = _mm256_cmp_pd( c47_0.v, aa_tmp.v, 0x1 );
     if ( !_mm256_testz_pd( b0.v, b0.v ) ) {
       _mm256_store_pd( c + 16, c47_0.v );
-      heap_sort_d( aux->n, r, c + 16, bmap, D + 4 * ldr, I + 4 * ldr ); 
+      heapSelect_d( aux->n, r, c + 16, bmap, D + 4 * ldr, I + 4 * ldr ); 
     }
   }
 
@@ -397,7 +397,7 @@ void rnn_r_1norm_int_d8x4_row(
     b0.v     = _mm256_cmp_pd( c47_1.v, aa_tmp.v, 0x1 );
     if ( !_mm256_testz_pd( b0.v, b0.v ) ) {
       _mm256_store_pd( c + 20, c47_1.v );
-      heap_sort_d( aux->n, r, c + 20, bmap, D + 5 * ldr, I + 5 * ldr ); 
+      heapSelect_d( aux->n, r, c + 20, bmap, D + 5 * ldr, I + 5 * ldr ); 
     }
   }
 
@@ -406,7 +406,7 @@ void rnn_r_1norm_int_d8x4_row(
     b0.v     = _mm256_cmp_pd( c47_2.v, aa_tmp.v, 0x1 );
     if ( !_mm256_testz_pd( b0.v, b0.v ) ) {
       _mm256_store_pd( c + 24, c47_2.v );
-      heap_sort_d( aux->n, r, c + 24, bmap, D + 6 * ldr, I + 6 * ldr ); 
+      heapSelect_d( aux->n, r, c + 24, bmap, D + 6 * ldr, I + 6 * ldr ); 
     }
   }
 
@@ -415,7 +415,7 @@ void rnn_r_1norm_int_d8x4_row(
     b0.v     = _mm256_cmp_pd( c47_3.v, aa_tmp.v, 0x1 );
     if ( !_mm256_testz_pd( b0.v, b0.v ) ) {
       _mm256_store_pd( c + 28, c47_3.v );
-      heap_sort_d( aux->n, r, c + 28, bmap, D + 7 * ldr, I + 7 * ldr ); 
+      heapSelect_d( aux->n, r, c + 28, bmap, D + 7 * ldr, I + 7 * ldr ); 
     }
   }
 

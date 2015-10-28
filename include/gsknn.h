@@ -1,12 +1,6 @@
 #include <math.h>
 #include <immintrin.h>
 
-#ifdef KNN_PREC_SINGLE
-#define prec_t float
-#else
-#define prec_t double
-#endif
-
 #define KNN_VAR_THRES 512
 #define KNN_HEAP_OFFSET 3
 
@@ -16,6 +10,11 @@ typedef enum {
   KNN_2NORM,
   KNN_1NORM
 } knn_type;
+
+typedef enum {
+  KNN_DOUBLE,
+  KNN_SINGLE
+} knn_prec;
 
 struct aux_s {
   double *b_next;
@@ -27,7 +26,6 @@ struct aux_s {
   int    m;
   int    n;
 };
-
 typedef struct aux_s aux_t;
 
 struct heap_s {
@@ -37,12 +35,13 @@ struct heap_s {
   int    d;
   double ro;
   double *D;
+  float  ro_s;
+  float  *D_s;
   int    *I;
   knn_type type;
+  knn_prec prec;
 };
-
 typedef struct heap_s heap_t;
-
 
 void sgsknn(
     int    m,
@@ -134,34 +133,33 @@ double *gsknn_malloc_aligned(
     int    size
     );
 
-heap_t *gsknn_heapCreate(
+heap_t *heapCreate_s(
+    int    m,
+    int    k,
+    float  ro
+    );
+
+heap_t *heapCreate_d(
     int    m,
     int    k,
     double ro
     );
 
-heap_t *gsknn_heapAttach(
+heap_t *heapAttach_s(
+    int    m,
+    int    k,
+    float  *D,
+    int    *I
+    );
+
+heap_t *heapAttach_d(
     int    m,
     int    k,
     double *D,
     int    *I
     );
 
-void HeapAdjust_s(
-    float  *D, 
-    int    s, 
-    int    n, 
-    int    *I
-    );
-
-void HeapAdjust_d(
-    double *D, 
-    int    s, 
-    int    n, 
-    int    *I
-    );
-
-void heap_sort_s(
+void heapSelect_s(
     int    m,
     int    r,
     float  *x, 
@@ -170,7 +168,7 @@ void heap_sort_s(
     int    *I
     );
 
-void heap_sort_d(
+void heapSelect_d(
     int    m,
     int    r,
     double *x, 

@@ -6,19 +6,20 @@
 #include <gsknn_config.h>
 
 
+/*
+ *
+ */ 
 inline void swap_float( float *x, int i, int j ) {
   float  tmp = x[ i ];
   x[ i ] = x[ j ];
   x[ j ] = tmp;
 }
 
-
 inline void swap_double( double *x, int i, int j ) {
   double tmp = x[ i ];
   x[ i ] = x[ j ];
   x[ j ] = tmp;
 }
-
 
 inline void swap_int( int *I, int i, int j ) {
   int    tmp = I[ i ];
@@ -27,13 +28,34 @@ inline void swap_int( int *I, int i, int j ) {
 }
 
 
-// Maintain a max heap
-#ifdef KNN_PREC_SINGLE 
-inline void HeapAdjust_s
-#else
-inline void HeapAdjust_d
-#endif
-    (
+/*
+ * Maintain a max heap
+ *
+ */ 
+inline void HeapAdjust_s(
+    float  *D, 
+    int    s, 
+    int    n, 
+    int    *I
+    ) 
+{
+  int    j;
+
+  while ( 2 * s + 1 < n ) {
+    j = 2 * s + 1;
+    if ( ( j + 1 ) < n ) {
+      if ( D[ j ] < D[ j + 1 ] ) j ++;
+    }
+    if ( D[ s ] < D[ j ] ) {
+      swap_float( D, s, j );
+      swap_int( I, s, j );
+      s = j;
+    } 
+    else break;
+  }
+}
+
+inline void HeapAdjust_d(
     double *D, 
     int    s, 
     int    n, 
@@ -48,28 +70,50 @@ inline void HeapAdjust_d
       if ( D[ j ] < D[ j + 1 ] ) j ++;
     }
     if ( D[ s ] < D[ j ] ) {
-#ifdef KNN_PREC_SINGLE 
-      swap_float( D, s, j );
-#else
       swap_double( D, s, j );
-#endif
       swap_int( I, s, j );
       s = j;
     } 
+    else break;
+  }
+}
+
+
+
+/*
+ * Heap Sort the first largest r elements in an double array of length len)
+ *
+ */ 
+inline void heapSelect_s(
+    int    m,
+    int    r,
+    float  *x, 
+    int    *alpha, 
+    float  *D,
+    int    *I
+    ) 
+{
+  int    i;
+
+  __asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( x ) );
+  __asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( alpha ) );
+  __asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( D ) );
+  __asm__ volatile( "prefetcht0 0(%0)    \n\t" : :"r"( I ) );
+
+  for ( i = 0; i < m; i ++ ) {
+    if ( x[ i ] > D[ 0 ] ) {
+      continue;
+    }
     else {
-      break;
+      D[ 0 ] = x[ i ];  
+      I[ 0 ] = alpha[ i ];
+      HeapAdjust_s( D, 0, r, I );
     }
   }
 }
 
 
-// Heap Sort the first largest r elements in an double array of length len)
-#ifdef KNN_PREC_SINGLE 
-inline void heap_sort_s
-#else
-inline void heap_sort_d
-#endif
-    (
+inline void heapSelect_d(
     int    m,
     int    r,
     double *x, 
@@ -95,17 +139,37 @@ inline void heap_sort_d
     else {
       D[ 0 ] = x[ i ];  
       I[ 0 ] = alpha[ i ];
-#ifdef KNN_PREC_SINGLE 
-      HeapAdjust_s( D, 0, r, I );
-#else
       HeapAdjust_d( D, 0, r, I );
-#endif
     }
   }
 }
 
 
-heap_t *gsknn_heapAttach(
+/*
+ *
+ *
+ */ 
+heap_t *heapAttach_s(
+    int    m,
+    int    k,
+    float  *D,
+    int    *I
+    )
+{
+  heap_t *heap = malloc( sizeof(heap_t) );
+  heap->m    = m;
+  heap->k    = k;
+  heap->d    = 2;
+  heap->ro_s = 0.0;
+  heap->ldk  = k;
+  heap->D_s  = D;
+  heap->I    = I;
+  heap->type = KNN_2NORM;
+  heap->prec = KNN_SINGLE;
+  return heap;
+}
+
+heap_t *heapAttach_d(
     int    m,
     int    k,
     double *D,
@@ -113,18 +177,64 @@ heap_t *gsknn_heapAttach(
     )
 {
   heap_t *heap = malloc( sizeof(heap_t) );
-  heap->m   = m;
-  heap->k   = k;
-  heap->d   = 2;
-  heap->ro  = 0.0;
-  heap->ldk = k;
-  heap->D   = D;
-  heap->I   = I;
+  heap->m    = m;
+  heap->k    = k;
+  heap->d    = 2;
+  heap->ro   = 0.0;
+  heap->ldk  = k;
+  heap->D    = D;
+  heap->I    = I;
+  heap->type = KNN_2NORM;
+  heap->prec = KNN_DOUBLE;
   return heap;
 }
 
 
-heap_t *gsknn_heapCreate(
+
+/*
+ *
+ *
+ */ 
+heap_t *heapCreate_s(
+    int    m,
+    int    k,
+    float  ro_s
+    )
+{
+  int    ldk, i, j;
+ 
+  heap_t *heap = malloc( sizeof(heap_t) );
+  heap->m    = m;
+  heap->k    = k;
+  heap->d    = 2;
+  heap->ro_s = ro_s;
+  heap->ldk  = k;
+  heap->type = KNN_2NORM;
+  heap->prec = KNN_SINGLE;
+
+  if ( posix_memalign( (void**)&(heap->D), (size_t)SKNN_SIMD_ALIGN_SIZE, 
+        sizeof(float) * ldk * m ) ) {
+    printf( "heapCreate_s(): posix_memalign() failures" );
+    exit( 1 );    
+  }
+
+  if ( posix_memalign( (void**)&(heap->I), (size_t)SKNN_SIMD_ALIGN_SIZE, 
+        sizeof(int) * ldk * m ) ) {
+    printf( "heapCreate_s(): posix_memalign() failures" );
+    exit( 1 );    
+  }
+
+  for ( i = 0; i < m; i ++ ) {
+    for ( j = 0; j < k; j ++ ) {
+      heap->D[ i * ldk + j ] = ro_s;
+      heap->I[ i * ldk + j ] = -1;
+    }
+  }
+
+  return heap;
+}
+
+heap_t *heapCreate_d(
     int    m,
     int    k,
     double ro
@@ -143,23 +253,24 @@ heap_t *gsknn_heapCreate(
     heap->d = 2;
   }
 
-
   heap->m   = m;
   heap->k   = k;
   heap->ro  = ro;
   heap->ldk = ldk;
+  heap->type = KNN_2NORM;
+  heap->prec = KNN_SINGLE;
 
   //printf( "ldk = %d\n", ldk );
 
   if ( posix_memalign( (void**)&(heap->D), (size_t)DKNN_SIMD_ALIGN_SIZE, 
         sizeof(double) * ldk * m ) ) {
-    printf( "gsknn_heapCreate(): posix_memalign() failures" );
+    printf( "heapCreate_d(): posix_memalign() failures" );
     exit( 1 );    
   }
 
   if ( posix_memalign( (void**)&(heap->I), (size_t)DKNN_SIMD_ALIGN_SIZE, 
         sizeof(int) * ldk * m ) ) {
-    printf( "gsknn_heapCreate(): posix_memalign() failures" );
+    printf( "heapCreate_d(): posix_memalign() failures" );
     exit( 1 );    
   }
   

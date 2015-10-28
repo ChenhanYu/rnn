@@ -112,7 +112,7 @@ void test_sgsknn(
 
 
   // Need to create single heap here.
-  heap_t *heap = gsknn_heapCreate( n, r, 1.79E+30 );
+  heap_t *heap = heapCreate_s( n, r, 1.79E+30 );
 
   for ( i = 0; i < m; i ++ ) {
     amap[ i ] = i;

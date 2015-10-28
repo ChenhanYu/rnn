@@ -52,7 +52,7 @@ void knn_r_ref_s8x8_row(
   }
 
   for ( i = 0; i < aux->m; i ++ ) {
-    heap_sort_s( aux->n, r, c + i * SKNN_NR, bmap, D + i * ldr, I + i * ldr ); 
+    heapSelect_s( aux->n, r, c + i * SKNN_NR, bmap, D + i * ldr, I + i * ldr ); 
   }
 
 }
