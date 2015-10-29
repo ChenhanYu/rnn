@@ -41,38 +41,78 @@ void compute_error(
 {
   int    i, j, p;
   float  *D1, *D2;
-  int    *I1, *I2;
+  int    *I1, *I2, *Set1, *Set2;
 
   D1 = (float*)malloc( sizeof(float) * r * n );
   D2 = (float*)malloc( sizeof(float) * r * n );
   I1 = (int*)malloc( sizeof(int) * r * n );
   I2 = (int*)malloc( sizeof(int) * r * n );
 
+  Set1 = (int*)malloc( sizeof(int) * 4096 * 5 );
+  Set2 = (int*)malloc( sizeof(int) * 4096 * 5 );
 
-  // bubble sort
+  // Check set equvilent.
   for ( j = 0; j < n; j ++ ) {
-    for ( i = 0; i < r; i ++ ) {
-      D1[ j * r + i ] = D[ j * r + i ];
-      I1[ j * r + i ] = I[ j * r + i ];
-      D2[ j * r + i ] = D_gold[ j * r + i ];
-      I2[ j * r + i ] = I_gold[ j * r + i ];
+    for ( i = 0; i < 4096 * 5; i ++ ) {
+      Set1[ i ] = 0;
+      Set2[ i ] = 0;
     }
-    bubble_sort( r, &D1[ j * r ], &I1[ j * r ] );
-    bubble_sort( r, &D2[ j * r ], &I2[ j * r ] );
-  }
-
-  for ( j = 0; j < n; j ++ ) {
     for ( i = 0; i < r; i ++ ) {
-      //printf( "D[ %d ][ %d ], %E, %E\n", i, j, D1[ j * r + i ], D2[ j * r + i ] );
-      if ( I1[ j * r + i ] != I2[ j * r + i ] ) {
-        if ( fabs( D1[ j * r + i ] - D2[ j * r + i ] ) > 1E-7 ) {
-          printf( "D[ %d ][ %d ] != D_gold, %E, %E\n", i, j, D1[ j * r + i ], D2[ j * r + i ] );
-          printf( "I[ %d ][ %d ] != I_gold, %d, %d\n", i, j, I1[ j * r + i ], I2[ j * r + i ] );
-        //  break;
+      p = I[ j * r + i ];
+      Set1[ p ] = i;
+      Set2[ p ] = 1;
+    }
+    for ( i = 0; i < r; i ++ ) {
+      p = I_gold[ j * r + i ];
+      if ( Set2[ p ] == 0 ) {
+        Set1[ p ] = i;
+        Set2[ p ] = 2;
+      }
+      else {
+        Set2[ p ] = 0;
+      }
+    }
+    for ( i = 0; i < 4096 * 5; i ++ ) {
+      if ( Set2[ i ] == 1 && D[ j * r ] != D[ j * r + Set1[ i ] ] ) {
+        printf( "(%E,%E,%d,%d,%E,1,%d)\n", D[ j * r ], D_gold[ j * r ], 
+            j, i, D[ j * r + Set1[ i ] ], I[ j * r ] );
+      }
+      if ( Set2[ i ] == 2 && D_gold[ j * r ] != D_gold[ j * r + Set1[ i ] ] ) {
+        printf( "(%E,%E,%d,%d,%E,2,%d)\n", D[ j * r ], D_gold[ j * r ], 
+            j, i, D_gold[ j * r + Set1[ i ] ], I_gold[ j * r ] );
+        if ( D_gold[ j * r ] < D_gold[ j * r + Set1[ i ] ] ) {
+          printf( "bug\n" );
         }
       }
     }
   }
+
+
+
+  // bubble sort
+  //for ( j = 0; j < n; j ++ ) {
+  //  for ( i = 0; i < r; i ++ ) {
+  //    D1[ j * r + i ] = D[ j * r + i ];
+  //    I1[ j * r + i ] = I[ j * r + i ];
+  //    D2[ j * r + i ] = D_gold[ j * r + i ];
+  //    I2[ j * r + i ] = I_gold[ j * r + i ];
+  //  }
+  //  bubble_sort( r, &D1[ j * r ], &I1[ j * r ] );
+  //  bubble_sort( r, &D2[ j * r ], &I2[ j * r ] );
+  //}
+
+  //for ( j = 0; j < n; j ++ ) {
+  //  for ( i = 0; i < r; i ++ ) {
+  //    //printf( "D[ %d ][ %d ], %E, %E\n", i, j, D1[ j * r + i ], D2[ j * r + i ] );
+  //    if ( I1[ j * r + i ] != I2[ j * r + i ] ) {
+  //      if ( fabs( D1[ j * r + i ] - D2[ j * r + i ] ) > 1E-7 ) {
+  //        printf( "D[ %d ][ %d ] != D_gold, %E, %E\n", i, j, D1[ j * r + i ], D2[ j * r + i ] );
+  //        printf( "I[ %d ][ %d ] != I_gold, %d, %d\n", i, j, I1[ j * r + i ], I2[ j * r + i ] );
+  //        break;
+  //      }
+  //    }
+  //  }
+  //}
 
 
   free( D1 );
@@ -124,7 +164,7 @@ void test_sgsknn(
   // random[ 0, 0.1 ]
   for ( i = 0; i < nx; i ++ ) {
     for ( p = 0; p < k; p ++ ) {
-      XA[ i * k + p ] = (float)( rand() % 1000 ) / 1000.0;	
+      XA[ i * k + p ] = (float)( rand() % 1000000 ) / 1000000.0;	
     }
   }
 
@@ -239,9 +279,8 @@ int main( int argc, char *argv[] )
   int    m, n, k, r; 
 
   if ( argc != 5 ) {
-    printf("argc: %d\n", argc);
-    printf("we need 4 arguments!\n");
-    exit(0);
+    printf( "Error: require 4 arguments, but only %d provided.\n", argc - 1 );
+    exit( 0 );
   }
 
   sscanf( argv[ 1 ], "%d", &m );
@@ -249,9 +288,7 @@ int main( int argc, char *argv[] )
   sscanf( argv[ 3 ], "%d", &k );
   sscanf( argv[ 4 ], "%d", &r );
 
-
   test_sgsknn( m, n, k, r );
-
 
   return 0;
 }

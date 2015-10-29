@@ -14,7 +14,7 @@ void knn_rank_k_ref_s8x8(
   float  cr[ SKNN_MR * SKNN_NR ];
 
   for ( j = 0; j < SKNN_NR; j ++ ) {
-    for ( i = 0; i <SKNN_MR; i ++ ) {
+    for ( i = 0; i < SKNN_MR; i ++ ) {
       cr[ j * SKNN_MR + i ] = 0.0;
     }
   }

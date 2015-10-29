@@ -20,9 +20,18 @@ void knn_r_ref_s8x8_row(
   float  *D = aux->D_s;
   float  cr[ SKNN_MR * SKNN_NR ];
 
-  for ( i = 0; i <SKNN_MR; i ++ ) {
+  if ( aux->pc ) {
     for ( j = 0; j < SKNN_NR; j ++ ) {
-      cr[ i * SKNN_NR + j ] = 0.0;
+      for ( i = 0; i < SKNN_MR; i ++ ) {
+        cr[ i * SKNN_NR + j ] = c[ j * SKNN_MR + i ];
+      }
+    }
+  }
+  else {
+    for ( i = 0; i < SKNN_MR; i ++ ) {
+      for ( j = 0; j < SKNN_NR; j ++ ) {
+        cr[ i * SKNN_NR + j ] = 0.0;
+      }
     }
   }
 
@@ -34,15 +43,6 @@ void knn_r_ref_s8x8_row(
     }
     a += SKNN_MR;
     b += SKNN_NR;
-  }
-
-  // Accumulate rank-k update.
-  if ( aux->pc ) {
-    for ( j = 0; j < SKNN_NR; j ++ ) {
-      for ( i = 0; i < SKNN_MR; i ++ ) {
-        cr[ i * SKNN_NR + j ] += c[ j * SKNN_MR + i ];
-      }
-    }
   }
 
   for ( i = 0; i < SKNN_MR; i ++ ) {
@@ -59,7 +59,7 @@ void knn_r_ref_s8x8_row(
   //printf( "\n\n" );
 
 
-  /*
+  /* 
   printf( "\n" );
   for ( i = 0; i < SKNN_MR; i ++ ) {
     for ( j = 0; j < SKNN_NR; j ++ ) {
@@ -78,7 +78,7 @@ void knn_r_ref_s8x8_row(
     printf( "%E, ", aa[ i ] );
   }
   printf( "\n\n" );
-  */
+  */  
 
   //printf( "%d, %d, %d\n", aux->m, aux->n, ldr );
 

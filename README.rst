@@ -22,6 +22,15 @@ check the Githup repo:
 
 https://github.com/ChenhanYu/rnn
 
+To reuse the material of, please cite GSKNN in the following form:
+
+@article{
+  yu2015performance,
+  title={Performance Optimization for the K Nearest-Neighbor Kernel on x86 Architectures},
+  author={Yu, Chenhan D. and Huang, Jianyu and Austin, Woody and Xiao, Bo and Biros, George},
+  year={2015}
+}
+
 Thank you again for being intersted in GSKNN!
 
 Best regards,

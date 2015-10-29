@@ -39,39 +39,78 @@ void compute_error(
     int    *I_gold
     )
 {
-  int    i, j;
+  int    i, j, p;
   double *D1, *D2;
-  int    *I1, *I2;
+  int    *I1, *I2, *Set1, *Set2;
 
   D1 = (double*)malloc( sizeof(double) * r * n );
   D2 = (double*)malloc( sizeof(double) * r * n );
   I1 = (int*)malloc( sizeof(int) * r * n );
   I2 = (int*)malloc( sizeof(int) * r * n );
 
+  Set1 = (int*)malloc( sizeof(int) * 4096 * 5 );
+  Set2 = (int*)malloc( sizeof(int) * 4096 * 5 );
 
-  // bubble sort
+  // Check set equvilent.
   for ( j = 0; j < n; j ++ ) {
-    for ( i = 0; i < r; i ++ ) {
-      D1[ j * r + i ] = D[ j * r + i ];
-      I1[ j * r + i ] = I[ j * r + i ];
-      D2[ j * r + i ] = D_gold[ j * r + i ];
-      I2[ j * r + i ] = I_gold[ j * r + i ];
+    for ( i = 0; i < 4096 * 5; i ++ ) {
+      Set1[ i ] = 0;
+      Set2[ i ] = 0;
     }
-    bubble_sort( r, &D1[ j * r ], &I1[ j * r ] );
-    bubble_sort( r, &D2[ j * r ], &I2[ j * r ] );
-  }
-
-  for ( j = 0; j < n; j ++ ) {
     for ( i = 0; i < r; i ++ ) {
-      if ( I1[ j * r + i ] != I2[ j * r + i ] ) {
-        if ( fabs( D1[ j * r + i ] - D2[ j * r + i ] ) > 1E-17 ) {
-          printf( "D[ %d ][ %d ] != D_gold, %E, %E\n", i, j, D1[ j * r + i ], D2[ j * r + i ] );
-          printf( "I[ %d ][ %d ] != I_gold, %d, %d\n", i, j, I1[ j * r + i ], I2[ j * r + i ] );
-          break;
+      p = I[ j * r + i ];
+      Set1[ p ] = i;
+      Set2[ p ] = 1;
+    }
+    for ( i = 0; i < r; i ++ ) {
+      p = I_gold[ j * r + i ];
+      if ( Set2[ p ] == 0 ) {
+        Set1[ p ] = i;
+        Set2[ p ] = 2;
+      }
+      else {
+        Set2[ p ] = 0;
+      }
+    }
+    for ( i = 0; i < 4096 * 5; i ++ ) {
+      if ( Set2[ i ] == 1 && D[ j * r ] != D[ j * r + Set1[ i ] ] ) {
+        printf( "(%E,%E,%d,%d,%E,1,%d)\n", D[ j * r ], D_gold[ j * r ], 
+            j, i, D[ j * r + Set1[ i ] ], I[ j * r ] );
+      }
+      if ( Set2[ i ] == 2 && D_gold[ j * r ] != D_gold[ j * r + Set1[ i ] ] ) {
+        printf( "(%E,%E,%d,%d,%E,2,%d)\n", D[ j * r ], D_gold[ j * r ], 
+            j, i, D_gold[ j * r + Set1[ i ] ], I_gold[ j * r ] );
+        if ( D_gold[ j * r ] < D_gold[ j * r + Set1[ i ] ] ) {
+          printf( "bug\n" );
         }
       }
     }
   }
+
+
+  // bubble sort
+  //for ( j = 0; j < n; j ++ ) {
+  //  for ( i = 0; i < r; i ++ ) {
+  //    D1[ j * r + i ] = D[ j * r + i ];
+  //    I1[ j * r + i ] = I[ j * r + i ];
+  //    D2[ j * r + i ] = D_gold[ j * r + i ];
+  //    I2[ j * r + i ] = I_gold[ j * r + i ];
+  //  }
+  //  bubble_sort( r, &D1[ j * r ], &I1[ j * r ] );
+  //  bubble_sort( r, &D2[ j * r ], &I2[ j * r ] );
+  //}
+
+  //for ( j = 0; j < n; j ++ ) {
+  //  for ( i = 0; i < r; i ++ ) {
+  //    if ( I1[ j * r + i ] != I2[ j * r + i ] ) {
+  //      if ( fabs( D1[ j * r + i ] - D2[ j * r + i ] ) > 1E-12 ) {
+  //        printf( "D[ %d ][ %d ] != D_gold, %E, %E\n", i, j, D1[ j * r + i ], D2[ j * r + i ] );
+  //        printf( "I[ %d ][ %d ] != I_gold, %d, %d\n", i, j, I1[ j * r + i ], I2[ j * r + i ] );
+  //        break;
+  //      }
+  //    }
+  //  }
+  //}
 
 
   free( D1 );
@@ -112,11 +151,11 @@ void test_dgsknn(
   heap_t *heap = heapCreate_d( n, r, 1.79E+308 );
 
   for ( i = 0; i < m; i ++ ) {
-    amap[ i ] = 2 * i;
+    amap[ i ] = i;
   }
 
   for ( j = 0; j < n; j ++ ) {
-    bmap[ j ] = 2 * j + 1;
+    bmap[ j ] = j;
   }
 
 

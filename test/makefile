@@ -18,6 +18,8 @@ GSKNN_TEST_EXE= $(GSKNN_TEST_CC_SRC:.c=.x) $(GSKNN_TEST_CPP_SRC:.cpp=.x)
 
 all: $(GSKNN_TEST_EXE)
 
+clean:
+	rm -f $(GSKNN_TEST_EXE)
 
 # ---------------------------------------------------------------------------
 # Executable files compiling rules
@@ -28,6 +30,3 @@ all: $(GSKNN_TEST_EXE)
 %.x: %.cpp 
 	$(CXX) $(CXXFLAGS) $< -o $@ $(LDFLAGS) $(LDLIBS)
 # ---------------------------------------------------------------------------
-
-clean:
-	rm -f $(GSKNN_TEST_EXE)

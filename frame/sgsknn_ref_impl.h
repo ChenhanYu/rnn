@@ -52,7 +52,10 @@
   #pragma omp parallel for private( i )
   for ( j = 0; j < n; j ++ ) {
     for ( i = 0; i < m; i ++ ) {
+#ifdef USE_BLAS
+#else
       Cs[ j * m + i ] *= -2.0;
+#endif
       Cs[ j * m + i ] += XA2[ alpha[ i ] ];
       Cs[ j * m + i ] += XB2[ beta[ j ] ];
     }
@@ -78,4 +81,3 @@
   }
   printf( "\n" );
   */
-
