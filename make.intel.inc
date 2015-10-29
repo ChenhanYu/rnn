@@ -16,7 +16,4 @@ endif
 LIBGSKNN = $(GSKNN_DIR)/lib/libgsknn.a
 SHAREDLIBGSKNN = $(GSKNN_DIR)/lib/libgsknn.so
 
-
 LDFLAGS = -I$(GSKNN_DIR)/include -I$(GSKNN_DIR)/kernels/$(GSKNN_ARCH) -I$(GSKNN_MKL_DIR)/include
-
-#LDLIBS = $(LIBGSKNN) -lpthread -lm -openmp -mkl=parallel -Werror -Wall -pedantic

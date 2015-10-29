@@ -3,24 +3,33 @@ GSKNN (General Stride K-Nearest Neighbor)
 INSTALL
 ---
 
+GSKNN is tested on LINUX and OSX.
+Compilation REQUIRES Intel or GNU compilers with AVX and OpenMP support.
 
 
-GSKNN is tested on LINUX and OSX
-REQUIRES Intel or GNU compilers. 
+Configuration: 
+--------------
 
-LINUX and OSX:
-edit set_env.sh and make.inc to set the paths to the libraries. 
-Set GSKNN_USE_INTEL=false to use GNU compilers.
-Set GSKNN_USE_BLAS=false if you don't have a BLAS library.
+Edit set_env.sh for compilation options. 
+
+Set GSKNN_USE_INTEL = true  to use Intel compilers (make.intel.inc).
+Set GSKNN_USE_INTEL = false to use GNU compilers   (make.gnu.inc).
+Set GSKNN_USE_BLAS  = false if you don't have a BLAS library.
+
 The default BLAS library for Intel compiler is MKL, and the 
-default for GNU is Netlib (-lblas). If you want to use other 
-implementations, change set_env.sh, makefile, make.inc accordingly.
+default BLAS for GNU is Netlib (-lblas).
+If you want to use other implementations, change set_env.sh, 
+makefile, make.inc accordingly.
 
-For LINUX (and similarly for OSX), to use the standard makefile:
+
+Installation:
+-------------
+
+Use the standard makefile:
 >source set_env.sh
 >make
 
-For LINUX (and similarly for OSX), to use cmake:
+Use cmake:
 >source set_env.sh
 >mkdir build
 >cd build
@@ -28,25 +37,40 @@ For LINUX (and similarly for OSX), to use cmake:
 >make
 >make install
 
-GSKNN requires C and C++ compilers that support OpenMP, and the
-default micro-kernel (uses AVX) requires the a Sandy-Bridge
-processor or any successor. 
 
-The default compilation will also compile all the test drivers. To run
-some basic example from the testing drivers:
+Testing and compilation example:
+--------------------------------
+
+The default compilation will also compile all the test drivers. 
+To run some basic examples from the testing drivers:
 
 >cd test
->./run_dgsknn.sh
+>./run_gsknn.sh
 
 To embed GSKNN in a specific application, you need to include the
 header files <gsknn.h> and make the right function calls. 
 GSKNN can be linked statically with lib/libgsknn.a or dynamically
 using -lgsknn.
 
-C/C++ example:
+Include head files:
 ...
 #include <gsknn.h>
 ...
 
-Compilation example:
+Link:
 >icc ... -I$(GSKNN_DIR)/include $(GSKNN_DIR)/lib/libgsknn.a
+
+
+Note:
+-----
+
+The numerical accruacy of the 2-norm and 1-norm depends on the rank-k
+update implementation and compiler optimization. When some points are
+very close to each other, round-off errors will lead to different 
+neighbors between gsknn and the reference kernel.
+
+GSKNN currntly only support Intel Sandy-Bridge and its successors.
+Double precision is optimized on Sandy-Bridge and Ivy-Bridge processors,
+but these kernels are not optimized on Haswell and Skylake.
+We are working on extending our support to single precision and
+providing more optimized kernels.

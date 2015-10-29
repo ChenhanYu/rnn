@@ -205,3 +205,15 @@ void swap_int(
     int    i, 
     int    j 
     );
+
+void bubbleSort_s(
+    int    n,
+    float  *D,
+    int    *I
+    );
+
+void bubbleSort_d(
+    int    n,
+    double *D,
+    int    *I
+    );

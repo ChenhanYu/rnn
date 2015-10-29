@@ -7,4 +7,4 @@
 #SBATCH -N 1
 export OMP_NUM_THREADS=10
 
-ibrun tacc_affinity run_dgsknn.sh
+ibrun tacc_affinity run_gsknn.sh

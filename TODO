@@ -5,7 +5,11 @@ TODO
 README.rst
 INSTALL
 CREDITS
-
-
+/test
+/include
+makefile
+make.inc
+make.intel.inc
+make.gnu.inc
 
 BUGS:

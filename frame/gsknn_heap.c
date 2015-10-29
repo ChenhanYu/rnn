@@ -7,28 +7,6 @@
 
 
 /*
- *
- */ 
-inline void swap_float( float *x, int i, int j ) {
-  float  tmp = x[ i ];
-  x[ i ] = x[ j ];
-  x[ j ] = tmp;
-}
-
-inline void swap_double( double *x, int i, int j ) {
-  double tmp = x[ i ];
-  x[ i ] = x[ j ];
-  x[ j ] = tmp;
-}
-
-inline void swap_int( int *I, int i, int j ) {
-  int    tmp = I[ i ];
-  I[ i ] = I[ j ];
-  I[ j ] = tmp;
-}
-
-
-/*
  * Maintain a max heap
  *
  */ 

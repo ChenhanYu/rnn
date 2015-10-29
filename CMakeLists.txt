@@ -32,15 +32,17 @@ set (GSKNN_ARCH ${GSKNN_ARCH_MAJOR}/${GSKNN_ARCH_MINOR})
 if ($ENV{GSKNN_USE_INTEL} MATCHES "true")
   set (CMAKE_C_COMPILER   icc )
   set (CMAKE_CXX_COMPILER icpc)
+  set (GSKNN_CFLAGS          "-O3 -openmp -mavx")
+  set (CMAKE_EXE_LINKER_FLAGS "-lpthread -openmp -lm")
 else ($ENV{GSKNN_USE_INTEL} MATCHES "true")
   set (CMAKE_C_COMPILER   gcc)
   set (CMAKE_CXX_COMPILER g++)
+  set (GSKNN_CFLAGS          "-O3 -fopenmp -mavx")
+  set (CMAKE_EXE_LINKER_FLAGS "-lpthread -fopenmp -lm")
 endif ($ENV{GSKNN_USE_INTEL} MATCHES "true")
 
 if ($ENV{GSKNN_USE_BLAS} MATCHES "true")
-  set (GSKNN_CFLAGS          "-O3 -openmp -mavx -Werror -Wall -pedantic -DUSE_BLAS")
-else ($ENV{GSKNN_USE_BLAS} MATCHES "true")
-  set (GSKNN_CFLAGS          "-O3 -openmp -mavx -Werror -Wall -pedantic")
+  set (GSKNN_CFLAGS          "${GSKNN_CFLAGS} -DUSE_BLAS")
 endif ($ENV{GSKNN_USE_BLAS} MATCHES "true")
 set (CMAKE_C_FLAGS      "${CMAKE_C_FLAGS} ${GSKNN_CFLAGS}")
 set (CMAKE_CXX_FLAGS    "${CMAKE_CXX_FLAGS} ${GSKNN_CFLAGS}")
@@ -51,8 +53,6 @@ set (MKL_DIR $ENV{GSKNN_MKL_DIR})
 
 
 # Linking infos.
-set (CMAKE_EXE_LINKER_FLAGS "-lpthread -lm")
-
 if ($ENV{GSKNN_USE_INTEL} MATCHES "true" AND $ENV{GSKNN_USE_BLAS} MATCHES "true")
   set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mkl=parallel")
 endif ($ENV{GSKNN_USE_INTEL} MATCHES "true" AND $ENV{GSKNN_USE_BLAS} MATCHES "true")
@@ -81,10 +81,14 @@ add_library (gsknn ${FRAME_CC_SRC} ${FRAME_CXX_SRC} ${KERNEL_SRC})
 
 
 # Build the executable files.
-add_executable (test_dgsknn_stl.x ${CMAKE_SOURCE_DIR}/test/test_dgsknn_stl.cpp)
-target_link_libraries(test_dgsknn_stl.x gsknn)
+add_executable (test_sgsknn.x ${CMAKE_SOURCE_DIR}/test/test_sgsknn.c)
+target_link_libraries(test_sgsknn.x gsknn)
+add_executable (test_sgsknn_stl.x ${CMAKE_SOURCE_DIR}/test/test_sgsknn_stl.cpp)
+target_link_libraries(test_sgsknn_stl.x gsknn)
 add_executable (test_dgsknn.x ${CMAKE_SOURCE_DIR}/test/test_dgsknn.c)
 target_link_libraries(test_dgsknn.x gsknn)
+add_executable (test_dgsknn_stl.x ${CMAKE_SOURCE_DIR}/test/test_dgsknn_stl.cpp)
+target_link_libraries(test_dgsknn_stl.x gsknn)
 
 
 # Install shell script
