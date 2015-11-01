@@ -1,3 +1,42 @@
+/*
+ * --------------------------------------------------------------------------
+ * GSKNN (General Stride K-Nearest Neighbors)
+ * --------------------------------------------------------------------------
+ * Copyright (C) 2015, The University of Texas at Austin
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ *
+ * gsknn.c
+ *
+ * Chenhan D. Yu - Department of Computer Science,
+ *                 The University of Texas at Austin
+ *
+ *
+ * Purpose:
+ * this is the main file of the general stride k-nearest neighbors.
+ *
+ * Todo:
+ *
+ *
+ * Modification:
+ *
+ * 
+ * */
+
+
 #include <stdio.h>
 #include <omp.h>
 #include <gsknn.h>
@@ -9,7 +48,16 @@
 
 
 /*
+ * --------------------------------------------------------------------------
+ * @brief  Pack A into mr x kc x mc folded panels. Collect A using amap. 
  *
+ * @param  m        Number of query points
+ * @param  k        Min( remaining d, dc )
+ * @param  *XA      Query coordinate table
+ * @param  ldXA     Data pont dimension
+ * @param  amap     Global indicies of query points
+ * @param  *packA   Packed query points coordinates
+ * --------------------------------------------------------------------------
  */
 inline void packA_kcxmc_s(
     int    m,
@@ -38,7 +86,6 @@ inline void packA_kcxmc_s(
   }
 }
 
-
 inline void packA_kcxmc_d(
     int    m,
     int    k,
@@ -65,11 +112,24 @@ inline void packA_kcxmc_d(
     }
   }
 }
+/*
+ * --------------------------------------------------------------------------
+ */
+
 
 
 /*
+ * --------------------------------------------------------------------------
+ * @brief  Pack B into nr x kc x nc folded panels. Collect B using bmap. 
  *
- */ 
+ * @param  n        Number of reference points
+ * @param  k        Min( remaining d, dc )
+ * @param  *XB      Reference coordinate table
+ * @param  ldXB     Data pont dimension
+ * @param  bmap     Global indicies of reference points
+ * @param  *packB   Packed reference points coordinates
+ * --------------------------------------------------------------------------
+ */
 inline void packB_kcxnc_s(
     int    n,
     int    k,
@@ -97,7 +157,6 @@ inline void packB_kcxnc_s(
   }
 }
 
-
 inline void packB_kcxnc_d(
     int    n,
     int    k,
@@ -124,6 +183,9 @@ inline void packB_kcxnc_d(
     }
   }
 }
+/*
+ * --------------------------------------------------------------------------
+ */
 
 
 
@@ -132,11 +194,11 @@ inline void packB_kcxnc_d(
  * @brief  This macro-kernel contains the 3.rd and the 2.nd loop of the
  *         rank-k update.
  * 
- * @param  m        Number of target points
- * @param  n        Number of source points
+ * @param  m        Number of query points
+ * @param  n        Number of reference points
  * @param  k        Data point dimension
- * @param  *packA   Packed target points coordinates
- * @param  *packB   Packed source points coordinates
+ * @param  *packA   Packed query points coordinates
+ * @param  *packB   Packed reference points coordinates
  * @param  *packC   Packed accumulated rank-k update
  * @param  ldc      Leading dimension of packC
  * @param  pc       5.th loop counter, used to indicate whether this is the
@@ -178,7 +240,6 @@ void rank_k_macro_kernel_s(
   }
 }
 
-
 void rank_k_macro_kernel_d(
     int    m,
     int    n,
@@ -212,12 +273,35 @@ void rank_k_macro_kernel_d(
     }
   }
 }
+/*
+ * --------------------------------------------------------------------------
+ */
 
 
 
 /*
- *
- *
+ * --------------------------------------------------------------------------
+ * @brief  This macro-kernel further partitions packC into mr x nr blocks.
+ *         Each block computes the remaining rank-k update, square distances
+ *         and directly performs heap select to update the neighbor lists.
+ * 
+ * @param  m        Number of query points
+ * @param  n        Number of reference points
+ * @param  k        Data point dimension
+ * @param  r        Number of neighbors
+ * @param  *packA   Packed query points coordinates
+ * @param  *packA2  Packed query points square 2-norm
+ * @param  *packB   Packed reference points coordinates
+ * @param  *packB   Packed reference points square 2-norm
+ * @param  *bmap    Global indecies of the reference points
+ * @param  *packC   Packed accumulated rank-k update
+ * @param  ldc      Leading dimension of packC
+ * @param  pc       5.th loop counter, used to indicate whether this is the
+ *                  first iteration
+ * @param  *D       Neighbor lists (key, square distances)
+ * @param  *I       Neighbor lists (value, global indicies)
+ * @param  ldr      Leading dimension of D and I
+ * --------------------------------------------------------------------------
  */ 
 void sgsknn_macro_kernel_row(
     int    m,
@@ -335,6 +419,10 @@ void dgsknn_macro_kernel_row(
     }
   }
 }
+/*
+ * --------------------------------------------------------------------------
+ */
+
 
 
 void dsq2nrm_macro_kernel(
