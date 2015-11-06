@@ -887,9 +887,9 @@ void dgsknn_var1(
     double *XB,
     double *XB2,
     int    *bmap,
-    heap_t *heap
-    //double *D,
-    //int    *I
+    //heap_t *heap
+    double *D,
+    int    *I
     )
 {
   int    i, j, p, gsknn_ic_nt;
@@ -898,8 +898,8 @@ void dgsknn_var1(
   int    ldc, padn, ldr;
   double *packA, *packB, *packC, *packw, *packu, *packA2, *packB2;
   char   *str;
-  double *D = heap->D;
-  int    *I = heap->I;
+  //double *D = heap->D;
+  //int    *I = heap->I;
 
 
   // Early return if possible
@@ -922,8 +922,8 @@ void dgsknn_var1(
 
   // D-array heap leading dimenstion.
   //ldr = I[ 2 ];
-  //ldr = r;
-  ldr = heap->ldk;
+  //ldr = heap->ldk;
+  ldr = r;
 
 
   // Allocate packing buffers
@@ -1170,7 +1170,9 @@ void dgsknn(
         XA,
         XA2,
         amap,
-        heap
+        //heap
+        heap->D,
+        heap->I
         );
   }
 }

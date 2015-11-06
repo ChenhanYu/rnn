@@ -137,7 +137,9 @@ void dgsknn_var1(
     double *XB,
     double *XB2,
     int    *beta,
-    heap_t *heap
+    //heap_t *heap
+    double *D,
+    int    *I
     );
 
 void dgsknn_var3(
