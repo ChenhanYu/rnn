@@ -60,6 +60,20 @@ Include head files:
 Link:
 >icc ... -I$(GSKNN_DIR)/include $(GSKNN_DIR)/lib/libgsknn.a
 
+We also provide simple python wrappers to invoke gsknn and its reference
+kernels. These wrappers reside in /python, and they require the support
+of numpy. See /python/example.py for their usages. To use the four functions 
+in the /python/gsknn.py module,
+
+...
+import numpy
+From gsknn import *
+...
+
+Make sure you assign the right type ro each numpy ndarray and make the
+right function call. If your floating point data type is numpy.double,
+then call dgsknn. If it's numpy.float32, then call sgsknn instead.
+
 
 Note:
 -----

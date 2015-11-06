@@ -123,7 +123,9 @@ void sgsknn_var1(
     float  *XB,
     float  *XB2,
     int    *beta,
-    heap_t *heap
+    //heap_t *heap
+    float  *D,
+    int    *I
     );
 
 void dgsknn_var1(

@@ -671,18 +671,19 @@ void sgsknn_var1(
     float  *XB,
     float  *XB2,
     int    *bmap,
-    heap_t *heap
+    float  *D,
+    int    *I
+    //heap_t *heap
     )
 {
-  //printf( "sgsknn_var1(): Not implemented yet.\n" );
   int    i, j, p, gsknn_ic_nt;
   int    ic, ib, jc, jb, pc, pb;
   int    ir, jr;
   int    ldc, padn, ldr;
   float  *packA, *packB, *packC, *packw, *packu, *packA2, *packB2;
   char   *str;
-  float   *D = heap->D_s;
-  int    *I = heap->I;
+  //float   *D = heap->D_s;
+  //int    *I = heap->I;
 
   // Early return if possible
   if ( m == 0 || n == 0 || k == 0 ) {
@@ -703,7 +704,8 @@ void sgsknn_var1(
 
 
   // D-array heap leading dimenstion.
-  ldr = heap->ldk;
+  //ldr = heap->ldk;
+  ldr = r;
 
 
   // Allocate packing buffers
@@ -1124,7 +1126,9 @@ void sgsknn(
       XA,
       XA2,
       amap,
-      heap
+      //heap
+      heap->D_s,
+      heap->I
       );
 }
 

@@ -3,7 +3,7 @@ export DYLD_LIBRARY_PATH=/opt/intel/lib:/opt/intel/mkl/lib
 
 m=4097
 n=4097
-r=515
+r=10
 kmax=600
 
 echo "run_gsknn=["
