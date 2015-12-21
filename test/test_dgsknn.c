@@ -227,6 +227,9 @@ void test_dgsknn(
     }
   }
 
+  // Free the memory of the heap structure.
+  heapFree_d( heap );
+
   computeError(
       r,
       n,

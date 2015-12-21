@@ -214,6 +214,9 @@ void test_sgsknn(
       I[ j * r + i ] = heap->I[ j * heap->ldk + i ];
     }
   }
+  
+  // Free the memory of the heap structure.
+  heapFree_s( heap );
 
   // Compute error
   computeError(

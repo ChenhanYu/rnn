@@ -317,3 +317,22 @@ heap_t *heapCreate_d(
 
   return heap;
 }
+
+void heapFree_s(
+    heap_t *heap
+    )
+{
+  free( heap->D_s );
+  free( heap->I );
+  free( heap );
+}
+
+void heapFree_d(
+    heap_t *heap
+    )
+{
+  free( heap->D );
+  free( heap->I );
+  free( heap );
+}
+

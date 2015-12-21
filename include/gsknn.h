@@ -36,6 +36,9 @@
  * 
  * */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <math.h>
 #include <immintrin.h>
@@ -190,6 +193,14 @@ heap_t *heapCreate_d(
     double ro
     );
 
+void heapFree_s(
+    heap_t *heap
+    );
+
+void heapFree_d(
+    heap_t *heap
+    );
+
 heap_t *heapAttach_s(
     int    m,
     int    k,
@@ -260,3 +271,7 @@ void bubbleSort_d(
     double *D,
     int    *I
     );
+
+#ifdef __cplusplus
+}
+#endif
