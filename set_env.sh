@@ -3,8 +3,10 @@ export GSKNN_DIR=$PWD
 echo "GSKNN_DIR = $GSKNN_DIR"
 
 # Manually set the target architecture.
-export GSKNN_ARCH_MAJOR=x86_64
-export GSKNN_ARCH_MINOR=sandybridge
+#export GSKNN_ARCH_MAJOR=x86_64
+export GSKNN_ARCH_MAJOR=arm
+#export GSKNN_ARCH_MINOR=sandybridge
+export GSKNN_ARCH_MINOR=neon
 export GSKNN_ARCH=$GSKNN_ARCH_MAJOR/$GSKNN_ARCH_MINOR
 echo "GSKNN_ARCH = $GSKNN_ARCH"
 
@@ -27,5 +29,5 @@ echo "GSKNN_MKL_DIR = $GSKNN_MKL_DIR"
 
 # Parallel options
 export KMP_AFFINITY=compact
-export OMP_NUM_THREADS=10
-export GSKNN_IC_NT=10
+export OMP_NUM_THREADS=1
+export GSKNN_IC_NT=1
