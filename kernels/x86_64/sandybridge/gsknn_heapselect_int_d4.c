@@ -1,5 +1,6 @@
 #include <gsknn.h>
 #include <gsknn_config.h>
+#include <immintrin.h> // AVX
 #include <avx_types.h>
 
 inline void heapadjust_int_d4(
