@@ -69,6 +69,7 @@ endif ($ENV{GSKNN_USE_GNU} MATCHES "true" AND $ENV{GSKNN_USE_BLAS} MATCHES "true
 
 # Headers.
 include_directories ("include" "${CMAKE_SOURCE_DIR}/kernels/${GSKNN_ARCH}" "${MKL_DIR}/include")
+include_directories ("${CMAKE_SOURCE_DIR}/kernels/ref")
 file (GLOB GSKNN_HDRS ${CMAKE_SOURCE_DIR}/include/*)
 install (FILES ${GSKNN_HDRS} DESTINATION ${CMAKE_BINARY_DIR}/include)
 
@@ -76,7 +77,7 @@ install (FILES ${GSKNN_HDRS} DESTINATION ${CMAKE_BINARY_DIR}/include)
 # Library dependencies
 file (GLOB FRAME_CC_SRC  ${CMAKE_SOURCE_DIR}/frame/*.c)
 file (GLOB FRAME_CXX_SRC ${CMAKE_SOURCE_DIR}/frame/*.cpp)
-file (GLOB KERNEL_SRC ${CMAKE_SOURCE_DIR}/kernels/${GSKNN_ARCH}/*.c)
+file (GLOB KERNEL_SRC ${CMAKE_SOURCE_DIR}/kernels/${GSKNN_ARCH}/*.c ${CMAKE_SOURCE_DIR}/kernels/ref/*.c)
 
 
 # Build the static library.

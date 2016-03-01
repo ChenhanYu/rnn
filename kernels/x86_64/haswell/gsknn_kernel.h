@@ -14,14 +14,11 @@
 // Float rank-k update prototype
 void KERNEL1(rank_k_ref_s,float);
 void KERNEL1(rank_k_abs_ref_s,float);
-void KERNEL1(knn_rank_k_ref_s8x8,float);
-void KERNEL1(knn_rank_k_abs_ref_s8x8,float);
 
 // Double rank-k update prototype
 void KERNEL1(rank_k_ref_d,double);
 void KERNEL1(rank_k_abs_ref_d,double);
-void KERNEL1(rnn_rank_k_asm_d8x4,double);
-void KERNEL1(rnn_rank_k_abs_int_d8x4,double);
+void KERNEL1(rank_k_int_d8x6,double);
 
 #define KERNEL2(name,type) \
   name(                    \
@@ -38,12 +35,10 @@ void KERNEL1(rnn_rank_k_abs_int_d8x4,double);
 
 // Float knn prototype
 void KERNEL2(knn_ref_row_s,float);
-void KERNEL2(knn_r_ref_s8x8_row,float);
 
 // Double knn prototype
 void KERNEL2(knn_ref_row_d,double);
-void KERNEL2(rnn_r_int_d8x4_row,double);
-void KERNEL2(rnn_r_1norm_int_d8x4_row,double);
+void KERNEL2(knn_int_row_d8x6,double);
 
 #define KERNEL3(name,type) \
   name(                    \
@@ -80,29 +75,24 @@ void KERNEL4(sq2nrm_asm_d8x4,double);
 void KERNEL1((*rankk_s[ 2 ]),float)  = {
   rank_k_ref_s,
   rank_k_abs_ref_s
-  //knn_rank_k_ref_s8x8,
-  //knn_rank_k_abs_ref_s8x8
 };
 
 // Double rank-k update function pointer table
 void KERNEL1((*rankk_d[ 2 ]),double)  = {
   //rank_k_ref_d,
-  //rank_k_abs_ref_d
-  rnn_rank_k_asm_d8x4,
-  rnn_rank_k_abs_int_d8x4
+  rank_k_int_d8x6,
+  rank_k_abs_ref_d
 };
 
 // Float knn function pointer table
 void KERNEL2((*micro_s[ 1 ]),float) = {
   knn_ref_row_s
-  //knn_r_ref_s8x8_row
 };
 
 // Double knn function pointer table
-void KERNEL2((*micro_d[ 2 ]),double) = {
-  //knn_ref_row_d,
-  rnn_r_int_d8x4_row,
-  rnn_r_1norm_int_d8x4_row
+void KERNEL2((*micro_d[ 1 ]),double) = {
+  //knn_ref_row_d
+  knn_int_row_d8x6
 };
 
 // Double k-select function pointer table

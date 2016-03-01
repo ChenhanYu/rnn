@@ -3,14 +3,15 @@ export GSKNN_DIR=$PWD
 echo "GSKNN_DIR = $GSKNN_DIR"
 
 ## Manually set the target architecture.
-export GSKNN_ARCH_MAJOR=x86_64
-export GSKNN_ARCH_MINOR=sandybridge
-
 #export GSKNN_ARCH_MAJOR=x86_64
-#export GSKNN_ARCH_MINOR=haswell
+#export GSKNN_ARCH_MINOR=sandybridge
+
+export GSKNN_ARCH_MAJOR=x86_64
+export GSKNN_ARCH_MINOR=haswell
 
 #export GSKNN_ARCH_MAJOR=arm
 #export GSKNN_ARCH_MINOR=neon
+
 export GSKNN_ARCH=$GSKNN_ARCH_MAJOR/$GSKNN_ARCH_MINOR
 echo "GSKNN_ARCH = $GSKNN_ARCH"
 
@@ -25,7 +26,7 @@ export GSKNN_USE_GNU=false
 echo "GSKNN_USE_GNU = $GSKNN_USE_GNU"
 
 ## Whether use BLAS or not?
-export GSKNN_USE_BLAS=false
+export GSKNN_USE_BLAS=true
 echo "GSKNN_USE_BLAS = $GSKNN_USE_BLAS"
 
 ## Manually set the mkl or openblas path
