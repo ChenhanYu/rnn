@@ -1,3 +1,6 @@
+#ifndef __AVX_TYPES_H__
+#define __AVX_TYPES_H__
+
 typedef union {
   __m256d v;
   __m256i u;
@@ -10,3 +13,4 @@ typedef union {
   int d[ 4 ];
 } v4li_t;
 
+#endif // define __AVX_TYPES_H__

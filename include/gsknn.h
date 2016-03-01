@@ -87,6 +87,18 @@ struct heap_s {
 };
 typedef struct heap_s heap_t;
 
+void dgskm(
+    int    m,
+    int    n,
+    int    d,
+    double *X,
+    double *X2,
+    int    *amap,
+    int    *pi,
+    double tol,
+    int    niter
+    );
+
 void sgsknn(
     int    m,
     int    n,

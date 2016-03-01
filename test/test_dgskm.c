@@ -2,10 +2,10 @@
 #include <stdlib.h>
 #include <omp.h>
 #include <limits.h>
-#include <rnn.h>
+#include <gsknn.h>
 
 
-void test_dgsnm(
+void test_dgskm(
     int    m,
     int    n,
     int    k,
@@ -32,7 +32,7 @@ void test_dgsnm(
   // random[ 0, 0.1 ]
   for ( i = 0; i < nx; i ++ ) {
     for ( p = 0; p < k; p ++ ) {
-      XA[ i * k + p ] = (double)( rand() % 100 ) / 1000.0;	
+      XA[ i * k + p ] = (double)( rand() % 1000 ) / 1000.0;	
     }
   }
 
@@ -50,7 +50,7 @@ void test_dgsnm(
 
   dgsnm_beg = omp_get_wtime();
 
-  dgsbnm(
+  dgskm(
       m,
       n,
       k,
@@ -101,7 +101,7 @@ int main( int argc, char *argv[] )
     sscanf( argv[ 5 ], "%lf", &tol );
 
 
-  test_dgsnm( m, n, k, niter, tol );
+  test_dgskm( m, n, k, niter, tol );
 
   return 0;
 }

@@ -1,3 +1,6 @@
+#ifndef __GSKNN_CONFIG_H__
+#define __GSKNN_CONFIG_H__
+
 #define KNN_SIMD_ALIGN_SIZE 32
 
 #define DKNN_MC 104
@@ -11,3 +14,5 @@
 #define SKNN_KC 256
 #define SKNN_MR 8
 #define SKNN_NR 8
+
+#endif // define __GSKNN_CONFIG_H__

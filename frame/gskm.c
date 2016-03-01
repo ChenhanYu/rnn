@@ -1,6 +1,8 @@
-#include <stdlib.h>
 #include <stdio.h>
-#include <rnn.h>
+#include <omp.h>
+#include <gsknn.h>
+#define min( i, j ) ( (i)<(j) ? (i): (j) )
+
 
 double quality(
     int    m,
@@ -81,10 +83,10 @@ void centroid(
 }
 
 
-void dgsbnm(
+void dgskm(
     int    m,
     int    n,
-    int    k,
+    int    d,
     double *X,
     double *X2,
     int    *amap,
@@ -95,40 +97,34 @@ void dgsbnm(
 {
   double *C, *C2, *D;
   double delta, q, qnext;
-  int    *cmap;
+  int    *cmap, *activity;
   int    i, j, p, iter;
 
   // Allocate and compute centroid C and C2.
-  C  = rnn_malloc_aligned( k, n, sizeof(double) );
-  C2 = rnn_malloc_aligned( 1, n, sizeof(double) );
-
-  centroid( m, n, k, X, amap, C, C2, pi ); 
+  C  = gsknn_malloc_aligned( d, n, sizeof(double) );
+  C2 = gsknn_malloc_aligned( 1, n, sizeof(double) );
+  centroid( m, n, d, X, amap, C, C2, pi ); 
   
   // Allocate cmap [0,n-1].
   cmap = (int*)malloc( sizeof(int)*n );
   for ( j = 0; j < n; j ++ ) cmap[ j ] = j;
 
-  // Allocate D.
-  D = rnn_malloc_aligned( m, 1, sizeof(double) );
+  // Allocate D (similarity).
+  D = gsknn_malloc_aligned( m, 1, sizeof(double) );
 
-  q     = quality( m, n, k, X, amap, C, pi );
+  q     = quality( m, n, d, X, amap, C, pi );
   delta = q;
   iter  = 0;
 
   // Main loop
   while ( delta > tol && iter < niter ) {
-    
     printf( "iter#%d ---> %lf\n", iter, q );
-
-    // Reset D vector.
     for ( i = 0; i < m; i ++ ) D[ i ] = 99999.99;
 
-    // Recompute the distance and reassign the group.
-    //printf( "gsrnn\n" );
-    dgsrnn_var1(
+    dgsknn_var1(
         m,
         n,
-        k,
+        d,
         1,
         X,
         X2,
@@ -140,68 +136,16 @@ void dgsbnm(
         pi
         );
 
-    // Recompute centroids.
-    //printf( "Centroid\n" );
-    centroid( m, n, k, X, amap, C, C2, pi ); 
-
-
-    qnext = quality( m, n, k, X, amap, C, pi );
+    centroid( m, n, d, X, amap, C, C2, pi ); 
+    qnext = quality( m, n, d, X, amap, C, pi );
     delta = q - qnext;
     q     = qnext;
 
-    // Increase the counter.
     iter ++;
-    
   }
 
   free( C );
   free( C2 );
   free( D );
   free( cmap );
-}
-
-
-void dgsodnm(
-    int    m,
-    int    n,
-    int    k,
-    double *X,
-    double *X2,
-    int    *amap,
-    int    *pi,
-    double tol,
-    int    niter
-    )
-{
-  double *C, *C2, *D;
-  double delta;
-  int    *cmap, *acti;
-  int    i, j, p, iter;
-
-  // Allocate and compute centroid C and C2.
-  C  = rnn_malloc_aligned( k, n, sizeof(double) );
-  C2 = rnn_malloc_aligned( 1, n, sizeof(double) );
-
-  centroid( m, n, k, X, amap, C, C2, pi ); 
-
-  // Allocate cmap [0,n-1].
-  cmap = (int*)malloc( sizeof(int)*n );
-  for ( j = 0; j < n; j ++ ) cmap[ j ] = j;
-
-  // Allocate D.
-  D = rnn_malloc_aligned( m, 1, sizeof(double) );
-
-  // Activate all points.
-  for ( i = 0; i < m; i ++ ) acti[ i ] = i;
-
-
-  delta = 99999.99;
-  iter  = 0;
-
-
-  // Main loop
-  while ( delta > tol && iter < niter ) {
-
-  }
-
 }
