@@ -87,6 +87,19 @@ struct heap_s {
 };
 typedef struct heap_s heap_t;
 
+void dstrrk(
+	int    m,
+	int    n,
+	int    k,
+	int    d,
+	double *A,
+	int    *amap,
+	double *B,
+	int    *bmap,
+	double *C,
+	int    ldc
+	);
+
 void dgskm(
     int    m,
     int    n,

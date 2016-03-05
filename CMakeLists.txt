@@ -100,6 +100,9 @@ target_link_libraries(test_dgsknn_stl.x gsknn)
 add_executable (test_dgskm.x ${CMAKE_SOURCE_DIR}/test/test_dgskm.c)
 target_link_libraries(test_dgskm.x gsknn)
 
+add_executable (test_dstrassen.x ${CMAKE_SOURCE_DIR}/test/test_dstrassen.c)
+target_link_libraries(test_dstrassen.x gsknn)
+
 
 # Install shell script
 file (GLOB GSKNN_SCRIPTS ${CMAKE_SOURCE_DIR}/test/*.sh)

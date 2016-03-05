@@ -70,6 +70,25 @@ void KERNEL3(gsknn_heapselect_int_d4,double);
 void KERNEL4(sq2nrm_asm_d8x4,double);
 
 
+#define KERNEL5(name,type) \
+  name(                    \
+    int    k,              \
+    type   alpha0,         \
+    type   alpha1,         \
+    type   *a,             \
+    type   *b,             \
+    type   beta0,          \
+    type   *c0,            \
+    type   beta1,          \
+	type   *c1,            \
+    int    ldc,            \
+    aux_t  *aux            \
+	)
+    
+
+// Double strassen prototype
+void KERNEL5(strassen_ref_d,double);
+void KERNEL5(strassen_int_d8x6,double);
 
 // Float rank-k update function pointer table
 void KERNEL1((*rankk_s[ 2 ]),float)  = {
@@ -103,6 +122,12 @@ void KERNEL3((*kselect[ 1 ]),double) = {
 // Double square 2-norm function pointer table
 void KERNEL4((*sq2nrm[ 1 ]),double) = {
   sq2nrm_asm_d8x4
+};
+
+// Double square 2-norm function pointer table
+void KERNEL5((*strassen_d[ 1 ]),double) = {
+  //strassen_ref_d
+  strassen_int_d8x6
 };
 
 #endif // define __RNN_KERNEL_H__
