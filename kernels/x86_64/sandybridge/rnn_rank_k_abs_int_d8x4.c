@@ -1,6 +1,7 @@
 #include <immintrin.h> // AVX
 
-#include <gsknn.h>
+//#include <gsknn.h>
+#include <gsknn_internal.h>
 #include <avx_types.h>
 
 void rnn_rank_k_abs_int_d8x4(

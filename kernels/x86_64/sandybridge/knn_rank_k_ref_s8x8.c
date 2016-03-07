@@ -1,4 +1,5 @@
-#include <gsknn.h>
+//#include <gsknn.h>
+#include <gsknn_internal.h>
 #include <gsknn_config.h>
 
 void knn_rank_k_ref_s8x8(

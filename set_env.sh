@@ -30,8 +30,8 @@ export GSKNN_USE_BLAS=true
 echo "GSKNN_USE_BLAS = $GSKNN_USE_BLAS"
 
 ## Manually set the mkl or openblas path
-export GSKNN_MKL_DIR=/opt/intel/mkl
-#export GSKNN_MKL_DIR=$TACC_MKL_DIR
+#export GSKNN_MKL_DIR=/opt/intel/mkl
+export GSKNN_MKL_DIR=$TACC_MKL_DIR
 echo "GSKNN_MKL_DIR = $GSKNN_MKL_DIR"
 
 export GSKNN_OPENBLAS_DIR=
@@ -40,5 +40,5 @@ echo "GSKNN_OPENBLAS_DIR = $GSKNN_OPENBLAS_DIR"
 
 ## Parallel options
 export KMP_AFFINITY=compact
-export OMP_NUM_THREADS=2
-export GSKNN_IC_NT=2
+export OMP_NUM_THREADS=24
+export GSKNN_IC_NT=24

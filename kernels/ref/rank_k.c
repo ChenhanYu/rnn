@@ -1,5 +1,6 @@
 #include <math.h>
-#include <gsknn.h>
+//#include <gsknn.h>
+#include <gsknn_internal.h>
 #include <gsknn_config.h>
 
 void rank_k_ref_s(

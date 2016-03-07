@@ -40,6 +40,8 @@
 #include <stdio.h>
 #include <omp.h>
 #include <gsknn.h>
+#include <gsknn_internal.h>
+
 #define min( i, j ) ( (i)<(j) ? (i): (j) )
 
 #include <gsknn_config.h>

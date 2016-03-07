@@ -124,7 +124,7 @@ void KERNEL4((*sq2nrm[ 1 ]),double) = {
   sq2nrm_asm_d8x4
 };
 
-// Double square 2-norm function pointer table
+// Strassen function pointer table
 void KERNEL5((*strassen_d[ 1 ]),double) = {
   //strassen_ref_d
   strassen_int_d8x6

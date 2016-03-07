@@ -1,5 +1,6 @@
 #include <stdio.h>
-#include <gsknn.h>
+//#include <gsknn.h>
+#include <gsknn_internal.h>
 #include <gsknn_config.h>
 
 void knn_r_ref_s8x8_row(

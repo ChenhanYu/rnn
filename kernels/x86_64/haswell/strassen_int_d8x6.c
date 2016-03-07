@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <immintrin.h> // AVX
-#include <gsknn.h>
+//#include <gsknn.h>
+#include <gsknn_internal.h>
 #include <avx_types.h>
 
 void strassen_int_d8x6(

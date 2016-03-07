@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <omp.h>
 #include <gsknn.h>
+#include <gsknn_internal.h>
 #define min( i, j ) ( (i)<(j) ? (i): (j) )
 
 #include <gsknn_config.h>
@@ -362,7 +363,7 @@ void dstrrk(
 	  A00, amap0, A11, amap1, 1.0,
 	  B00, bmap0, B11, bmap1, 1.0,
       0.0, C00, 
-	  0.0, C11, ldc
+	  0.0, C11, ldc, 0
 	  );
 
   //printf( "M1\n");
@@ -376,7 +377,7 @@ void dstrrk(
 	  A10, amap1, A11, amap1, 1.0,
 	  B00, bmap0, NULL, NULL, 0.0,
       0.0, C10, 
-	  1.0, C11, ldc
+	  1.0, C11, ldc, 0
 	  );
 
   //printf( "M2\n");
@@ -390,7 +391,7 @@ void dstrrk(
 	  A00, amap0, NULL, NULL, 0.0,
 	  B01, bmap1, B11, bmap1, -1.0,
       0.0, C01, 
-	  1.0, C11, ldc
+	  1.0, C11, ldc, 0
 	  );
 
   //printf( "M3\n");
@@ -404,7 +405,7 @@ void dstrrk(
 	  A11, amap1, NULL, NULL, 0.0,
 	  B10, bmap0, B00, bmap0, -1.0,
       1.0, C00, 
-	  1.0, C10, ldc
+	  1.0, C10, ldc, 0
 	  );
 
   //printf( "M4\n");
@@ -418,7 +419,7 @@ void dstrrk(
 	  A00, amap0, A01, amap0, 1.0,
 	  B11, bmap1, NULL, NULL, 0.0,
       1.0, C00, 
-	  1.0, C01, ldc
+	  1.0, C01, ldc, 0
 	  );
 
   //printf( "M5\n");
@@ -431,7 +432,7 @@ void dstrrk(
 	  A10, amap1, A00, amap0, -1.0,
 	  B00, bmap0, B01, bmap1, 1.0,
       1.0, C11, 
-	  0.0, NULL, ldc
+	  0.0, NULL, ldc, 0
 	  );
 
   //printf( "M6\n");
@@ -444,7 +445,7 @@ void dstrrk(
 	  A01, amap0, A11, amap1, -1.0,
 	  B10, bmap0, B11, bmap1, 1.0,
       1.0, C00, 
-	  0.0, NULL, ldc
+	  0.0, NULL, ldc, 0
 	  );
 
   //printf( "M7\n");
@@ -507,7 +508,7 @@ void dstrrk_packC(
 	  A00, amap0, A11, amap1, 1.0,
 	  B00, bmap0, B11, bmap1, 1.0,
       0.0, C00, 
-	  0.0, C11, ldpackC
+	  0.0, C11, ldpackC, 1
 	  );
 
   //printf( "M1\n");
@@ -521,7 +522,7 @@ void dstrrk_packC(
 	  A10, amap1, A11, amap1, 1.0,
 	  B00, bmap0, NULL, NULL, 0.0,
       0.0, C10, 
-	  1.0, C11, ldpackC
+	  1.0, C11, ldpackC, 1
 	  );
 
   //printf( "M2\n");
@@ -535,7 +536,7 @@ void dstrrk_packC(
 	  A00, amap0, NULL, NULL, 0.0,
 	  B01, bmap1, B11, bmap1, -1.0,
       0.0, C01, 
-	  1.0, C11, ldpackC
+	  1.0, C11, ldpackC, 1
 	  );
 
   //printf( "M3\n");
@@ -549,7 +550,7 @@ void dstrrk_packC(
 	  A11, amap1, NULL, NULL, 0.0,
 	  B10, bmap0, B00, bmap0, -1.0,
       1.0, C00, 
-	  1.0, C10, ldpackC
+	  1.0, C10, ldpackC, 1
 	  );
 
   //printf( "M4\n");
@@ -563,7 +564,7 @@ void dstrrk_packC(
 	  A00, amap0, A01, amap0, 1.0,
 	  B11, bmap1, NULL, NULL, 0.0,
       1.0, C00, 
-	  1.0, C01, ldpackC
+	  1.0, C01, ldpackC, 1
 	  );
 
   //printf( "M5\n");
@@ -576,7 +577,7 @@ void dstrrk_packC(
 	  A10, amap1, A00, amap0, -1.0,
 	  B00, bmap0, B01, bmap1, 1.0,
       1.0, C11, 
-	  0.0, NULL, ldpackC
+	  0.0, NULL, ldpackC, 1
 	  );
 
   //printf( "M6\n");
@@ -589,7 +590,7 @@ void dstrrk_packC(
 	  A01, amap0, A11, amap1, -1.0,
 	  B10, bmap0, B11, bmap1, 1.0,
       1.0, C00, 
-	  0.0, NULL, ldpackC
+	  0.0, NULL, ldpackC, 1
 	  );
 
   //printf( "M7\n");
