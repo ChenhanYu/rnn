@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <omp.h>
 #include <gsknn.h>
 #define min( i, j ) ( (i)<(j) ? (i): (j) )

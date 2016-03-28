@@ -20,13 +20,13 @@ export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/opt/intel/lib:/opt/intel/mkl/lib
 echo "DYLD_LIBRARY_PATH = $DYLD_LIBRARY_PATH"
 
 ## Compiler options (if false, then use GNU compilers)
-export GSKNN_USE_INTEL=true
+export GSKNN_USE_INTEL=false
 echo "GSKNN_USE_INTEL = $GSKNN_USE_INTEL"
-export GSKNN_USE_GNU=false
+export GSKNN_USE_GNU=true
 echo "GSKNN_USE_GNU = $GSKNN_USE_GNU"
 
 ## Whether use BLAS or not?
-export GSKNN_USE_BLAS=true
+export GSKNN_USE_BLAS=false
 echo "GSKNN_USE_BLAS = $GSKNN_USE_BLAS"
 
 ## Manually set the mkl or openblas path
