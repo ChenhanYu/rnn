@@ -12,7 +12,7 @@
 #define SKNN_MC 144
 #define SKNN_NC 960
 #define SKNN_KC 256
-#define SKNN_MR 8
-#define SKNN_NR 16
+#define SKNN_MR 16
+#define SKNN_NR 6
 
 #endif // define __GSKNN_CONFIG_H__

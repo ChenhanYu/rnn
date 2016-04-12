@@ -35,6 +35,7 @@ void KERNEL1(rank_k_int_d8x6,double);
 
 // Float knn prototype
 void KERNEL2(knn_ref_row_s,float);
+void KERNEL2(knn_int_row_s16x6,float);
 
 // Double knn prototype
 void KERNEL2(knn_ref_row_d,double);
@@ -105,7 +106,8 @@ void KERNEL1((*rankk_d[ 2 ]),double)  = {
 
 // Float knn function pointer table
 void KERNEL2((*micro_s[ 1 ]),float) = {
-  knn_ref_row_s
+  //knn_ref_row_s
+  knn_int_row_s16x6
 };
 
 // Double knn function pointer table

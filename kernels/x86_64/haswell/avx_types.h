@@ -2,6 +2,12 @@
 #define __AVX_TYPES_H__
 
 typedef union {
+  __m256  v;
+  __m256i u;
+  float  s[ 8 ];
+} v8sf_t;
+
+typedef union {
   __m256d v;
   __m256i u;
   double d[ 4 ];
