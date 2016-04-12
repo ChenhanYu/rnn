@@ -60,7 +60,7 @@
 #include <gsknn_internal.h>
 #include <avx_types.h>
 
-void rank_k_asm_s16x6(
+void rank_k_int_s16x6(
     int    k,
     float  *a,
     float  *b,
@@ -69,7 +69,33 @@ void rank_k_asm_s16x6(
     aux_t  *aux
     )
 {
-  printf( "rank_k_asm_s16x6 not yet implemented.\n" );
+  //printf( "rank_k_asm_s16x6 not yet implemented.\n" );
+  int    i;
+  // 16 registers.
+  v8sf_t c03_0, c03_1, c03_2, c03_3, c03_4, c03_5;
+  v8sf_t c47_0, c47_1, c47_2, c47_3, c47_4, c47_5;
+  v8sf_t a03, a47, b0, b1;
+
+  #include <rank_k_int_s16x6.h>
+
+  // Store c
+  _mm256_store_ps( c      , c03_0.v );
+  _mm256_store_ps( c +  8 , c47_0.v );
+
+  _mm256_store_ps( c + 16 , c03_1.v );
+  _mm256_store_ps( c + 24 , c47_1.v );
+
+  _mm256_store_ps( c + 32 , c03_2.v );
+  _mm256_store_ps( c + 40 , c47_2.v );
+
+  _mm256_store_ps( c + 48 , c03_3.v );
+  _mm256_store_ps( c + 56 , c47_3.v );
+
+  _mm256_store_ps( c + 64 , c03_4.v );
+  _mm256_store_ps( c + 72 , c47_4.v );
+
+  _mm256_store_ps( c + 80 , c03_5.v );
+  _mm256_store_ps( c + 88 , c47_5.v );
 }
 
 void rank_k_int_d8x6(

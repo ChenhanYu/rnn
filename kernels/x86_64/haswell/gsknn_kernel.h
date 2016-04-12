@@ -14,6 +14,7 @@
 // Float rank-k update prototype
 void KERNEL1(rank_k_ref_s,float);
 void KERNEL1(rank_k_abs_ref_s,float);
+void KERNEL1(rank_k_int_s16x6,float);
 
 // Double rank-k update prototype
 void KERNEL1(rank_k_ref_d,double);
@@ -93,7 +94,8 @@ void KERNEL5(strassen_int_d8x6,double);
 
 // Float rank-k update function pointer table
 void KERNEL1((*rankk_s[ 2 ]),float)  = {
-  rank_k_ref_s,
+  //rank_k_ref_s,
+  rank_k_int_s16x6,
   rank_k_abs_ref_s
 };
 
